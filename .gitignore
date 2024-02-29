@@ -3,3 +3,4 @@ CMakePresets.json
 .vs
 out
 .DS_Store
+.idea
