@@ -1,0 +1,4 @@
+cmake-build-debug-visual-studio
+CMakePresets.json
+.vs
+out
