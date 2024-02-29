@@ -2,3 +2,4 @@ cmake-build-debug-visual-studio
 CMakePresets.json
 .vs
 out
+.DS_Store

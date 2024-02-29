@@ -11,7 +11,9 @@ project ("opengl_renderer")
 include_directories("dep")
 
 # Add source to this project's executable.
-add_executable (opengl_renderer src/main.cpp src/renderer/Input.cpp src/glad.c
+add_executable (opengl_renderer
+		src/main.cpp
+		src/renderer/Input.cpp
 		src/renderer/Common.hpp
 		src/renderer/gl/Renderer.cpp
 		src/renderer/gl/Renderer.hpp
@@ -21,6 +23,7 @@ add_executable (opengl_renderer src/main.cpp src/renderer/Input.cpp src/glad.c
 		src/renderer/Window.hpp
 		src/renderer/Application.cpp
 		src/renderer/Application.hpp
+		dep/glad/glad.c
 		dep/imgui/imgui_impl_opengl3.cpp
 		dep/imgui/imgui_impl_glfw.cpp
 		dep/imgui/imgui_draw.cpp
