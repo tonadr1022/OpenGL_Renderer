@@ -5,7 +5,7 @@
 #ifndef OPENGL_RENDERER_SRC_RENDERER_COMMON_HPP_
 #define OPENGL_RENDERER_SRC_RENDERER_COMMON_HPP_
 
-#include <glad/glad.h>
+#include "glad/glad.h"
 #include <glfw/glfw3.h>
 
 #include <glm/glm.hpp>

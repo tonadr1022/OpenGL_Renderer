@@ -3,6 +3,7 @@
 //
 
 #include "Application.hpp"
+#include "gl/VertexBuffer.hpp"
 
 Application::Application() {
   m_window = std::make_unique<Window>();

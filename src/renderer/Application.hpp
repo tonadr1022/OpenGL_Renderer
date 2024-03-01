@@ -7,7 +7,7 @@
 
 #include "Window.hpp"
 #include "Input.hpp"
-#include "src/renderer/gl/Renderer.hpp"
+#include "Renderer.hpp"
 
 class Application {
  public:

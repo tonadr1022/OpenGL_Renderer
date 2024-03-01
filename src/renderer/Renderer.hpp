@@ -6,7 +6,7 @@
 #define OPENGL_RENDERER_SRC_RENDERER_GL_RENDERER_HPP_
 
 
-#include "../Common.hpp"
+#include "Common.hpp"
 
 class Renderer {
  public:
