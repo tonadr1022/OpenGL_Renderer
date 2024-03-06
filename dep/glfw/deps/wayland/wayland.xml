@@ -228,7 +228,7 @@
 	Create a wl_buffer object from the pool.
 
 	The buffer is created offset bytes into the pool and has
-	width and height as specified.  The stride argument specifies
+	width and windowHeight as specified.  The stride argument specifies
 	the number of bytes from the beginning of one row to the beginning
 	of the next.  The format is the pixel format of the buffer and
 	must be one of those advertised through the wl_shm.format event.
@@ -240,7 +240,7 @@
       <arg name="id" type="new_id" interface="wl_buffer" summary="buffer to create"/>
       <arg name="offset" type="int" summary="buffer byte offset within the pool"/>
       <arg name="width" type="int" summary="buffer width, in pixels"/>
-      <arg name="height" type="int" summary="buffer height, in pixels"/>
+      <arg name="windowHeight" type="int" summary="buffer windowHeight, in pixels"/>
       <arg name="stride" type="int" summary="number of bytes from the beginning of one row to the beginning of the next row"/>
       <arg name="format" type="uint" enum="wl_shm.format" summary="buffer pixel format"/>
     </request>
@@ -449,7 +449,7 @@
       A buffer provides the content for a wl_surface. Buffers are
       created through factory interfaces such as wl_shm, wp_linux_buffer_params
       (from the linux-dmabuf protocol extension) or similar. It has a width and
-      a height and can be attached to a wl_surface, but the mechanism by which a
+      a windowHeight and can be attached to a wl_surface, but the mechanism by which a
       client provides and updates the contents is defined by the buffer factory
       interface.
 
@@ -1110,7 +1110,7 @@
 	Start a pointer-driven move of the surface.
 
 	This request must be used in response to a button press event.
-	The server may ignore move requests depending on the state of
+	The server may ignore move requests depending on the m_state of
 	the surface (e.g. fullscreen or maximized).
       </description>
       <arg name="seat" type="object" interface="wl_seat" summary="seat whose pointer is used"/>
@@ -1140,7 +1140,7 @@
 	Start a pointer-driven resizing of the surface.
 
 	This request must be used in response to a button press event.
-	The server may ignore resize requests depending on the state of
+	The server may ignore resize requests depending on the m_state of
 	the surface (e.g. fullscreen or maximized).
       </description>
       <arg name="seat" type="object" interface="wl_seat" summary="seat whose pointer is used"/>
@@ -1339,12 +1339,12 @@
 	The client is free to dismiss all but the last configure
 	event it received.
 
-	The width and height arguments specify the size of the window
+	The width and windowHeight arguments specify the size of the window
 	in surface-local coordinates.
       </description>
       <arg name="edges" type="uint" enum="resize" summary="how the surface was resized"/>
       <arg name="width" type="int" summary="new width of the surface"/>
-      <arg name="height" type="int" summary="new height of the surface"/>
+      <arg name="windowHeight" type="int" summary="new windowHeight of the surface"/>
     </event>
 
     <event name="popup_done">
@@ -1441,10 +1441,10 @@
 	When the bound wl_surface version is 5 or higher, passing any
 	non-zero x or y is a protocol violation, and will result in an
         'invalid_offset' error being raised. The x and y arguments are ignored
-        and do not change the pending state. To achieve equivalent semantics,
+        and do not change the pending m_state. To achieve equivalent semantics,
         use wl_surface.offset.
 
-	Surface contents are double-buffered state, see wl_surface.commit.
+	Surface contents are double-buffered m_state, see wl_surface.commit.
 
 	The initial surface contents are void; there is no content.
 	wl_surface.attach assigns the given wl_buffer as the pending
@@ -1493,7 +1493,7 @@
 	the surface therefore needs to be repainted. The compositor
 	ignores the parts of the damage that fall outside of the surface.
 
-	Damage is double-buffered state, see wl_surface.commit.
+	Damage is double-buffered m_state, see wl_surface.commit.
 
 	The damage rectangle is specified in surface-local coordinates,
 	where x and y specify the upper left corner of the damage rectangle.
@@ -1513,7 +1513,7 @@
       <arg name="x" type="int" summary="surface-local x coordinate"/>
       <arg name="y" type="int" summary="surface-local y coordinate"/>
       <arg name="width" type="int" summary="width of damage rectangle"/>
-      <arg name="height" type="int" summary="height of damage rectangle"/>
+      <arg name="windowHeight" type="int" summary="windowHeight of damage rectangle"/>
     </request>
 
     <request name="frame">
@@ -1570,7 +1570,7 @@
 	The compositor ignores the parts of the opaque region that fall
 	outside of the surface.
 
-	Opaque region is double-buffered state, see wl_surface.commit.
+	Opaque region is double-buffered m_state, see wl_surface.commit.
 
 	wl_surface.set_opaque_region changes the pending opaque region.
 	wl_surface.commit copies the pending region to the current region.
@@ -1596,7 +1596,7 @@
 
 	The input region is specified in surface-local coordinates.
 
-	Input region is double-buffered state, see wl_surface.commit.
+	Input region is double-buffered m_state, see wl_surface.commit.
 
 	wl_surface.set_input_region changes the pending input region.
 	wl_surface.commit copies the pending region to the current region.
@@ -1615,24 +1615,24 @@
     </request>
 
     <request name="commit">
-      <description summary="commit pending surface state">
-	Surface state (input, opaque, and damage regions, attached buffers,
-	etc.) is double-buffered. Protocol requests modify the pending state,
-	as opposed to the current state in use by the compositor. A commit
-	request atomically applies all pending state, replacing the current
-	state. After commit, the new pending state is as documented for each
+      <description summary="commit pending surface m_state">
+	Surface m_state (input, opaque, and damage regions, attached buffers,
+	etc.) is double-buffered. Protocol requests modify the pending m_state,
+	as opposed to the current m_state in use by the compositor. A commit
+	request atomically applies all pending m_state, replacing the current
+	m_state. After commit, the new pending m_state is as documented for each
 	related request.
 
-	On commit, a pending wl_buffer is applied first, and all other state
-	second. This means that all coordinates in double-buffered state are
+	On commit, a pending wl_buffer is applied first, and all other m_state
+	second. This means that all coordinates in double-buffered m_state are
 	relative to the new wl_buffer coming into use, except for
 	wl_surface.attach itself. If there is no pending wl_buffer, the
 	coordinates are relative to the current surface contents.
 
 	All requests that need a commit to become effective are documented
-	to affect double-buffered state.
+	to affect double-buffered m_state.
 
-	Other interfaces may add further double-buffered surface state.
+	Other interfaces may add further double-buffered surface m_state.
       </description>
     </request>
 
@@ -1671,7 +1671,7 @@
 	accepted values for the transform parameter are the values for
 	wl_output.transform.
 
-	Buffer transform is double-buffered state, see wl_surface.commit.
+	Buffer transform is double-buffered m_state, see wl_surface.commit.
 
 	A newly created surface has its buffer transformation set to normal.
 
@@ -1689,7 +1689,7 @@
 	request should be considered on a case-by-case basis.
 
 	Note that if the transform value includes 90 or 270 degree rotation,
-	the width of the buffer will become the surface height and the height
+	the width of the buffer will become the surface windowHeight and the windowHeight
 	of the buffer will become the surface width.
 
 	If transform is not one of the values from the
@@ -1707,7 +1707,7 @@
 	This request sets an optional scaling factor on how the compositor
 	interprets the contents of the buffer attached to the window.
 
-	Buffer scale is double-buffered state, see wl_surface.commit.
+	Buffer scale is double-buffered m_state, see wl_surface.commit.
 
 	A newly created surface has its buffer scale set to 1.
 
@@ -1740,7 +1740,7 @@
 	the surface therefore needs to be repainted. The compositor
 	ignores the parts of the damage that fall outside of the surface.
 
-	Damage is double-buffered state, see wl_surface.commit.
+	Damage is double-buffered m_state, see wl_surface.commit.
 
 	The damage rectangle is specified in buffer coordinates,
 	where x and y specify the upper left corner of the damage rectangle.
@@ -1771,7 +1771,7 @@
       <arg name="x" type="int" summary="buffer-local x coordinate"/>
       <arg name="y" type="int" summary="buffer-local y coordinate"/>
       <arg name="width" type="int" summary="width of damage rectangle"/>
-      <arg name="height" type="int" summary="height of damage rectangle"/>
+      <arg name="windowHeight" type="int" summary="windowHeight of damage rectangle"/>
     </request>
 
     <!-- Version 5 additions -->
@@ -1784,7 +1784,7 @@
 	x and y, combined with the new surface size define in which
 	directions the surface's size changes.
 
-	Surface location offset is double-buffered state, see
+	Surface location offset is double-buffered m_state, see
 	wl_surface.commit.
 
 	This request is semantically equivalent to and the replaces the x and y
@@ -2055,8 +2055,8 @@
     </event>
 
     <enum name="button_state">
-      <description summary="physical button state">
-	Describes the physical state of a button that produced the button
+      <description summary="physical button m_state">
+	Describes the physical m_state of a button that produced the button
 	event.
       </description>
       <entry name="released" value="0" summary="the button is not pressed"/>
@@ -2083,7 +2083,7 @@
       <arg name="serial" type="uint" summary="serial number of the button event"/>
       <arg name="time" type="uint" summary="timestamp with millisecond granularity"/>
       <arg name="button" type="uint" summary="button that produced the event"/>
-      <arg name="state" type="uint" enum="button_state" summary="physical state of the button"/>
+      <arg name="m_state" type="uint" enum="button_state" summary="physical m_state of the button"/>
     </event>
 
     <enum name="axis">
@@ -2430,8 +2430,8 @@
     </event>
 
     <enum name="key_state">
-      <description summary="physical key state">
-	Describes the physical state of a key that produced the key event.
+      <description summary="physical key m_state">
+	Describes the physical m_state of a key that produced the key event.
       </description>
       <entry name="released" value="0" summary="key is not pressed"/>
       <entry name="pressed" value="1" summary="key is pressed"/>
@@ -2452,13 +2452,13 @@
       <arg name="serial" type="uint" summary="serial number of the key event"/>
       <arg name="time" type="uint" summary="timestamp with millisecond granularity"/>
       <arg name="key" type="uint" summary="key that produced the event"/>
-      <arg name="state" type="uint" enum="key_state" summary="physical state of the key"/>
+      <arg name="m_state" type="uint" enum="key_state" summary="physical m_state of the key"/>
     </event>
 
     <event name="modifiers">
-      <description summary="modifier and group state">
-	Notifies clients that the modifier and/or group state has
-	changed, and it should update its local state.
+      <description summary="modifier and group m_state">
+	Notifies clients that the modifier and/or group m_state has
+	changed, and it should update its local m_state.
       </description>
       <arg name="serial" type="uint" summary="serial number of the modifiers event"/>
       <arg name="mods_depressed" type="uint" summary="depressed modifiers"/>
@@ -2553,8 +2553,8 @@
 
 	A wl_touch.frame terminates at least one event but otherwise no
 	guarantee is provided about the set of events within a frame. A client
-	must assume that any state not updated in a frame is unchanged from the
-	previously known state.
+	must assume that any m_state not updated in a frame is unchanged from the
+	previously known m_state.
       </description>
     </event>
 
@@ -2714,7 +2714,7 @@
       <arg name="physical_width" type="int"
 	   summary="width in millimeters of the output"/>
       <arg name="physical_height" type="int"
-	   summary="height in millimeters of the output"/>
+	   summary="windowHeight in millimeters of the output"/>
       <arg name="subpixel" type="int" enum="subpixel"
 	   summary="subpixel orientation of the output"/>
       <arg name="make" type="string"
@@ -2774,7 +2774,7 @@
       </description>
       <arg name="flags" type="uint" enum="mode" summary="bitfield of mode flags"/>
       <arg name="width" type="int" summary="width of the mode in hardware units"/>
-      <arg name="height" type="int" summary="height of the mode in hardware units"/>
+      <arg name="windowHeight" type="int" summary="windowHeight of the mode in hardware units"/>
       <arg name="refresh" type="int" summary="vertical refresh rate in mHz"/>
     </event>
 
@@ -2903,7 +2903,7 @@
       <arg name="x" type="int" summary="region-local x coordinate"/>
       <arg name="y" type="int" summary="region-local y coordinate"/>
       <arg name="width" type="int" summary="rectangle width"/>
-      <arg name="height" type="int" summary="rectangle height"/>
+      <arg name="windowHeight" type="int" summary="rectangle windowHeight"/>
     </request>
 
     <request name="subtract">
@@ -2913,7 +2913,7 @@
       <arg name="x" type="int" summary="region-local x coordinate"/>
       <arg name="y" type="int" summary="region-local y coordinate"/>
       <arg name="width" type="int" summary="rectangle width"/>
-      <arg name="height" type="int" summary="rectangle height"/>
+      <arg name="windowHeight" type="int" summary="rectangle windowHeight"/>
     </request>
   </interface>
 
@@ -2967,7 +2967,7 @@
 
 	Adding sub-surfaces to a parent is a double-buffered operation on the
 	parent (see wl_surface.commit). The effect of adding a sub-surface
-	becomes visible on the next time the state of the parent surface is
+	becomes visible on the next time the m_state of the parent surface is
 	applied.
 
 	The parent surface must not be one of the child surface's descendants,
@@ -3004,18 +3004,18 @@
       depends on the sub-surface's mode. The possible modes are
       synchronized and desynchronized, see methods
       wl_subsurface.set_sync and wl_subsurface.set_desync. Synchronized
-      mode caches the wl_surface state to be applied when the parent's
-      state gets applied, and desynchronized mode applies the pending
-      wl_surface state directly. A sub-surface is initially in the
+      mode caches the wl_surface m_state to be applied when the parent's
+      m_state gets applied, and desynchronized mode applies the pending
+      wl_surface m_state directly. A sub-surface is initially in the
       synchronized mode.
 
-      Sub-surfaces also have another kind of state, which is managed by
+      Sub-surfaces also have another kind of m_state, which is managed by
       wl_subsurface requests, as opposed to wl_surface requests. This
-      state includes the sub-surface position relative to the parent
+      m_state includes the sub-surface position relative to the parent
       surface (wl_subsurface.set_position), and the stacking order of
       the parent and its sub-surfaces (wl_subsurface.place_above and
-      .place_below). This state is applied when the parent surface's
-      wl_surface state is applied, regardless of the sub-surface's mode.
+      .place_below). This m_state is applied when the parent surface's
+      wl_surface m_state is applied, regardless of the sub-surface's mode.
       As the exception, set_sync and set_desync are effective immediately.
 
       The main surface can be thought to be always in desynchronized mode,
@@ -3059,7 +3059,7 @@
 	coordinate system. The coordinates are not restricted to the parent
 	surface area. Negative values are allowed.
 
-	The scheduled coordinates will take effect whenever the state of the
+	The scheduled coordinates will take effect whenever the m_state of the
 	parent surface is applied. When this happens depends on whether the
 	parent surface is in synchronized mode or not. See
 	wl_subsurface.set_sync and wl_subsurface.set_desync for details.
@@ -3083,8 +3083,8 @@
 	will cause a protocol error.
 
 	The z-order is double-buffered. Requests are handled in order and
-	applied immediately to a pending state. The final pending state is
-	copied to the active state the next time the state of the parent
+	applied immediately to a pending m_state. The final pending m_state is
+	copied to the active m_state the next time the m_state of the parent
 	surface is applied. When this happens depends on whether the parent
 	surface is in synchronized mode or not. See wl_subsurface.set_sync and
 	wl_subsurface.set_desync for details.
@@ -3111,13 +3111,13 @@
 	mode, also described as the parent dependent mode.
 
 	In synchronized mode, wl_surface.commit on a sub-surface will
-	accumulate the committed state in a cache, but the state will
+	accumulate the committed m_state in a cache, but the m_state will
 	not be applied and hence will not change the compositor output.
-	The cached state is applied to the sub-surface immediately after
-	the parent surface's state is applied. This ensures atomic
+	The cached m_state is applied to the sub-surface immediately after
+	the parent surface's m_state is applied. This ensures atomic
 	updates of the parent and all its synchronized sub-surfaces.
-	Applying the cached state will invalidate the cache, so further
-	parent surface commits do not (re-)apply old state.
+	Applying the cached m_state will invalidate the cache, so further
+	parent surface commits do not (re-)apply old m_state.
 
 	See wl_subsurface for the recursive effect of this mode.
       </description>
@@ -3129,21 +3129,21 @@
 	mode, also described as independent or freely running mode.
 
 	In desynchronized mode, wl_surface.commit on a sub-surface will
-	apply the pending state directly, without caching, as happens
+	apply the pending m_state directly, without caching, as happens
 	normally with a wl_surface. Calling wl_surface.commit on the
 	parent surface has no effect on the sub-surface's wl_surface
-	state. This mode allows a sub-surface to be updated on its own.
+	m_state. This mode allows a sub-surface to be updated on its own.
 
-	If cached state exists when wl_surface.commit is called in
-	desynchronized mode, the pending state is added to the cached
-	state, and applied as a whole. This invalidates the cache.
+	If cached m_state exists when wl_surface.commit is called in
+	desynchronized mode, the pending m_state is added to the cached
+	m_state, and applied as a whole. This invalidates the cache.
 
 	Note: even if a sub-surface is set to desynchronized, a parent
 	sub-surface may override it to behave as synchronized. For details,
 	see wl_subsurface.
 
 	If a surface's parent surface behaves as desynchronized, then
-	the cached state is applied on set_desync.
+	the cached m_state is applied on set_desync.
       </description>
     </request>
   </interface>

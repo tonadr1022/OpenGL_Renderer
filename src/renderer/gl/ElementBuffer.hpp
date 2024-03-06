@@ -5,16 +5,18 @@
 #ifndef OPENGL_RENDERER_SRC_RENDERER_GL_ELEMENTBUFFER_HPP_
 #define OPENGL_RENDERER_SRC_RENDERER_GL_ELEMENTBUFFER_HPP_
 
-#include <glad/glad.h>
+#include "src/Common.hpp"
+
 
 class ElementBuffer {
  public:
-  ElementBuffer();
-  ~ElementBuffer();
-  void Bind() const noexcept;
-  static void Unbind()  noexcept;
-  void Delete() noexcept;
-//  [[nodiscard]] GLuint Id() const noexcept { return m_id; }
+  ElementBuffer() = default;
+  ~ElementBuffer() = default;
+  void Generate();
+  void Bind() const;
+  void Unbind() const;
+  void Delete();
+  [[nodiscard]] inline GLuint Id() const { return m_id; }
 
  private:
   GLuint m_id{0};

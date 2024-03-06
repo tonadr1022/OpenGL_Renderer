@@ -5,14 +5,21 @@
 #ifndef OPENGL_RENDERER_SRC_RENDERER_GL_RENDERER_HPP_
 #define OPENGL_RENDERER_SRC_RENDERER_GL_RENDERER_HPP_
 
+#include <cstdint>
+#include "src/renderer/group/Scene.hpp"
 
-#include "Common.hpp"
+namespace Renderer {
+void Init();
+void RenderScene(const Scene& scene);
+float GetAspectRatio();
+void SetWindowSize(int width, int height);
+void SetImGuiFullScreen(bool imguiFullScreen);
 
-class Renderer {
- public:
-  void OnRender();
-
- private:
+struct PerFrameStats {
+  uint32_t drawCalls{0};
+  uint32_t vertices{0};
+  uint32_t indices{0};
+};
 };
 
 #endif //OPENGL_RENDERER_SRC_RENDERER_GL_RENDERER_HPP_

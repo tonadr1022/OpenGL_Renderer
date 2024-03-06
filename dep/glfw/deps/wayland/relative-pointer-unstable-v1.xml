@@ -114,7 +114,7 @@
 	relative motion. The order of an absolute and relative motion event
 	originating from the same physical motion is not guaranteed.
 
-	If the client needs button events or focus state, it can receive them
+	If the client needs button events or focus m_state, it can receive them
 	from a wl_pointer object of the same seat that the wp_relative_pointer
 	object is associated with.
       </description>

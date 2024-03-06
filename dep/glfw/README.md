@@ -398,7 +398,7 @@ information on what to include when reporting a bug.
  - [Wayland] Bugfix: `glfwSetWindowMonitor` did not update windowed mode size
  - [Wayland] Bugfix: `glfwRestoreWindow` would make a full screen window windowed
  - [Wayland] Bugfix: A window maximized or restored by the user would enter an
-   inconsistent state
+   inconsistent m_state
  - [Wayland] Bugfix: Window maximization events were not emitted
  - [Wayland] Bugfix: `glfwRestoreWindow` assumed it was always in windowed mode
  - [Wayland] Bugfix: `glfwSetWindowSize` would resize a full screen window

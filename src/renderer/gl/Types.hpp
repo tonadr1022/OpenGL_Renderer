@@ -5,9 +5,8 @@
 #ifndef OPENGL_RENDERER_SRC_RENDERER_GL_TYPES_HPP_
 #define OPENGL_RENDERER_SRC_RENDERER_GL_TYPES_HPP_
 
-#include <glad/glad.h>
+#include "src/Common.hpp"
 
-namespace GL {
 
 enum BufferType : int {
   ARRAY = GL_ARRAY_BUFFER,
@@ -20,5 +19,5 @@ enum DrawMode : int {
   STREAM = GL_STREAM_DRAW,
 };
 
-}
+
 #endif //OPENGL_RENDERER_SRC_RENDERER_GL_TYPES_HPP_

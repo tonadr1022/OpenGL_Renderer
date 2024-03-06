@@ -18,7 +18,6 @@ endif ()
 add_executable(opengl_renderer
         src/main.cpp
         src/renderer/Input.cpp
-        src/renderer/Common.hpp
         src/renderer/Renderer.cpp
         src/renderer/Renderer.hpp
         src/renderer/Renderer.hpp
@@ -27,8 +26,8 @@ add_executable(opengl_renderer
         src/renderer/Window.hpp
         src/renderer/Application.cpp
         src/renderer/Application.hpp
-        dep/imgui/imgui_impl_opengl3.cpp
-        dep/imgui/imgui_impl_glfw.cpp
+        dep/imgui/backends/imgui_impl_opengl3.cpp
+        dep/imgui/backends/imgui_impl_glfw.cpp
         dep/imgui/imgui_draw.cpp
         dep/imgui/imgui_demo.cpp
         dep/imgui/imgui.cpp
@@ -36,11 +35,10 @@ add_executable(opengl_renderer
         dep/imgui/imgui_widgets.cpp
         src/renderer/gl/VertexArray.cpp
         src/renderer/gl/VertexArray.hpp
-        src/renderer/gl/Triangle.hpp
         src/renderer/gl/VertexBuffer.cpp
         src/renderer/gl/VertexBuffer.hpp
-        src/renderer/shader/Shader.cpp
-        src/renderer/shader/Shader.hpp
+        src/renderer/gl/Shader.cpp
+        src/renderer/gl/Shader.hpp
         dep/KHR/khrplatform.h
         dep/glad/glad.c
         src/renderer/DefaultVertex.hpp
@@ -49,19 +47,69 @@ add_executable(opengl_renderer
         src/renderer/gl/ElementBuffer.cpp
         src/renderer/gl/ElementBuffer.hpp
         src/core/Logger.hpp
-        src/core/Logger.hpp)
+        src/core/Logger.hpp
+        src/renderer/Mesh.cpp
+        src/renderer/Mesh.hpp
+        src/renderer/camera/FPSCamera.cpp
+        src/renderer/camera/FPSCamera.hpp
+        src/renderer/camera/OrbitCamera.cpp
+        src/renderer/camera/OrbitCamera.hpp
+        src/renderer/shapes/Cube.hpp
+        src/renderer/shapes/Quad.hpp
+        src/imgui/ImguiStyles.h
+        src/imgui/ImguiStyles.h
+        src/imgui/ImguiStyles.h
+        src/renderer/gl/FrameBuffer.cpp
+        src/renderer/gl/FrameBuffer.hpp
+        src/renderer/gl/Texture.cpp
+        src/renderer/gl/Texture.hpp
+        src/renderer/gl/stb_image/stb_image_impl.hpp
+        src/renderer/Material.cpp
+        src/renderer/Material.hpp
+        src/renderer/group/Object.cpp
+        src/renderer/group/Object.hpp
+        src/core/HashedString.hpp
+        src/renderer/Transform.cpp
+        src/renderer/Transform.hpp
+        src/renderer/resource/ShaderManager.cpp
+        src/renderer/resource/MaterialManager.cpp
+        src/core/Utils.hpp
+        src/renderer/group/Group.cpp
+        src/renderer/group/Group.hpp
+        src/renderer/group/Scene.cpp
+        src/renderer/group/Scene.hpp
+        src/renderer/resource/MeshManager.cpp
+        src/renderer/resource/MeshManager.hpp
+        src/renderer/resource/TextureManager.cpp
+        src/renderer/resource/TextureManager.hpp
+        src/scenes/PlaygroundScene.cpp
+        src/scenes/PlaygroundScene.hpp
+        src/renderer/camera/Camera.cpp
+        src/renderer/camera/Camera.hpp
+        src/Common.hpp
+        src/renderer/FrameCapturer.cpp
+        src/renderer/FrameCapturer.hpp
+        src/renderer/gl/RenderBuffer.cpp
+        src/renderer/gl/RenderBuffer.hpp
+)
 
 
-if(CMAKE_BUILD_TYPE MATCHES Debug)
+if (CMAKE_BUILD_TYPE MATCHES Debug)
     add_compile_definitions(DEBUG_MODE)
     set(CMAKE_CXX_FLAGS "-g")
-endif()
+endif ()
 
 if (WIN32)
     add_definitions(-DWINDOWS)
 else ()
     add_definitions(-DUNIX)
 endif ()
+
+if (APPLE)
+    set(CMAKE_CXX_FLAGS -Wdeprecated-declarations)
+endif ()
+
+add_definitions(-Wall -v)
 
 
 add_subdirectory(dep/glfw)

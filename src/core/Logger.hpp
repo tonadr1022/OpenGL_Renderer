@@ -5,8 +5,10 @@
 #ifndef OPENGL_RENDERER_SRC_CORE_LOGGER_HPP_
 #define OPENGL_RENDERER_SRC_CORE_LOGGER_HPP_
 
-#include <cstdio>
+//#include <cstdio>
 #include <mutex>
+#include <iostream>
+#include "src/Common.hpp"
 
 enum LogPriority {
   TracePriority, DebugPriority, InfoPriority, WarnPriority, ErrorPriority, CriticalPriority
@@ -18,33 +20,64 @@ class Logger {
 
  public:
   template<typename... Args>
-  static void Trace(int lineNumber, const char* source_file, const char* msg, Args... args) {
-    instance().log(lineNumber, source_file, "[TRACE]\t", TracePriority, msg, args...);
+  static void Trace(int lineNumber, const char* sourceFile, const char* msg, Args... args) {
+    instance().log(lineNumber, sourceFile, "[TRACE]\t", TracePriority, msg, args...);
   }
 
   template<typename... Args>
-  static void Debug(int lineNumber, const char* source_file, const char* msg, Args... args) {
-    instance().log(lineNumber, source_file, "[DEBUG]\t", DebugPriority, msg, args...);
+  static void Debug(int lineNumber, const char* sourceFile, const char* msg, Args... args) {
+    instance().log(lineNumber, sourceFile, "[DEBUG]\t", DebugPriority, msg, args...);
   }
 
   template<typename... Args>
-  static void Info(int lineNumber, const char* source_file, const char* msg, Args... args) {
-    instance().log(lineNumber, source_file, "[INFO]\t", InfoPriority, msg, args...);
+  static void Info(int lineNumber, const char* sourceFile, const char* msg, Args... args) {
+    instance().log(lineNumber, sourceFile, "[INFO]\t", InfoPriority, msg, args...);
   }
 
   template<typename... Args>
-  static void Warn(int lineNumber, const char* source_file, const char* msg, Args... args) {
-    instance().log(lineNumber, source_file, "[WARN]\t", WarnPriority, msg, args...);
+  static void Warn(int lineNumber, const char* sourceFile, const char* msg, Args... args) {
+    instance().log(lineNumber, sourceFile, "[WARN]\t", WarnPriority, msg, args...);
   }
 
   template<typename... Args>
-  static void Error(int lineNumber, const char* source_file, const char* msg, Args... args) {
-    instance().log(lineNumber, source_file, "[ERROR]\t", ErrorPriority, msg, args...);
+  static void Error(int lineNumber, const char* sourceFile,const char* msg, Args... args) {
+    instance().log(lineNumber, sourceFile, "[ERROR]\t", ErrorPriority, msg, args...);
   }
 
   template<typename... Args>
-  static void Critical(int lineNumber, const char* source_file, const char* msg, Args... args) {
-    instance().log(lineNumber, source_file, "[CRITICAL]\t", CriticalPriority, msg, args...);
+  static void Critical(int lineNumber, const char* sourceFile, const char* msg, Args... args) {
+    instance().log(lineNumber, sourceFile, "[CRITICAL]\t", CriticalPriority, msg, args...);
+  }
+
+  template<typename... Args>
+  static void LogError(int lineNumber, const char* sourceFile, const char* msg, Args... args) {
+    instance().log(lineNumber, sourceFile, ErrorPriority, msg, args...);
+  }
+
+  static std::string GetGLError() {
+    GLenum errorCode = GL_NO_ERROR;
+    std::string error;
+
+    while ((errorCode = glGetError()) != GL_NO_ERROR) {
+      switch (errorCode) {
+        case GL_INVALID_ENUM: error += "GL_INVALID_ENUM";
+          break;
+        case GL_INVALID_VALUE: error += "GL_INVALID_VALUE";
+          break;
+        case GL_INVALID_OPERATION: error += "GL_INVALID_OPERATION";
+          break;
+        case GL_STACK_OVERFLOW: error += "GL_STACK_OVERFLOW";
+          break;
+        case GL_STACK_UNDERFLOW: error += "GL_STACK_UNDERFLOW";
+          break;
+        case GL_OUT_OF_MEMORY: error += "GL_OUT_OF_MEMORY";
+          break;
+        case GL_INVALID_FRAMEBUFFER_OPERATION: error += "GL_INVALID_FRAMEBUFFER_OPERATION";
+        default: break;
+      }
+    }
+    return error;
+
   }
 
   Logger(const Logger&) = delete;
@@ -58,22 +91,45 @@ class Logger {
     return instance;
   }
 
+  // Function to print formatted message using recursion
+  template<typename T, typename... Rest>
+  static void printFormattedMessage(const char* format, T value, Rest... rest) {
+    for (; *format != '\0'; format++) {
+      if (*format == '%') {
+        std::cout << value;
+        printFormattedMessage(format + 2, rest...);
+        return;
+      }
+      std::cout << *format;
+    }
+  }
+
+  // Base case of the recursion when no more arguments left
+  static void printFormattedMessage(const char* format) {
+    for (; *format != '\0'; format++) {
+      std::cout << *format;
+    }
+  }
+
   template<typename... Args>
   void log(int lineNumber,
-           const char* source_file,
+           const char* sourceFile,
            const char* msgPriorityStr,
            LogPriority msgPriority,
-           const char* msg,
+            const char* msg,
            Args... args) {
     if (priority <= msgPriority) {
       std::scoped_lock lock(logMutex);
-      printf(msgPriorityStr);
-      printf("LINE: %d FILE: %s\t", lineNumber, source_file);
-      printf(msg, args...);
+      std::cout << msgPriorityStr << lineNumber << " " << sourceFile << "\t";
+//      printf(msgPriorityStr);
+//      printf("LINE: %d FILE: %s\t", lineNumber, sourceFile);
+//      printf(msg, args...);
+      printFormattedMessage(msg, args...);
       printf("\n");
     }
   }
 };
+
 
 // Macro to extract filename from path
 #ifdef WINDOWS
@@ -83,18 +139,21 @@ class Logger {
 #endif
 
 #ifdef DEBUG_MODE
-#define LOG_TRACE(Message, ...) Logger::Trace(__LINE__, FILENAME_ONLY, Message, __VA_ARGS__)
-#define LOG_DEBUG(Message, ...) Logger::Debug(__LINE__, FILENAME_ONLY, Message, __VA_ARGS__)
-#define LOG_INFO(Message, ...) Logger::Info(__LINE__, FILENAME_ONLY, Message, __VA_ARGS__)
-#define LOG_WARN(Message, ...) Logger::Warn(__LINE__, FILENAME_ONLY, Message, __VA_ARGS__)
-#define LOG_ERROR(Message, ...) Logger::Error(__LINE__, FILENAME_ONLY, Message, __VA_ARGS__)
-#define LOG_CRITICAL(Message, ...) Logger::Critical(__LINE__, FILENAME_ONLY, Message, __VA_ARGS__)
+#define LOG_TRACE(Message, ...) Logger::Trace(__LINE__, FILENAME_ONLY, Message, ##__VA_ARGS__)
+#define LOG_DEBUG(Message, ...) Logger::Debug(__LINE__, FILENAME_ONLY, Message, ##__VA_ARGS__)
+#define LOG_INFO(Message, ...) Logger::Info(__LINE__, FILENAME_ONLY, Message, ##__VA_ARGS__)
+#define LOG_WARN(Message, ...) Logger::Warn(__LINE__, FILENAME_ONLY, Message, ##__VA_ARGS__)
+#define LOG_ERROR(Message, ...) Logger::Error(__LINE__, FILENAME_ONLY, Message, ##__VA_ARGS__)
+#define LOG_CRITICAL(Message, ...) Logger::Critical(__LINE__, FILENAME_ONLY, Message, ##__VA_ARGS__)
 
-#define DEBUG_ASSERT(condition, message) \
-if (!(condition)) { \
-      LOG_DEBUG("Assertion Failed", message); \
-      std::abort(); \
-      }
+#define GL_LOG_ERROR(...) \
+    do { \
+        std::string error_##__LINE__##__FILE__ = Logger::GetGLError(); \
+        if (strcmp(error_##__LINE__##__FILE__.c_str(), "") != 0) \
+            Logger::Error(__LINE__, FILENAME_ONLY, error_##__LINE__##__FILE__.c_str(), ##__VA_ARGS__); \
+    } while(0)
+
+
 
 
 #else
@@ -104,9 +163,13 @@ if (!(condition)) { \
 #define LOG_WARN(Message, ...)
 #define LOG_ERROR(Message, ...)
 #define LOG_CRITICAL(Message, ...)
-
-#define DEBUG_ASSERT(condition, message) ((void)0)
-
+#define GL_LOG_ERROR()
 #endif
+
+#define ASSERT(condition, message, ...) \
+if (!(condition)) { \
+      LOG_DEBUG("Assertion Failed", message, ##__VA_ARGS__); \
+      std::abort(); \
+      }
 
 #endif //OPENGL_RENDERER_SRC_CORE_LOGGER_HPP_

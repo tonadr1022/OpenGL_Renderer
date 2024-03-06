@@ -1,16 +1,16 @@
 #include "Input.hpp"
 #include <imgui/imgui.h>
-#include "imgui/imgui_impl_glfw.h"
+#include <imgui/backends/imgui_impl_glfw.h>
 
 void Input::Update() {
   for (auto& mouseButtonState : mouseButtonStates) {
-    if (mouseButtonState & pressed) mouseButtonState = down;
-    if (mouseButtonState & released) mouseButtonState = up;
+    if (mouseButtonState & Pressed) mouseButtonState = Down;
+    if (mouseButtonState & Released) mouseButtonState = Up;
   }
 
   for (auto& keyState : keyStates) {
-    if (keyState & pressed) keyState = down;
-    if (keyState & released) keyState = up;
+    if (keyState & Pressed) keyState = Down;
+    if (keyState & Released) keyState = Up;
   }
   scrollOffset = glm::vec2(0);
   screenOffset = glm::vec2(0);
@@ -18,35 +18,35 @@ void Input::Update() {
 }
 
 bool Input::IsKeyDown(Key key) {
-  return keyStates[key] & down;
+  return keyStates[key] & Down;
 }
 
 bool Input::IsKeyUp(Key key) {
-  return keyStates[key] & down;
+  return keyStates[key] & Down;
 }
 
 bool Input::IsKeyPressed(Key key) {
-  return keyStates[key] & pressed;
+  return keyStates[key] & Pressed;
 }
 
 bool Input::IsKeyReleased(Key key) {
-  return keyStates[key] & released;
+  return keyStates[key] & Released;
 }
 
 bool Input::IsMouseDown(MouseButton key) {
-  return mouseButtonStates[key] & down;
+  return mouseButtonStates[key] & Down;
 }
 
 bool Input::IsMouseUp(MouseButton key) {
-  return mouseButtonStates[key] & up;
+  return mouseButtonStates[key] & Up;
 }
 
 bool Input::IsMousePressed(MouseButton key) {
-  return mouseButtonStates[key] & pressed;
+  return mouseButtonStates[key] & Pressed;
 }
 
 bool Input::IsMouseReleased(MouseButton key) {
-  return mouseButtonStates[key] & released;
+  return mouseButtonStates[key] & Released;
 }
 
 void Input::init_glfw_input_callbacks(GLFWwindow* window) {
@@ -57,7 +57,7 @@ void Input::init_glfw_input_callbacks(GLFWwindow* window) {
   glfwSetMouseButtonCallback(window, mouse_button_cb);
   glfwSetScrollCallback(window, mouse_scroll_cb);
 
-  glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
+//  glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
 
 }
 
@@ -71,7 +71,7 @@ bool Input::GetCursorVisible() {
 }
 
 void Input::keypress_cb(GLFWwindow* window, int key, int scancode, int action, int mods) {
-  ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
+//  ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
 
   ImGuiIO& io = ImGui::GetIO();
   if (action == GLFW_PRESS) {
@@ -85,6 +85,16 @@ void Input::keypress_cb(GLFWwindow* window, int key, int scancode, int action, i
   io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
   io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
   io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
+
+  if (action == GLFW_PRESS) {
+    keyStates[key] = Down;
+  }
+  if (action == GLFW_RELEASE) {
+    keyStates[key] = Released;
+  }
+  if (action == GLFW_REPEAT) {
+    keyStates[key] = Repeat;
+  }
 }
 
 void Input::mouse_pos_cb(GLFWwindow* window, double xpos, double ypos) {
@@ -99,7 +109,8 @@ void Input::mouse_button_cb(GLFWwindow* window, int button, int action, int mods
 
 }
 
-void Input::framebuffer_size_cb(GLFWwindow* window, int width, int height) {
-  glViewport(0,0,width,height);
+void Input::Initialize(GLFWwindow* window) {
+  m_window = window;
+  init_glfw_input_callbacks(window);
 }
 

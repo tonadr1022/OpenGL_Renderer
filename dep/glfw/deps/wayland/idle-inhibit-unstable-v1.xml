@@ -60,7 +60,7 @@
   <interface name="zwp_idle_inhibitor_v1" version="1">
     <description summary="context object for inhibiting idle behavior">
       An idle inhibitor prevents the output that the associated surface is
-      visible on from being set to a state where it is not visually usable due
+      visible on from being set to a m_state where it is not visually usable due
       to lack of user interaction (e.g. blanked, dimmed, locked, set to power
       save, etc.)  Any screensaver processes are also blocked from displaying.
 

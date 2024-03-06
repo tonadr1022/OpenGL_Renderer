@@ -47,7 +47,7 @@
       <entry name="invalid_popup_parent" value="3"
 	     summary="the client specified an invalid popup parent surface"/>
       <entry name="invalid_surface_state" value="4"
-	     summary="the client provided an invalid surface state"/>
+	     summary="the client provided an invalid surface m_state"/>
       <entry name="invalid_positioner" value="5"
 	     summary="the client provided an invalid positioner"/>
       <entry name="unresponsive" value="6"
@@ -164,7 +164,7 @@
 	If a zero or negative size is set the invalid_input error is raised.
       </description>
       <arg name="width" type="int" summary="width of positioned rectangle"/>
-      <arg name="height" type="int" summary="height of positioned rectangle"/>
+      <arg name="windowHeight" type="int" summary="windowHeight of positioned rectangle"/>
     </request>
 
     <request name="set_anchor_rect">
@@ -183,7 +183,7 @@
       <arg name="x" type="int" summary="x position of anchor rectangle"/>
       <arg name="y" type="int" summary="y position of anchor rectangle"/>
       <arg name="width" type="int" summary="width of anchor rectangle"/>
-      <arg name="height" type="int" summary="height of anchor rectangle"/>
+      <arg name="windowHeight" type="int" summary="windowHeight of anchor rectangle"/>
     </request>
 
     <enum name="anchor">
@@ -383,7 +383,7 @@
       <description summary="">
 	Set the parent window geometry the compositor should use when
 	positioning the popup. The compositor may use this information to
-	determine the future state the popup should be constrained using. If
+	determine the future m_state the popup should be constrained using. If
 	this doesn't match the dimension of the parent the popup is eventually
 	positioned against, the behavior is undefined.
 
@@ -392,14 +392,14 @@
       <arg name="parent_width" type="int"
 	   summary="future window geometry width of parent"/>
       <arg name="parent_height" type="int"
-	   summary="future window geometry height of parent"/>
+	   summary="future window geometry windowHeight of parent"/>
     </request>
 
     <request name="set_parent_configure" since="3">
       <description summary="set parent configure this is a response to">
 	Set the serial of an xdg_surface.configure event this positioner will be
 	used in response to. The compositor may use this information together
-	with set_parent_size to determine what future state the popup should be
+	with set_parent_size to determine what future m_state the popup should be
 	constrained using.
       </description>
       <arg name="serial" type="uint"
@@ -427,7 +427,7 @@
       xdg_surface object.
 
       The client must call wl_surface.commit on the corresponding wl_surface
-      for the xdg_surface state to take effect.
+      for the xdg_surface m_state to take effect.
 
       Creating an xdg_surface from a wl_surface which has a buffer attached or
       committed is a client error, and any attempts by a client to attach or
@@ -436,7 +436,7 @@
 
       After creating a role-specific object and setting it up, the client must
       perform an initial commit without any buffer attached. The compositor
-      will reply with initial wl_surface state such as
+      will reply with initial wl_surface m_state such as
       wl_surface.preferred_buffer_scale followed by an xdg_surface.configure
       event. The client must acknowledge it and is then allowed to attach a
       buffer to map the surface.
@@ -448,8 +448,8 @@
       For an xdg_surface to be mapped by the compositor, the following
       conditions must be met:
       (1) the client has assigned an xdg_surface-based role to the surface
-      (2) the client has set and committed the xdg_surface state and the
-	  role-dependent state to the surface
+      (2) the client has set and committed the xdg_surface m_state and the
+	  role-dependent m_state to the surface
       (3) the client has committed a buffer to the surface
 
       A newly-unmapped surface is considered to have met condition (1) out
@@ -468,7 +468,7 @@
       <entry name="invalid_serial" value="4"
 	     summary="Invalid serial number when acking a configure event"/>
       <entry name="invalid_size" value="5"
-	     summary="Width or height was zero or negative"/>
+	     summary="Width or windowHeight was zero or negative"/>
       <entry name="defunct_role_object" value="6"
 	     summary="Surface was destroyed before its role object"/>
     </enum>
@@ -498,7 +498,7 @@
 	the associated wl_surface the xdg_popup role.
 
 	If null is passed as a parent, a parent surface must be specified using
-	some other protocol, before committing the initial state.
+	some other protocol, before committing the initial m_state.
 
 	See the documentation of xdg_popup for more details about what an
 	xdg_popup is and how it is used.
@@ -542,17 +542,17 @@
 	subsurfaces.
 
 	The effective geometry will not be recalculated unless a new call to
-	set_window_geometry is done and the new pending surface state is
+	set_window_geometry is done and the new pending surface m_state is
 	subsequently applied.
 
-	The width and height of the effective window geometry must be
+	The width and windowHeight of the effective window geometry must be
 	greater than zero. Setting an invalid size will raise an
 	invalid_size error.
       </description>
       <arg name="x" type="int"/>
       <arg name="y" type="int"/>
       <arg name="width" type="int"/>
-      <arg name="height" type="int"/>
+      <arg name="windowHeight" type="int"/>
     </request>
 
     <request name="ack_configure">
@@ -564,7 +564,7 @@
 
 	For instance, for toplevel surfaces the compositor might use this
 	information to move a surface to the top left only when the client has
-	drawn itself for the maximized or fullscreen state.
+	drawn itself for the maximized or fullscreen m_state.
 
 	If the client receives multiple configure events before it
 	can respond to one, it only has to ack the last configure event.
@@ -596,14 +596,14 @@
     <event name="configure">
       <description summary="suggest a surface change">
 	The configure event marks the end of a configure sequence. A configure
-	sequence is a set of one or more events configuring the state of the
+	sequence is a set of one or more events configuring the m_state of the
 	xdg_surface, including the final xdg_surface.configure event.
 
 	Where applicable, xdg_surface surface roles will during a configure
-	sequence extend this event as a latched state sent as events before the
+	sequence extend this event as a latched m_state sent as events before the
 	xdg_surface.configure event. Such events should be considered to make up
 	a set of atomically applied configuration states, where the
-	xdg_surface.configure commits the accumulated state.
+	xdg_surface.configure commits the accumulated m_state.
 
 	Clients should arrange their surface for the new states, and then send
 	an ack_configure request with the serial sent in this configure event at
@@ -628,9 +628,9 @@
       Unmapping an xdg_toplevel means that the surface cannot be shown
       by the compositor until it is explicitly mapped again.
       All active operations (e.g., move, resize) are canceled and all
-      attributes (e.g. title, state, stacking, ...) are discarded for
+      attributes (e.g. title, m_state, stacking, ...) are discarded for
       an xdg_toplevel surface when it is unmapped. The xdg_toplevel returns to
-      the state it had right after xdg_surface.get_toplevel. The client
+      the m_state it had right after xdg_surface.get_toplevel. The client
       can re-map the toplevel by perfoming a commit without any buffer
       attached, waiting for a configure event and handling it as usual (see
       xdg_surface description).
@@ -752,7 +752,7 @@
 	serial is used to determine the type of interactive move (touch,
 	pointer, etc).
 
-	The server may ignore move requests depending on the state of
+	The server may ignore move requests depending on the m_state of
 	the surface (e.g. fullscreen or maximized), or if the passed serial
 	is no longer valid.
 
@@ -791,15 +791,15 @@
 	serial is used to determine the type of interactive resize (touch,
 	pointer, etc).
 
-	The server may ignore resize requests depending on the state of
+	The server may ignore resize requests depending on the m_state of
 	the surface (e.g. fullscreen or maximized).
 
 	If triggered, the client will receive configure events with the
-	"resize" state enum value and the expected sizes. See the "resize"
+	"resize" m_state enum value and the expected sizes. See the "resize"
 	enum value for more details about what is required. The client
 	must also acknowledge configure events using "ack_configure". After
 	the resize is completed, the client will receive another "configure"
-	event without the resize state.
+	event without the resize m_state.
 
 	If triggered, the surface also will lose the focus of the device
 	(wl_pointer, wl_touch, etc) used for the resize. It is up to the
@@ -821,12 +821,12 @@
       <arg name="edges" type="uint" enum="resize_edge" summary="which edge or corner is being dragged"/>
     </request>
 
-    <enum name="state">
-      <description summary="types of state on the surface">
-	The different state values used on the surface. This is designed for
-	state values like maximized, fullscreen. It is paired with the
+    <enum name="m_state">
+      <description summary="types of m_state on the surface">
+	The different m_state values used on the surface. This is designed for
+	m_state values like maximized, fullscreen. It is paired with the
 	configure event to ensure that both the client and the compositor
-	setting the state can be synchronized.
+	setting the m_state can be synchronized.
 
 	States set in this way are double-buffered. They will get applied on
 	the next commit.
@@ -905,7 +905,7 @@
 	The client can specify a maximum size so that the compositor does
 	not try to configure the window beyond this size.
 
-	The width and height arguments are in window geometry coordinates.
+	The width and windowHeight arguments are in window geometry coordinates.
 	See xdg_surface.set_window_geometry.
 
 	Values set in this way are double-buffered. They will get applied
@@ -925,18 +925,18 @@
 	If never set, or a value of zero in the request, means that the
 	client has no expected maximum size in the given dimension.
 	As a result, a client wishing to reset the maximum size
-	to an unspecified state can use zero for width and height in the
+	to an unspecified m_state can use zero for width and windowHeight in the
 	request.
 
 	Requesting a maximum size to be smaller than the minimum size of
 	a surface is illegal and will result in an invalid_size error.
 
-	The width and height must be greater than or equal to zero. Using
-	strictly negative values for width or height will result in a
+	The width and windowHeight must be greater than or equal to zero. Using
+	strictly negative values for width or windowHeight will result in a
 	invalid_size error.
       </description>
       <arg name="width" type="int"/>
-      <arg name="height" type="int"/>
+      <arg name="windowHeight" type="int"/>
     </request>
 
     <request name="set_min_size">
@@ -946,7 +946,7 @@
 	The client can specify a minimum size so that the compositor does
 	not try to configure the window below this size.
 
-	The width and height arguments are in window geometry coordinates.
+	The width and windowHeight arguments are in window geometry coordinates.
 	See xdg_surface.set_window_geometry.
 
 	Values set in this way are double-buffered. They will get applied
@@ -966,18 +966,18 @@
 	If never set, or a value of zero in the request, means that the
 	client has no expected minimum size in the given dimension.
 	As a result, a client wishing to reset the minimum size
-	to an unspecified state can use zero for width and height in the
+	to an unspecified m_state can use zero for width and windowHeight in the
 	request.
 
 	Requesting a minimum size to be larger than the maximum size of
 	a surface is illegal and will result in an invalid_size error.
 
-	The width and height must be greater than or equal to zero. Using
-	strictly negative values for width and height will result in a
+	The width and windowHeight must be greater than or equal to zero. Using
+	strictly negative values for width and windowHeight will result in a
 	invalid_size error.
       </description>
       <arg name="width" type="int"/>
-      <arg name="height" type="int"/>
+      <arg name="windowHeight" type="int"/>
     </request>
 
     <request name="set_maximized">
@@ -988,7 +988,7 @@
 	will respond by emitting a configure event. Whether this configure
 	actually sets the window maximized is subject to compositor policies.
 	The client must then update its content, drawing in the configured
-	state. The client must also acknowledge the configure when committing
+	m_state. The client must also acknowledge the configure when committing
 	the new content (see ack_configure).
 
 	It is up to the compositor to decide how and where to maximize the
@@ -996,10 +996,10 @@
 	be used.
 
 	If the surface was already maximized, the compositor will still emit
-	a configure event with the "maximized" state.
+	a configure event with the "maximized" m_state.
 
-	If the surface is in a fullscreen state, this request has no direct
-	effect. It may alter the state the surface is returned to when
+	If the surface is in a fullscreen m_state, this request has no direct
+	effect. It may alter the m_state the surface is returned to when
 	unmaximized unless overridden by the compositor.
       </description>
     </request>
@@ -1014,7 +1014,7 @@
 	If available and applicable, the compositor will include the window
 	geometry dimensions the window had prior to being maximized in the
 	configure event. The client must then update its content, drawing it in
-	the configured state. The client must also acknowledge the configure
+	the configured m_state. The client must also acknowledge the configure
 	when committing the new content (see ack_configure).
 
 	It is up to the compositor to position the surface after it was
@@ -1022,10 +1022,10 @@
 	applicable.
 
 	If the surface was already not maximized, the compositor will still
-	emit a configure event without the "maximized" state.
+	emit a configure event without the "maximized" m_state.
 
-	If the surface is in a fullscreen state, this request has no direct
-	effect. It may alter the state the surface is returned to when
+	If the surface is in a fullscreen m_state, this request has no direct
+	effect. It may alter the m_state the surface is returned to when
 	unmaximized unless overridden by the compositor.
       </description>
     </request>
@@ -1036,7 +1036,7 @@
 
 	After requesting that the surface should be fullscreened, the
 	compositor will respond by emitting a configure event. Whether the
-	client is actually put into a fullscreen state is subject to compositor
+	client is actually put into a fullscreen m_state is subject to compositor
 	policies. The client must also acknowledge the configure when
 	committing the new content (see ack_configure).
 
@@ -1065,13 +1065,13 @@
 
 	After requesting that the surface should be unfullscreened, the
 	compositor will respond by emitting a configure event.
-	Whether this actually removes the fullscreen state of the client is
+	Whether this actually removes the fullscreen m_state of the client is
 	subject to compositor policies.
 
 	Making a surface unfullscreen sets states for the surface based on the following:
-	* the state(s) it may have had before becoming fullscreen
-	* any state(s) decided by the compositor
-	* any state(s) requested by the client while the surface was fullscreen
+	* the m_state(s) it may have had before becoming fullscreen
+	* any m_state(s) decided by the compositor
+	* any m_state(s) requested by the client while the surface was fullscreen
 
 	The compositor may include the previous window geometry dimensions in
 	the configure event, if applicable.
@@ -1097,19 +1097,19 @@
     <event name="configure">
       <description summary="suggest a surface change">
 	This configure event asks the client to resize its toplevel surface or
-	to change its state. The configured state should not be applied
+	to change its m_state. The configured m_state should not be applied
 	immediately. See xdg_surface.configure for details.
 
-	The width and height arguments specify a hint to the window
+	The width and windowHeight arguments specify a hint to the window
 	about how its surface should be resized in window geometry
 	coordinates. See set_window_geometry.
 
-	If the width or height arguments are zero, it means the client
+	If the width or windowHeight arguments are zero, it means the client
 	should decide its own window dimension. This may happen when the
-	compositor needs to configure the state of the surface but doesn't
+	compositor needs to configure the m_state of the surface but doesn't
 	have any information about any previous or expected dimension.
 
-	The states listed in the event specify how the width/height
+	The states listed in the event specify how the width/windowHeight
 	arguments should be interpreted, and possibly how it should be
 	drawn.
 
@@ -1117,7 +1117,7 @@
 	xdg_surface.configure and xdg_surface.ack_configure for details.
       </description>
       <arg name="width" type="int"/>
-      <arg name="height" type="int"/>
+      <arg name="windowHeight" type="int"/>
       <arg name="states" type="array"/>
     </event>
 
@@ -1142,8 +1142,8 @@
 	event to communicate the bounds a window geometry size is recommended
 	to constrain to.
 
-	The passed width and height are in surface coordinate space. If width
-	and height are 0, it means bounds is unknown and equivalent to as if no
+	The passed width and windowHeight are in surface coordinate space. If width
+	and windowHeight are 0, it means bounds is unknown and equivalent to as if no
 	configure_bounds event was ever sent for this surface.
 
 	The bounds can for example correspond to the size of a monitor excluding
@@ -1155,7 +1155,7 @@
 	xdg_toplevel.configure and xdg_surface.configure.
       </description>
       <arg name="width" type="int"/>
-      <arg name="height" type="int"/>
+      <arg name="windowHeight" type="int"/>
     </event>
 
     <!-- Version 5 additions -->
@@ -1184,7 +1184,7 @@
 	must send this event again and then send an xdg_surface.configure
 	event.
 
-	The configured state should not be applied immediately. See
+	The configured m_state should not be applied immediately. See
 	xdg_surface.configure for details.
 
 	The capabilities are sent as an array of 32-bit unsigned integers in
@@ -1219,7 +1219,7 @@
       description) before the xdg_popup itself.
 
       The client must call wl_surface.commit on the corresponding wl_surface
-      for the xdg_popup state to take effect.
+      for the xdg_popup m_state to take effect.
     </description>
 
     <enum name="error">
@@ -1285,7 +1285,7 @@
     <event name="configure">
       <description summary="configure the popup surface">
 	This event asks the popup surface to configure itself given the
-	configuration. The configured state should not be applied immediately.
+	configuration. The configured m_state should not be applied immediately.
 	See xdg_surface.configure for details.
 
 	The x and y arguments represent the position the popup was placed at
@@ -1302,7 +1302,7 @@
       <arg name="y" type="int"
 	   summary="y position relative to parent surface window geometry"/>
       <arg name="width" type="int" summary="window geometry width"/>
-      <arg name="height" type="int" summary="window geometry height"/>
+      <arg name="windowHeight" type="int" summary="window geometry windowHeight"/>
     </event>
 
     <event name="popup_done">

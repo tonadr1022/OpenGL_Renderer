@@ -30,7 +30,7 @@
 
       A window decoration is a set of window controls as deemed appropriate by
       the party managing them, such as user interface components used to move,
-      resize and change a window's state.
+      resize and change a window's m_state.
 
       A client can use this protocol to request being decorated by a supporting
       compositor.
@@ -121,9 +121,9 @@
         The compositor can decide not to use the client's mode and enforce a
         different mode instead.
 
-        Clients whose decoration mode depend on the xdg_toplevel state may send
+        Clients whose decoration mode depend on the xdg_toplevel m_state may send
         a set_mode request in response to an xdg_surface.configure event and wait
-        for the next xdg_surface.configure event to prevent unwanted state.
+        for the next xdg_surface.configure event to prevent unwanted m_state.
         Such clients are responsible for preventing configure loops and must
         make sure not to send multiple successive set_mode requests with the
         same decoration mode.
@@ -143,7 +143,7 @@
     <event name="configure">
       <description summary="suggest a surface change">
         The configure event asks the client to change its decoration mode. The
-        configured state should not be applied immediately. Clients must send an
+        configured m_state should not be applied immediately. Clients must send an
         ack_configure in response to this event. See xdg_surface.configure and
         xdg_surface.ack_configure for details.
 

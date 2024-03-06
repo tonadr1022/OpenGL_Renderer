@@ -1,0 +1,26 @@
+//
+// Created by Tony Adriansen on 3/3/24.
+//
+
+#include "MeshManager.hpp"
+#include "src/core/Logger.hpp"
+
+std::unordered_map<HashedString, std::unique_ptr<Mesh>> MeshManager::m_meshes;
+
+Mesh* MeshManager::GetMesh(HashedString name) {
+  auto it = m_meshes.find(name);
+  if (it == m_meshes.end()) {
+    LOG_ERROR("Mesh not found: %s", name.data());
+    return nullptr;
+  }
+  return it->second.get();
+}
+
+void MeshManager::RemoveMesh(HashedString name) {
+  auto it = m_meshes.find(name);
+  if (it == m_meshes.end()) {
+    LOG_ERROR("Mesh not found, cannot remove: %s", name.data());
+    return;
+  }
+  m_meshes.erase(it);
+}

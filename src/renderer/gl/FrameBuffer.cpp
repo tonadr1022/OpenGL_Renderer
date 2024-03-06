@@ -1,0 +1,31 @@
+//
+// Created by Tony Adriansen on 3/1/24.
+//
+
+#include "FrameBuffer.hpp"
+#include "src/core/Logger.hpp"
+
+FrameBuffer::FrameBuffer() =default;
+
+void FrameBuffer::Gen() {
+  glGenFramebuffers(1, &m_id);
+}
+void FrameBuffer::Bind() const {
+  ASSERT(m_id != 0, "Framebuffer not valid")
+  glBindFramebuffer(GL_FRAMEBUFFER, m_id);
+}
+
+void FrameBuffer::Unbind() const {
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+bool FrameBuffer::IsComplete() const {
+  return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
+}
+
+void FrameBuffer::AttachColorBuffer(GLuint textureColorBuffer) {
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer, 0);
+}
+
+void FrameBuffer::AttachRenderBuffer(GLuint rbo) {
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+}

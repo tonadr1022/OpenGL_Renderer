@@ -1,6 +1,9 @@
 #pragma once
 
-#include "Common.hpp"
+
+#define GL_SILENCE_DEPRECATION 1
+#include "src/Common.hpp"
+#include <glm/glm.hpp>
 
 
 constexpr int BUTTON_COUNT = GLFW_KEY_LAST;
@@ -13,13 +16,13 @@ class Input {
  public:
   enum KeyState : uint8_t  // applicable to keyboard keys and mouse buttons
   {
-    down = 0b00001,
-    pressed = 0b00011,
-    up = 0b00100,
-    released = 0b01100,
-    repeat = 0b10001
+    Down = 0b00001,
+    Pressed = 0b00011,
+    Up = 0b00100,
+    Released = 0b01100,
+    Repeat = 0b10001
   };
-
+  static void Initialize(GLFWwindow* window);
   static void Update();
   static bool IsKeyDown(Key key);
   static bool IsKeyUp(Key key);
@@ -47,7 +50,6 @@ class Input {
   static void mouse_pos_cb(GLFWwindow* window, double xpos, double ypos);
   static void mouse_scroll_cb(GLFWwindow* window, double xoffset, double yoffset);
   static void mouse_button_cb(GLFWwindow* window, int button, int action, int mods);
-  static void framebuffer_size_cb(GLFWwindow* window, int width, int height);
 
   static inline KeyState keyStates[BUTTON_COUNT] = { KeyState(0) };
   static inline KeyState mouseButtonStates[MOUSE_BUTTON_STATES] = { KeyState(0) };

@@ -131,7 +131,7 @@
 	A surface may receive pointer focus without the lock being activated.
 
 	The request creates a new object wp_locked_pointer which is used to
-	interact with the lock as well as receive updates about its state. See
+	interact with the lock as well as receive updates about its m_state. See
 	the the description of wp_locked_pointer for further information.
 
 	Note that while a pointer is locked, the wl_pointer objects of the
@@ -167,7 +167,7 @@
 
 	The request will create a new object wp_confined_pointer which is used
 	to interact with the confinement as well as receive updates about its
-	state. See the the description of wp_confined_pointer for further
+	m_state. See the the description of wp_confined_pointer for further
 	information.
       </description>
       <arg name="id" type="new_id" interface="zwp_confined_pointer_v1"/>
@@ -183,7 +183,7 @@
 
   <interface name="zwp_locked_pointer_v1" version="1">
     <description summary="receive relative pointer motion events">
-      The wp_locked_pointer interface represents a locked pointer state.
+      The wp_locked_pointer interface represents a locked pointer m_state.
 
       While the lock of this object is active, the wl_pointer objects of the
       associated seat will not emit any wl_pointer.motion events.
@@ -226,7 +226,7 @@
 	jumps.
 
 	The cursor position hint is double buffered. The new hint will only take
-	effect when the associated surface gets it pending state applied. See
+	effect when the associated surface gets it pending m_state applied. See
 	wl_surface.commit for details.
       </description>
       <arg name="surface_x" type="fixed"
@@ -240,7 +240,7 @@
 	Set a new region used to lock the pointer.
 
 	The new lock region is double-buffered. The new lock region will
-	only take effect when the associated surface gets its pending state
+	only take effect when the associated surface gets its pending m_state
 	applied. See wl_surface.commit for details.
 
 	For details about the lock region, see wp_locked_pointer.
@@ -269,7 +269,7 @@
 
   <interface name="zwp_confined_pointer_v1" version="1">
     <description summary="confined pointer object">
-      The wp_confined_pointer interface represents a confined pointer state.
+      The wp_confined_pointer interface represents a confined pointer m_state.
 
       This object will send the event 'confined' when the confinement is
       activated. Whenever the confinement is activated, it is guaranteed that
@@ -299,7 +299,7 @@
 	Set a new region used to confine the pointer.
 
 	The new confine region is double-buffered. The new confine region will
-	only take effect when the associated surface gets its pending state
+	only take effect when the associated surface gets its pending m_state
 	applied. See wl_surface.commit for details.
 
 	If the confinement is active when the new confinement region is applied
