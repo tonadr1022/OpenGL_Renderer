@@ -1,4 +1,6 @@
 #include "Input.hpp"
+#include "src/core/Logger.hpp"
+#include "Application.hpp"
 #include <imgui/imgui.h>
 #include <imgui/backends/imgui_impl_glfw.h>
 
@@ -18,35 +20,35 @@ void Input::Update() {
 }
 
 bool Input::IsKeyDown(Key key) {
-  return keyStates[key] & Down;
+  return keyStates[key] == Down;
 }
 
 bool Input::IsKeyUp(Key key) {
-  return keyStates[key] & Down;
+  return keyStates[key] == Down;
 }
 
 bool Input::IsKeyPressed(Key key) {
-  return keyStates[key] & Pressed;
+  return keyStates[key] == Pressed;
 }
 
 bool Input::IsKeyReleased(Key key) {
-  return keyStates[key] & Released;
+  return keyStates[key] == Released;
 }
 
 bool Input::IsMouseDown(MouseButton key) {
-  return mouseButtonStates[key] & Down;
+  return mouseButtonStates[key] == Down;
 }
 
 bool Input::IsMouseUp(MouseButton key) {
-  return mouseButtonStates[key] & Up;
+  return mouseButtonStates[key] == Up;
 }
 
 bool Input::IsMousePressed(MouseButton key) {
-  return mouseButtonStates[key] & Pressed;
+  return mouseButtonStates[key] == Pressed;
 }
 
 bool Input::IsMouseReleased(MouseButton key) {
-  return mouseButtonStates[key] & Released;
+  return mouseButtonStates[key] == Released;
 }
 
 void Input::init_glfw_input_callbacks(GLFWwindow* window) {
@@ -57,7 +59,7 @@ void Input::init_glfw_input_callbacks(GLFWwindow* window) {
   glfwSetMouseButtonCallback(window, mouse_button_cb);
   glfwSetScrollCallback(window, mouse_scroll_cb);
 
-//  glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
+  glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
 
 }
 
@@ -71,8 +73,7 @@ bool Input::GetCursorVisible() {
 }
 
 void Input::keypress_cb(GLFWwindow* window, int key, int scancode, int action, int mods) {
-//  ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
-
+  ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
   ImGuiIO& io = ImGui::GetIO();
   if (action == GLFW_PRESS) {
     io.KeysDown[key] = true;
@@ -87,26 +88,26 @@ void Input::keypress_cb(GLFWwindow* window, int key, int scancode, int action, i
   io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
 
   if (action == GLFW_PRESS) {
-    keyStates[key] = Down;
+    keyStates[key] = Pressed;
   }
   if (action == GLFW_RELEASE) {
     keyStates[key] = Released;
   }
-  if (action == GLFW_REPEAT) {
-    keyStates[key] = Repeat;
-  }
+//  Application::Instance().OnKeyEvent(key, action);
 }
 
 void Input::mouse_pos_cb(GLFWwindow* window, double xpos, double ypos) {
-
+  ImGui_ImplGlfw_CursorPosCallback(window, xpos, ypos);
+  Application::Instance().OnMousePosMove(xpos, ypos);
 }
 
 void Input::mouse_scroll_cb(GLFWwindow* window, double xoffset, double yoffset) {
-
+  ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
 }
 
 void Input::mouse_button_cb(GLFWwindow* window, int button, int action, int mods) {
-
+  ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+  Application::Instance().OnMouseButtonEvent(button, action);
 }
 
 void Input::Initialize(GLFWwindow* window) {

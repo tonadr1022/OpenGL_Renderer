@@ -11,24 +11,8 @@
 #include "src/Common.hpp"
 #include "src/renderer/gl/FrameBuffer.hpp"
 #include "FrameCapturer.hpp"
-namespace Renderer {
 
-namespace { // detail
-
-struct State {
-  const Material* boundMaterial = nullptr;
-  Shader* boundShader = nullptr;
-  Camera* activeCamera = nullptr;
-  bool imguiFullScreen{true};
-  int windowWidth{1}, windowHeight{1};
-  bool wireframe{false};
-};
-
-std::unique_ptr<FrameCapturer> frameCapturer;
-State state;
-PerFrameStats stats;
-
-void UpdateRenderState(const Object& object) {
+void Renderer::UpdateRenderState(const Object& object) {
   if (object.GetMaterial() != state.boundMaterial) {
     state.boundMaterial = object.GetMaterial();
     if (state.boundMaterial->shader != state.boundShader) {
@@ -42,37 +26,36 @@ void UpdateRenderState(const Object& object) {
   }
 }
 
-void ResetStats() {
+void Renderer::ResetStats() {
   memset(&stats, 0, sizeof(PerFrameStats));
 }
 
-void StartFrame(const Scene& scene) {
+void Renderer::StartFrame(const Scene& scene) {
   state.boundShader = nullptr;
   state.boundMaterial = nullptr;
-  state.activeCamera = scene.GetCamera();
   ResetStats();
-  state.activeCamera->SetAspectRatio(GetAspectRatio());
-  glPolygonMode(GL_FRONT_AND_BACK, state.wireframe ? GL_LINE : GL_FILL);
-  if (state.imguiFullScreen) {
-    frameCapturer->StartCapture();
+  glPolygonMode(GL_FRONT_AND_BACK, m_settings.wireframe ? GL_LINE : GL_FILL);
+  if (m_settings.renderToImGuiViewport) {
+    m_frameCapturer.StartCapture();
   } else {
-    glClearColor(1, 1, 1, 1);
+    glClearColor(0.5, 0, 0, 1);
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   }
 }
 
-void EndFrame() {
-  if (state.imguiFullScreen) {
-    frameCapturer->EndCapture();
+void Renderer::EndFrame() {
+
+  if (m_settings.renderToImGuiViewport) {
+    m_frameCapturer.EndCapture();
   }
 }
 
-void RenderGroup(const Group& group) {
+void Renderer::RenderGroup(const Group& group) {
   if (!group.GetVisible()) return;
-  if (group.GetWireFrame() && !state.wireframe) {
+  if (group.GetWireFrame() && !m_settings.wireframe) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  } else if (!group.GetWireFrame() && state.wireframe) {
+  } else if (!group.GetWireFrame() && m_settings.wireframe) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   }
 
@@ -88,55 +71,34 @@ void RenderGroup(const Group& group) {
   }
 }
 
-void ImGuiDisplay() {
-  ImGui::Begin("Stats");
-  ImGui::Text("Draw Calls: %i", stats.drawCalls);
-  ImGui::Text("Vertices: %i", stats.vertices);
-  ImGui::Text("Indices: %i", stats.indices);
-  ImGui::End();
-  ImGui::Begin("Settings");
-  ImGui::Checkbox("Wireframe", &state.wireframe);
-  ImGui::End();
-
-  if (state.imguiFullScreen) {
-    ImGui::Begin("Viewport");
-    ImGui::Image((void*) (intptr_t) frameCapturer->GetTexture().Id(), ImGui::GetContentRegionAvail());
-    ImGui::End();
-  }
+void Renderer::Init() {
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+  glFrontFace(GL_CW);
 }
 
-} // namespace detail
-
-
-void Init() {
-  frameCapturer = std::make_unique<FrameCapturer>(state.windowWidth, state.windowHeight);
+void Renderer::SetActiveCamera(const Camera* camera) {
+  state.activeCamera = camera;
 }
 
-void RenderScene(const Scene& scene) {
+void Renderer::RenderScene(const Scene& scene) {
   StartFrame(scene);
 
   for (auto& group : scene.GetGroups()) {
     RenderGroup(*group);
   }
-
   EndFrame();
-  ImGuiDisplay();
 }
 
-void SetWindowSize(int width, int height) {
-  state.windowWidth = width;
-  state.windowHeight = height;
-  glViewport(0, 0, width, height);
-  if (frameCapturer)
-    frameCapturer->UpdateViewport(width, height);
+void Renderer::SetWindowSize(uint32_t width, uint32_t height) {
+  glViewport(0, 0, (int) width, (int) height);
+  m_frameCapturer.UpdateViewport(width, height);
 }
 
-float GetAspectRatio() {
-  return static_cast<float>(state.windowWidth) / static_cast<float>(state.windowHeight);
+
+
+Renderer::Renderer(Window& window, bool renderToImGuiViewport)
+    : m_window(window), m_frameCapturer(window.GetWidth(), window.GetHeight()) {
+  m_settings.renderToImGuiViewport = renderToImGuiViewport;
 }
 
-void SetImGuiFullScreen(bool imguiFullScreen) {
-  state.imguiFullScreen = imguiFullScreen;
-}
-
-} // namespace Renderer

@@ -19,7 +19,9 @@ void Scene::RemoveGroup(const Group* group) {
   }
 }
 
-void Scene::Update(double dt) {
-  m_camera->Update(dt);
 
-}
+
+
+Scene::Scene() : m_name("Default") {}
+
+Scene::Scene(HashedString name) : m_name(name) {}

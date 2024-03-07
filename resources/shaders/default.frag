@@ -4,7 +4,6 @@ out vec4 o_Color;
 
 in vec2 TexCoord;
 
-uniform float u_Time;
 uniform sampler2D tex;
 
 

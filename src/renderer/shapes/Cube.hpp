@@ -11,12 +11,13 @@
 namespace Cube {
 
 const std::vector<uint32_t> Indices =
-    {0, 1, 3, 1, 2, 3,
-     4, 5, 7, 5, 6, 7,
-     8, 9, 11, 9, 10, 11,
-     12, 13, 15, 13, 14, 15,
-     16, 17, 19, 17, 18, 19,
-     20, 21, 23, 21, 22, 23
+    {
+        0, 1, 3, 1, 2, 3,
+        4, 7, 5, 5, 7, 6,
+        8, 11, 9, 9, 11, 10,
+        12, 13, 15, 13, 14, 15,
+        16, 17, 19, 17, 18, 19,
+        20, 23, 21, 21, 23, 22
     };
 
 const std::vector<Vertex> Vertices = {
@@ -52,8 +53,13 @@ const std::vector<Vertex> Vertices = {
     {{-0.5f, -0.5f, 0.5f}, {0.0f, 1.0f},},// top left
 };
 
-std::shared_ptr<Mesh> Create() {
-  return std::make_shared<Mesh>(Vertices, Indices);
+std::unique_ptr<Mesh> Create(uint32_t scaleU, uint32_t scaleV) {
+  std::vector<Vertex> verts;
+  verts.reserve(Vertices.size());
+  for (auto& vert : Vertices) {
+    verts.push_back({vert.position, {vert.texCoords.x * scaleU, vert.texCoords.y * scaleV}});
+  }
+  return std::make_unique<Mesh>(verts, Indices);
 }
 
 }

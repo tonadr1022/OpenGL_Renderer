@@ -14,7 +14,7 @@ using MouseButton = int;
 
 class Input {
  public:
-  enum KeyState : uint8_t  // applicable to keyboard keys and mouse buttons
+  enum KeyState : uint8_t
   {
     Down = 0b00001,
     Pressed = 0b00011,
@@ -22,6 +22,7 @@ class Input {
     Released = 0b01100,
     Repeat = 0b10001
   };
+
   static void Initialize(GLFWwindow* window);
   static void Update();
   static bool IsKeyDown(Key key);

@@ -114,17 +114,18 @@ void ShaderManager::InitializeUniforms(ShaderData& shaderData) {
       shaderData.uniformIds.emplace(HashedString(uniformName), glGetUniformLocation(shaderData.id, uniformName));
     }
   }
+
 }
 
 std::optional<ShaderManager::ShaderData> ShaderManager::CompileProgram(HashedString name,
                                                                        const std::vector<ShaderCreateInfo>& moduleCreateInfos) {
   std::vector<GLuint> moduleIds;
-
   for (auto& [path, type] : moduleCreateInfos) {
     std::string src = Utils::LoadFromFile(path);
     GLuint shaderId = CompileModule(type, src, path);
     moduleIds.push_back(shaderId);
   }
+
 
   GLuint programId = glCreateProgram();
   for (auto& moduleId : moduleIds) {
@@ -143,7 +144,6 @@ std::optional<ShaderManager::ShaderData> ShaderManager::CompileProgram(HashedStr
   for (auto& module : moduleIds) {
     glDeleteShader(module);
   }
-
   ShaderData shaderData;
   shaderData.moduleCreateInfos = moduleCreateInfos;
   shaderData.id = programId;

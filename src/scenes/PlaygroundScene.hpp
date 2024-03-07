@@ -10,7 +10,7 @@
 class PlaygroundScene : public Scene {
  public:
   PlaygroundScene();
-  virtual void Update(double dt) override;
+  void Update(double dt) override;
  private:
   std::vector<Object*> m_cubes;
 

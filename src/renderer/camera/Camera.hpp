@@ -9,9 +9,9 @@
 
 class Camera {
  public:
+  virtual ~Camera() = default;
   virtual void Update(double dt) = 0;
   virtual void SetPosition(const glm::vec3& newPos) = 0;
-
   [[nodiscard]] virtual const glm::vec3& GetPosition() const = 0;
   [[nodiscard]] virtual const glm::mat4& GetProjectionMatrix() const = 0;
   [[nodiscard]] virtual const glm::mat4& GetViewMatrix() const = 0;

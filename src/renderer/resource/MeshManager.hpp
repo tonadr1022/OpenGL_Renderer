@@ -14,6 +14,9 @@ class MeshManager {
     m_meshes.emplace(name, std::make_unique<Mesh>(std::forward<Args>(args)...));
     return m_meshes.at(name).get();
   }
+
+  static Mesh* AddMesh(HashedString name, std::unique_ptr<Mesh> mesh);
+
   static void RemoveMesh(HashedString name);
   static Mesh* GetMesh(HashedString name);
  private:

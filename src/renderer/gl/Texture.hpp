@@ -11,6 +11,8 @@
 
 class Texture {
  public:
+
+
   explicit Texture(const std::string& texturePath);
   Texture(uint32_t width, uint32_t height, bool mipmap);
   ~Texture();
@@ -19,9 +21,14 @@ class Texture {
   static void Unbind() ;
   [[nodiscard]] GLuint Id() const { return m_id; }
   [[nodiscard]] GLint Slot() const { return m_slot; }
-  void Resize(int width, int height);
+  void Resize(uint32_t width, uint32_t height);
   [[nodiscard]] uint32_t GetWidth() const;
   [[nodiscard]] uint32_t GetHeight() const;
+  void SetWrapMode(GLint s, GLint t, GLint r);
+  void SetWrapMode(GLint s, GLint t);
+  void SetWrapMode(GLint all);
+
+  void SetFilterMode(GLint minFilter, GLint magFilter);
 
  private:
   static int count;

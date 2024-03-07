@@ -6,6 +6,7 @@
 #define OPENGL_RENDERER_SRC_RENDERER_TRANSFORM_HPP_
 
 #include <glm/glm.hpp>
+#include <vector>
 
 class Transform {
  public:
@@ -18,11 +19,15 @@ class Transform {
   const glm::mat4& GetModelMatrix();
   [[nodiscard]] inline bool IsDirty() const { return m_isDirty; }
 
-  void ComputeModelMatrix(const glm::mat4& parentModelMatrix);
-  void ComputeModelMatrix();
-
- private:
+//  void ComputeModelMatrix(const glm::mat4& parentModelMatrix);
+//  void ComputeModelMatrix();
+//  void AddChild(Transform *child);
+//  void RemoveChild(Transform *child);
   void UpdateModelMatrix();
+ private:
+//  Transform* parent;
+//  std::vector<Transform*> m_children;
+
   glm::vec3 m_pos{0.0f};
   glm::vec3 m_eulerRotDegrees{0.0f};
   glm::vec3 m_scale{1.0f};

@@ -7,6 +7,7 @@
 
 #include "src/renderer/gl/Texture.hpp"
 
+
 class TextureManager {
  public:
   template<typename... Args>

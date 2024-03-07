@@ -41,8 +41,6 @@ add_executable(opengl_renderer
         src/renderer/gl/Shader.hpp
         dep/KHR/khrplatform.h
         dep/glad/glad.c
-        src/renderer/DefaultVertex.hpp
-        src/renderer/DefaultVertex.hpp
         src/renderer/gl/Types.hpp
         src/renderer/gl/ElementBuffer.cpp
         src/renderer/gl/ElementBuffer.hpp
@@ -91,6 +89,10 @@ add_executable(opengl_renderer
         src/renderer/FrameCapturer.hpp
         src/renderer/gl/RenderBuffer.cpp
         src/renderer/gl/RenderBuffer.hpp
+        src/scenes/SceneManager.cpp
+        src/scenes/SceneManager.hpp
+        src/imgui/ImGuiMenu.cpp
+        src/imgui/ImGuiMenu.hpp
 )
 
 
@@ -98,6 +100,7 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
     add_compile_definitions(DEBUG_MODE)
     set(CMAKE_CXX_FLAGS "-g")
 endif ()
+
 
 if (WIN32)
     add_definitions(-DWINDOWS)
@@ -129,3 +132,6 @@ add_custom_command(
         ${CMAKE_SOURCE_DIR}/resources
         $<TARGET_FILE_DIR:opengl_renderer>/resources
 )
+
+add_compile_definitions(SHADER_PATH="resources/shaders/")
+add_compile_definitions(TEXTURE_PATH="resources/textures/")
