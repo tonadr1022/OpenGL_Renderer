@@ -46,15 +46,15 @@ void Texture::GenerateTextureFromBuffer(unsigned char* buffer) {
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, type, GL_UNSIGNED_BYTE, buffer);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   if (m_generateMipmaps) glGenerateMipmap(GL_TEXTURE_2D);
-  m_slot = GL_TEXTURE0 + count;
-  count++;
+//  m_slot = GL_TEXTURE0 + count;
+//  count++;
 }
 
 void Texture::Bind() const {
+//  glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, m_id);
 }
 

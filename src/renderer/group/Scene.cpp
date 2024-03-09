@@ -19,7 +19,7 @@ void Scene::RemoveGroup(const Group* group) {
   }
 }
 
-
+void Scene::Update(double dt) {}
 
 
 Scene::Scene() : m_name("Default") {}

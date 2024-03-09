@@ -33,6 +33,8 @@ class Input {
   static bool IsMouseUp(MouseButton key);
   static bool IsMousePressed(MouseButton key);
   static bool IsMouseReleased(MouseButton key);
+  static void SetCursorPos(float x, float y);
+  static void CenterCursor();
 
   static void init_glfw_input_callbacks(GLFWwindow* window);
 

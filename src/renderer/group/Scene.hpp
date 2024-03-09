@@ -13,7 +13,7 @@ class Scene {
  public:
   Scene();
   explicit Scene(HashedString name);
-  ~Scene() = default;
+  virtual ~Scene() = default;
   void AddGroup(std::unique_ptr<Group> group);
   void RemoveGroup(const Group* group);
   virtual void Update(double dt);

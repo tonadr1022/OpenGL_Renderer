@@ -8,8 +8,8 @@
 #include "Window.hpp"
 #include "Input.hpp"
 #include "Renderer.hpp"
-#include "src/renderer/camera/FPSCamera.hpp"
 #include "src/scenes/SceneManager.hpp"
+#include "src/renderer/camera/CameraController.hpp"
 
 #include <memory>
 
@@ -23,21 +23,23 @@ class Application {
   void Run();
 
   void OnViewportResize(uint32_t width, uint32_t height);
-  void OnMousePosMove(float xoffset, float yoffset);
+  void OnMousePosMove(double xoffset, double yoffset);
   void OnMouseButtonEvent(int button, int action);
+  void OnMouseScrollEvent(double yOffset);
+
 
  private:
-  void DisplayImGui();
+  void OnImGui();
   static Application* instancePtr;
   static void SetupResources();
   Window m_window;
+  CameraController m_cameraController;
   SceneManager m_sceneManager;
   Renderer m_renderer;
 
-  CameraMode m_cameraMode;
-  std::unique_ptr<FPSCamera> m_fpsCamera;
+
   bool m_renderToImGuiViewport;
-  bool m_focused;
+
 };
 
 #endif //OPENGL_RENDERER_SRC_RENDERER_APPLICATION_HPP_

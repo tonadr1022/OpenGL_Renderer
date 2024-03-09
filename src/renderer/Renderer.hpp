@@ -17,10 +17,9 @@ class Renderer {
     bool renderToImGuiViewport{false};
   };
 
-  Renderer(Window& window, bool renderToImGuiViewport);
+  Renderer(Window& window, Camera& camera, bool renderToImGuiViewport);
   void Init();
-  void RenderScene(const Scene& scene);
-  void SetActiveCamera(const Camera* camera);
+  void RenderScene(const Scene& scene, const Camera& camera);
   void SetWindowSize(uint32_t width, uint32_t height);
 
   struct PerFrameStats {
@@ -29,19 +28,17 @@ class Renderer {
     uint32_t indices{0};
   };
 
-
-
-  inline RenderSettings& GetSettings() {return m_settings; }
-  inline const PerFrameStats& GetStats() {return stats; }
-  inline const FrameCapturer& GetFrameCapturer() {return m_frameCapturer; }
+  inline RenderSettings& GetSettings() { return m_settings; }
+  inline const PerFrameStats& GetStats() { return stats; }
+  inline const FrameCapturer& GetFrameCapturer() { return m_frameCapturer; }
  private:
   struct RenderState {
     const Material* boundMaterial = nullptr;
     Shader* boundShader = nullptr;
-    const Camera* activeCamera = nullptr;
   };
 
   Window& m_window;
+  Camera& m_camera;
   RenderState state;
   FrameCapturer m_frameCapturer;
   PerFrameStats stats;

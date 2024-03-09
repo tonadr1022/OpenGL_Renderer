@@ -9,15 +9,18 @@
 #include "src/core/Logger.hpp"
 #include "src/imgui/ImGuiMenu.hpp"
 #include "src/Common.hpp"
+#include "src/scenes/LightingOneScene.hpp"
 
 Application* Application::instancePtr = nullptr;
 
-#define INIT_IMGUIRENDER false
+#define INIT_IMGUIRENDER true
 
 Application::Application()
-    : m_renderer(m_window, INIT_IMGUIRENDER), m_cameraMode(CameraMode::FPS), m_focused(false) {
+    : m_cameraController(m_window.GetAspectRatio()),
+      m_renderer(m_window, m_cameraController.GetActiveCamera(), INIT_IMGUIRENDER) {
   instancePtr = this;
   Window::SetVsync(false);
+  SetupResources();
 
   m_renderToImGuiViewport = INIT_IMGUIRENDER;
   m_renderer.SetWindowSize(m_window.GetWidth(), m_window.GetHeight());
@@ -25,10 +28,9 @@ Application::Application()
   renderSettings.renderToImGuiViewport = m_renderToImGuiViewport;
 
   Input::Initialize(m_window.GetContext());
+  m_cameraController.SetAspectRatio(m_window.GetAspectRatio());
 
-  m_fpsCamera = std::make_unique<FPSCamera>(m_window.GetAspectRatio());
-  float aspectRatio = static_cast<float>(m_window.GetWidth()) / static_cast<float>(m_window.GetHeight());
-  m_fpsCamera->SetAspectRatio(aspectRatio);
+  m_renderer.Init();
 }
 
 void Application::SetupResources() {
@@ -37,12 +39,11 @@ void Application::SetupResources() {
 }
 
 void Application::Run() {
-  SetupResources();
-  m_renderer.Init();
-
   m_sceneManager.AddScene(std::make_unique<PlaygroundScene>());
+
+m_sceneManager.AddScene(std::make_unique<LightingOneScene>());
   m_sceneManager.SetActiveScene("Playground");
-  m_renderer.SetActiveCamera(m_fpsCamera.get());
+
   double currTime, lastTime = glfwGetTime(), deltaTime;
   while (!m_window.ShouldClose()) {
     currTime = glfwGetTime();
@@ -51,34 +52,22 @@ void Application::Run() {
 
     // input
     Input::Update();
-    if (Input::IsKeyPressed(GLFW_KEY_TAB) || Input::IsKeyPressed(GLFW_KEY_BACKSLASH)
-        || Input::IsKeyPressed(GLFW_KEY_ESCAPE)) {
-      if (m_focused) {
-        m_focused = false;
-        Input::SetCursorVisible(true);
-      } else {
-        m_focused = true;
-        Input::SetCursorVisible(false);
-      }
-    }
-
 
     // update
     m_sceneManager.GetActiveScene()->Update(deltaTime);
-    m_fpsCamera->Update(deltaTime);
+    m_cameraController.Update(deltaTime);
 
     // render
     ImGuiMenu::StartFrame(m_renderToImGuiViewport);
-
-    m_renderer.RenderScene(*m_sceneManager.GetActiveScene());
-    DisplayImGui();
+    m_renderer.RenderScene(*m_sceneManager.GetActiveScene(), m_cameraController.GetActiveCamera());
+    OnImGui();
 
     ImGuiMenu::EndFrame();
     m_window.SwapBuffers();
   }
 }
 
-void Application::DisplayImGui() {
+void Application::OnImGui() {
   auto& rendererStats = m_renderer.GetStats();
   auto& rendererSettings = m_renderer.GetSettings();
 
@@ -98,10 +87,21 @@ void Application::DisplayImGui() {
   }
   ImGui::End(); // settings
 
-  ImGui::Begin("Camera");
-  m_fpsCamera->OnImGui();
+  ImGui::Begin("Main");
+  auto& names = m_sceneManager.GetSceneNames();
+  if (ImGui::BeginMenu("Scenes")) {
+    for (auto& name : names) {
+      if (ImGui::MenuItem(name.data(), nullptr, false)) {
+        m_sceneManager.SetActiveScene(name);
+        m_cameraController.GetActiveCamera().SetPosition({0,2,-3});
+        m_cameraController.GetActiveCamera().SetTargetPos({0,0,0});
+      }
+    }
+    ImGui::EndMenu();
+  }
   ImGui::End();
 
+  m_cameraController.OnImGui();
 
   // need to set focus on window if user is aiming camera in it
   if (m_renderToImGuiViewport) {
@@ -117,14 +117,14 @@ void Application::DisplayImGui() {
     ImVec2 currDimensions = ImGui::GetWindowSize();
     if (prevDimensions.x != currDimensions.x || prevDimensions.y != currDimensions.y) {
       // update cameras
-      m_fpsCamera->SetAspectRatio(static_cast<float>(currDimensions.x) / static_cast<float>(currDimensions.y));
+      float aspectRatio = static_cast<float>(currDimensions.x) / static_cast<float>(currDimensions.y);
+      m_cameraController.SetAspectRatio(aspectRatio);
     }
     prevDimensions = currDimensions;
 
     // focus viewport window
-    if (!m_focused && ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
-      m_focused = true;
-      Input::SetCursorVisible(false);
+    if (!m_cameraController.IsFocused() && ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+      m_cameraController.Focus();
     }
     ImGui::End();
   }
@@ -132,35 +132,35 @@ void Application::DisplayImGui() {
 
 void Application::OnViewportResize(uint32_t width, uint32_t height) {
   m_renderer.SetWindowSize(width, height);
-
   float aspectRatio = static_cast<float>(width) / static_cast<float>(height);
-  m_fpsCamera->SetAspectRatio(aspectRatio);
+  m_cameraController.SetAspectRatio(aspectRatio);
 }
 
-void Application::OnMousePosMove(float xpos, float ypos) {
+void Application::OnMousePosMove(double xpos, double ypos) {
+  if (!m_renderToImGuiViewport && ImGui::GetIO().WantCaptureMouse) return;
   static bool isFirstMouse = true;
-  static float lastX, lastY;
+  static double lastX, lastY;
   if (isFirstMouse) {
     lastX = xpos;
     lastY = ypos;
     isFirstMouse = false;
   }
 
-  float xOffset = xpos - lastX;
-  float yOffset = ypos - lastY;
+  double xOffset = xpos - lastX;
+  double yOffset = ypos - lastY;
 
   lastX = xpos;
   lastY = ypos;
 
-  if (m_focused) {
-    m_fpsCamera->ProcessMouseMovement(xOffset, yOffset);
-  }
+  m_cameraController.ProcessMouseMovement(xOffset, yOffset);
 }
-void Application::OnMouseButtonEvent(int button, int action) {
-  if (ImGui::GetIO().WantCaptureMouse) return;
-  if (m_cameraMode == CameraMode::FPS && button == GLFW_MOUSE_BUTTON_LEFT && !m_focused) {
-    m_focused = true;
-    Input::SetCursorVisible(false);
-  }
 
+void Application::OnMouseButtonEvent(int button, int action) {
+  if (!m_renderToImGuiViewport && ImGui::GetIO().WantCaptureMouse) return;
+  m_cameraController.OnMouseButtonEvent(button, action);
+}
+
+void Application::OnMouseScrollEvent(double yOffset) {
+  if (!m_renderToImGuiViewport && ImGui::GetIO().WantCaptureMouse) return;
+  m_cameraController.OnMouseScrollEvent(yOffset);
 }

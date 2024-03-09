@@ -34,7 +34,7 @@ class Transform {
 
   glm::mat4 m_modelMatrix{1.0f};
 
-  bool m_isDirty{true};
+  bool m_isDirty{false};
 
 };
 

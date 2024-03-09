@@ -89,8 +89,7 @@ void Input::keypress_cb(GLFWwindow* window, int key, int scancode, int action, i
 
   if (action == GLFW_PRESS) {
     keyStates[key] = Pressed;
-  }
-  if (action == GLFW_RELEASE) {
+  } else if (action == GLFW_RELEASE) {
     keyStates[key] = Released;
   }
 //  Application::Instance().OnKeyEvent(key, action);
@@ -103,15 +102,31 @@ void Input::mouse_pos_cb(GLFWwindow* window, double xpos, double ypos) {
 
 void Input::mouse_scroll_cb(GLFWwindow* window, double xoffset, double yoffset) {
   ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
+  Application::Instance().OnMouseScrollEvent(yoffset);
 }
 
 void Input::mouse_button_cb(GLFWwindow* window, int button, int action, int mods) {
   ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+  if (action == GLFW_PRESS) {
+    mouseButtonStates[button] = Pressed;
+  } else if (action == GLFW_RELEASE) {
+    mouseButtonStates[button] = Released;
+  }
   Application::Instance().OnMouseButtonEvent(button, action);
 }
 
 void Input::Initialize(GLFWwindow* window) {
   m_window = window;
   init_glfw_input_callbacks(window);
+}
+
+void Input::SetCursorPos(float x, float y) {
+  glfwSetCursorPos(m_window, x, y);
+}
+
+void Input::CenterCursor() {
+  int width,height;
+  glfwGetWindowSize(m_window, &width, &height);
+  glfwSetCursorPos(m_window, width/2.0f, height / 2.0f);
 }
 

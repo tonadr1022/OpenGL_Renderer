@@ -18,7 +18,7 @@ void Renderer::UpdateRenderState(const Object& object) {
     if (state.boundMaterial->shader != state.boundShader) {
       state.boundShader = state.boundMaterial->shader;
       state.boundShader->Bind();
-      state.boundShader->SetMat4("u_VP", state.activeCamera->GetVPMatrix());
+      state.boundShader->SetMat4("u_VP", m_camera.GetVPMatrix());
     }
     for (auto&& texture : state.boundMaterial->textures) {
       texture->Bind();
@@ -77,11 +77,8 @@ void Renderer::Init() {
   glFrontFace(GL_CW);
 }
 
-void Renderer::SetActiveCamera(const Camera* camera) {
-  state.activeCamera = camera;
-}
-
-void Renderer::RenderScene(const Scene& scene) {
+void Renderer::RenderScene(const Scene& scene, const Camera& camera) {
+  m_camera = camera;
   StartFrame(scene);
 
   for (auto& group : scene.GetGroups()) {
@@ -95,10 +92,8 @@ void Renderer::SetWindowSize(uint32_t width, uint32_t height) {
   m_frameCapturer.UpdateViewport(width, height);
 }
 
-
-
-Renderer::Renderer(Window& window, bool renderToImGuiViewport)
-    : m_window(window), m_frameCapturer(window.GetWidth(), window.GetHeight()) {
+Renderer::Renderer(Window& window, Camera& camera, bool renderToImGuiViewport)
+    : m_window(window), m_camera(camera), m_frameCapturer(window.GetWidth(), window.GetHeight()) {
   m_settings.renderToImGuiViewport = renderToImGuiViewport;
 }
 

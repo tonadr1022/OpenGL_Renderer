@@ -20,7 +20,7 @@ class Texture {
   void Bind(int slot) const;
   static void Unbind() ;
   [[nodiscard]] GLuint Id() const { return m_id; }
-  [[nodiscard]] GLint Slot() const { return m_slot; }
+//  [[nodiscard]] GLint Slot() const { return m_slot; }
   void Resize(uint32_t width, uint32_t height);
   [[nodiscard]] uint32_t GetWidth() const;
   [[nodiscard]] uint32_t GetHeight() const;
@@ -36,7 +36,7 @@ class Texture {
   bool m_generateMipmaps;
   uint32_t m_width{0}, m_height{0}, m_numChannels{0};
   GLuint m_id{0};
-  GLint m_slot{0};
+//  GLint m_slot{0};
   void GenerateTextureFromFile(const std::string& texturePath);
   void GenerateTextureFromBuffer(unsigned char* buffer);
 };

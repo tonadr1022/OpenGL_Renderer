@@ -14,30 +14,22 @@ class FPSCamera : public Camera {
 
   explicit FPSCamera(float aspectRatio);
   ~FPSCamera() override = default;
-  void SetPosition(const glm::vec3& newPos) override;
   void Update(double dt) override;
-  void ProcessMouseMovement(float xOffset, float yOffset);
+  void ProcessMouseMovement(double xOffset, double yOffset) override;
+  void OnMouseScrollEvent(double yOffset) override;
   void ResetSettings();
-  void OnImGui();
-
-  [[nodiscard]] inline const glm::vec3& GetPosition() const override { return m_pos; };
-  [[nodiscard]] inline const glm::mat4& GetProjectionMatrix() const override { return m_projectionMatrix; }
-  [[nodiscard]] inline const glm::mat4& GetViewMatrix() const override { return m_viewMatrix; }
-  [[nodiscard]] inline const glm::mat4& GetVPMatrix() const override { return m_VPMatrix; }
-  void SetAspectRatio(float aspectRatio) override;
-
+  void OnImGui() override;
+  void SetTargetPos(const glm::vec3& targetPos) override;
  private:
   static constexpr const glm::vec3 UP = {0, 1, 0};
-  void UpdateMatrices();
 
-  float m_nearPlane, m_farPlane, m_fov, m_aspectRatio;
-  glm::vec3 m_pos;
-  glm::vec3 m_right;
-  glm::vec3 m_up;
+  void UpdateProjectionMatrix();
+  void UpdateViewMatrix();
+  float m_fov;
+  glm::vec3 m_right{};
+  glm::vec3 m_up{};
   glm::vec3 m_front;
-  glm::mat4 m_viewMatrix{1.0f};
-  glm::mat4 m_projectionMatrix{1.0f};
-  glm::mat4 m_VPMatrix{};
+
 
   float m_yaw, m_pitch;
   float m_movementSpeed, m_mouseSensitivity;
