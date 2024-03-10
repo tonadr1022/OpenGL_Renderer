@@ -11,14 +11,14 @@
 
 class Texture {
  public:
+  enum class Type { None, Diffuse, Specular, Emission, Normal };
 
-
-  explicit Texture(const std::string& texturePath);
+  Texture(const std::string& texturePath, Type type);
   Texture(uint32_t width, uint32_t height, bool mipmap);
   ~Texture();
   void Bind() const;
   void Bind(int slot) const;
-  static void Unbind() ;
+  static void Unbind();
   [[nodiscard]] GLuint Id() const { return m_id; }
 //  [[nodiscard]] GLint Slot() const { return m_slot; }
   void Resize(uint32_t width, uint32_t height);
@@ -29,13 +29,14 @@ class Texture {
   void SetWrapMode(GLint all);
 
   void SetFilterMode(GLint minFilter, GLint magFilter);
-
+  inline Type GetType() const { return m_type; }
  private:
   static int count;
   bool m_flipVertically;
   bool m_generateMipmaps;
   uint32_t m_width{0}, m_height{0}, m_numChannels{0};
   GLuint m_id{0};
+  Type m_type;
 //  GLint m_slot{0};
   void GenerateTextureFromFile(const std::string& texturePath);
   void GenerateTextureFromBuffer(unsigned char* buffer);

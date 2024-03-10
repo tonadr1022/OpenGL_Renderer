@@ -27,7 +27,6 @@ class FPSCamera : public Camera {
   void UpdateViewMatrix();
   float m_fov;
   glm::vec3 m_right{};
-  glm::vec3 m_up{};
   glm::vec3 m_front;
 
 

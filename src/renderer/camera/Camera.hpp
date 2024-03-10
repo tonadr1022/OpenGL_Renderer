@@ -13,7 +13,7 @@ class Camera {
   virtual ~Camera() = default;
   virtual void Update(double dt);
   void SetPosition(const glm::vec3& newPos);
-  virtual void SetTargetPos(const glm::vec3& targetPos)=0;
+  virtual void SetTargetPos(const glm::vec3& targetPos) = 0;
   [[nodiscard]] inline const glm::vec3& GetPosition() const { return m_pos; };
   [[nodiscard]] inline const glm::mat4& GetProjectionMatrix() const { return m_projectionMatrix; }
   [[nodiscard]] inline const glm::mat4& GetViewMatrix() const { return m_viewMatrix; }
@@ -25,9 +25,10 @@ class Camera {
 
  protected:
   glm::vec3 m_pos;
-  glm::mat4 m_viewMatrix{1.0f};
-  glm::mat4 m_projectionMatrix{1.0f};
-  glm::mat4 m_VPMatrix{1.0f};
+  glm::mat4 m_viewMatrix = {1.0f};
+  glm::mat4 m_projectionMatrix = {1.0f};
+  glm::mat4 m_VPMatrix = {1.0f};
+  bool m_dirty = false;
 
   float m_aspectRatio;
   float m_nearPlane, m_farPlane;

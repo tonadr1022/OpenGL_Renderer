@@ -9,13 +9,13 @@
 
 int Texture::count = 0;
 
-Texture::Texture(const std::string& texturePath)
-    : m_flipVertically(true), m_generateMipmaps(true) {
+Texture::Texture(const std::string& texturePath, Type type)
+    : m_flipVertically(true), m_generateMipmaps(true), m_type(type) {
   GenerateTextureFromFile(texturePath);
 }
 
 Texture::Texture(uint32_t width, uint32_t height, bool mipmap)
-    : m_flipVertically(true), m_generateMipmaps(mipmap), m_width(width), m_height(height) {
+    : m_flipVertically(true), m_generateMipmaps(mipmap), m_width(width), m_height(height), m_type(Type::None) {
   GenerateTextureFromBuffer(nullptr);
 }
 

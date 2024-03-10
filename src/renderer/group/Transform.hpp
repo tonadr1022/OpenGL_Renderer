@@ -5,7 +5,7 @@
 #ifndef OPENGL_RENDERER_SRC_RENDERER_TRANSFORM_HPP_
 #define OPENGL_RENDERER_SRC_RENDERER_TRANSFORM_HPP_
 
-#include <glm/glm.hpp>
+#include "glm/glm.hpp"
 #include <vector>
 
 class Transform {

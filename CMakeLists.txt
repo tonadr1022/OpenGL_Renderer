@@ -17,7 +17,7 @@ endif ()
 # Add source to this project's executable.
 add_executable(opengl_renderer
         src/main.cpp
-        src/renderer/Input.cpp
+        src/core/Input.cpp
         src/renderer/Renderer.cpp
         src/renderer/Renderer.hpp
         src/renderer/Renderer.hpp
@@ -65,8 +65,8 @@ add_executable(opengl_renderer
         src/renderer/group/Object.cpp
         src/renderer/group/Object.hpp
         src/core/HashedString.hpp
-        src/renderer/Transform.cpp
-        src/renderer/Transform.hpp
+        src/renderer/group/Transform.cpp
+        src/renderer/group/Transform.hpp
         src/renderer/resource/ShaderManager.cpp
         src/renderer/resource/MaterialManager.cpp
         src/core/Utils.hpp
@@ -95,6 +95,8 @@ add_executable(opengl_renderer
         src/renderer/camera/CameraController.hpp
         src/scenes/LightingOneScene.cpp
         src/scenes/LightingOneScene.hpp
+        src/renderer/Light.cpp
+        src/renderer/Light.hpp
 )
 
 

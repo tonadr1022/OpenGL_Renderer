@@ -6,7 +6,7 @@
 #define OPENGL_RENDERER_SRC_RENDERER_APPLICATION_HPP_
 
 #include "Window.hpp"
-#include "Input.hpp"
+#include "src/core/Input.hpp"
 #include "Renderer.hpp"
 #include "src/scenes/SceneManager.hpp"
 #include "src/renderer/camera/CameraController.hpp"
@@ -26,9 +26,10 @@ class Application {
   void OnMousePosMove(double xoffset, double yoffset);
   void OnMouseButtonEvent(int button, int action);
   void OnMouseScrollEvent(double yOffset);
-
+  void OnKeyEvent(int key, int action);
 
  private:
+  void OnSceneChange();
   void OnImGui();
   static Application* instancePtr;
   static void SetupResources();

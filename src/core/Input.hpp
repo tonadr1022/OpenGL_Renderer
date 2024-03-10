@@ -3,7 +3,7 @@
 
 #define GL_SILENCE_DEPRECATION 1
 #include "src/Common.hpp"
-#include <glm/glm.hpp>
+#include "glm/glm.hpp"
 
 
 constexpr int BUTTON_COUNT = GLFW_KEY_LAST;
@@ -35,6 +35,9 @@ class Input {
   static bool IsMouseReleased(MouseButton key);
   static void SetCursorPos(float x, float y);
   static void CenterCursor();
+  static const glm::vec2& GetMousePosOffset();
+  static const glm::vec2& GetMousePosition();
+  static bool MouseMoved();
 
   static void init_glfw_input_callbacks(GLFWwindow* window);
 
@@ -44,10 +47,11 @@ class Input {
   static inline GLFWwindow* m_window;
  private:
 
-  static inline glm::vec2 screenPos;
-  static inline glm::vec2 screenOffset;
-  static inline glm::vec2 prevScreenPos;
-  static inline glm::vec2 scrollOffset;
+  static inline glm::vec2 mouseScreenPos;
+  static inline glm::vec2 mouseScreenOffset;
+  static inline glm::vec2 prevMouseScreenPos;
+  static inline glm::vec2 mouseScrollOffset;
+  static inline bool mouseMoved;
 
   static void keypress_cb(GLFWwindow* window, int key, int scancode, int action, int mods);
   static void mouse_pos_cb(GLFWwindow* window, double xpos, double ypos);

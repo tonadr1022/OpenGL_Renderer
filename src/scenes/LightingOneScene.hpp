@@ -10,6 +10,7 @@ class LightingOneScene:public Scene {
  public:
   LightingOneScene();
   void Update(double dt) override;
+  void OnImGui() override;
  private:
   std::vector<Object*> m_cubes;
 

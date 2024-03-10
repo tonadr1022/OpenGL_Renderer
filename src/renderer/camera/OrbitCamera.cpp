@@ -6,7 +6,7 @@
 #include "imgui/imgui.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "src/renderer/Input.hpp"
+#include "src/core/Input.hpp"
 
 OrbitCamera::OrbitCamera(float aspectRatio)
     : Camera(aspectRatio),

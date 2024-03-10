@@ -21,7 +21,11 @@ void Scene::RemoveGroup(const Group* group) {
 
 void Scene::Update(double dt) {}
 
+Scene::Scene() : defaultCameraPosition({0, 0, 0}), m_name("Default") {}
 
-Scene::Scene() : m_name("Default") {}
+Scene::Scene(HashedString name) : defaultCameraPosition({0, 0, 0}), m_name(name) {}
 
-Scene::Scene(HashedString name) : m_name(name) {}
+Scene::Scene(HashedString name, const glm::vec3& defaultCameraPos)
+    : defaultCameraPosition(defaultCameraPos), m_name(name) {}
+
+void Scene::OnImGui() {}

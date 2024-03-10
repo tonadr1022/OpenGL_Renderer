@@ -3,45 +3,44 @@
 //
 
 #include "FPSCamera.hpp"
-#include "src/renderer/Input.hpp"
+#include "src/core/Input.hpp"
 #include "src/renderer/Renderer.hpp"
 #include "src/core/Logger.hpp"
 #include <imgui/imgui.h>
 
 void FPSCamera::Update(double dt) {
   float offset = m_movementSpeed * (float) dt;
-  bool dirty = false;
   if (Input::IsKeyDown(GLFW_KEY_W) || Input::IsKeyDown(GLFW_KEY_O)) {
     m_pos += m_front * offset;
-    dirty = true;
+    m_dirty = true;
   }
   if (Input::IsKeyDown(GLFW_KEY_S) || Input::IsKeyDown(GLFW_KEY_L)) {
     m_pos -= m_front * offset;
-    dirty = true;
+    m_dirty = true;
   }
   if (Input::IsKeyDown(GLFW_KEY_D) || Input::IsKeyDown(GLFW_KEY_SEMICOLON)) {
     m_pos += m_right * offset;
-    dirty = true;
+    m_dirty = true;
   }
   if (Input::IsKeyDown(GLFW_KEY_A) || Input::IsKeyDown(GLFW_KEY_K)) {
     m_pos -= m_right * offset;
-    dirty = true;
+    m_dirty = true;
   }
-  if (Input::IsKeyDown(GLFW_KEY_U)) {
+  if (Input::IsKeyDown(GLFW_KEY_U) || Input::IsKeyDown(GLFW_KEY_R)) {
     m_pos += UP * offset;
-    dirty = true;
+    m_dirty = true;
   }
-  if (Input::IsKeyDown(GLFW_KEY_J)) {
+  if (Input::IsKeyDown(GLFW_KEY_J) || Input::IsKeyDown(GLFW_KEY_F)) {
     m_pos -= UP * offset;
-    dirty = true;
+    m_dirty = true;
   }
-  if (dirty) UpdateViewMatrix();
+  if (m_dirty) UpdateViewMatrix();
 }
 
 FPSCamera::FPSCamera(float aspectRatio) :
     Camera(aspectRatio),
     m_fov(45.0f),
-    m_front({0, 0, -1}),
+    m_front({0,0,-1}),
     m_yaw(-90.0f),
     m_pitch(0),
     m_movementSpeed(DEFAULT_MOVEMENT_SPEED),
@@ -60,7 +59,6 @@ void FPSCamera::ProcessMouseMovement(double xOffset, double yOffset) {
   eulers.z = glm::sin(glm::radians(m_yaw)) * glm::cos(glm::radians(m_pitch));
   m_front = glm::normalize(eulers);
   m_right = glm::normalize(glm::cross(m_front, UP));
-
   UpdateViewMatrix();
 }
 

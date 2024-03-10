@@ -5,9 +5,11 @@
 #include "Object.hpp"
 #include "src/core/Logger.hpp"
 
-
 Object::Object(const Mesh* mesh, Material* material)
     : m_material(material), m_mesh(mesh) {}
+
+Object::Object(const Mesh* mesh)
+    : m_material(nullptr), m_mesh(mesh) {}
 
 void Object::SetMaterial(Material* material) {
   m_material = material;
@@ -24,3 +26,8 @@ const Mesh* Object::GetMesh() const {
 const Material* Object::GetMaterial() const {
   return m_material;
 }
+
+bool Object::HasMaterial() const {
+  return m_material != nullptr;
+}
+

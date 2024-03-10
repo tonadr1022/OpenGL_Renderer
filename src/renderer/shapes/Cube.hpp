@@ -21,45 +21,93 @@ const std::vector<uint32_t> Indices =
     };
 
 const std::vector<Vertex> Vertices = {
+
+//    // positions          // normals           // texture coords
+//    {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f}},
+//    {{0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 0.0f}},
+//    {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f}},
+//    {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f}},
+//    {{-0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f}},
+//    {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f}},
+//
+//    {{-0.5f, -0.5f, 0.5f,}, {0.0f, 0.0f, 1.0f,}, {0.0f, 0.0f,}},
+//    {{0.5f, -0.5f, 0.5f,}, {0.0f, 0.0f, 1.0f,}, {1.0f, 0.0f,}},
+//    {{0.5f, 0.5f, 0.5f,}, {0.0f, 0.0f, 1.0f,}, {1.0f, 1.0f,}},
+//    {{0.5f, 0.5f, 0.5f,}, {0.0f, 0.0f, 1.0f,}, {1.0f, 1.0f,}},
+//    {{-0.5f, 0.5f, 0.5f,}, {0.0f, 0.0f, 1.0f,}, {0.0f, 1.0f,}},
+//    {{-0.5f, -0.5f, 0.5f,}, {0.0f, 0.0f, 1.0f,}, {0.0f, 0.0f,}},
+//
+//    {{-0.5f, 0.5f, 0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+//    {{-0.5f, 0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}},
+//    {{-0.5f, -0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}},
+//    {{-0.5f, -0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}},
+//    {{-0.5f, -0.5f, 0.5f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+//    {{-0.5f, 0.5f, 0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+//
+//    {{0.5f, 0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+//    {{0.5f, 0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}},
+//    {{0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}},
+//    {{0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}},
+//    {{0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+//    {{0.5f, 0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+//
+//    {{-0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}, {0.0f, 1.0f}},
+//    {{0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f}},
+//    {{0.5f, -0.5f, 0.5f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},
+//    {{0.5f, -0.5f, 0.5f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},
+//    {{-0.5f, -0.5f, 0.5f}, {0.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},
+//    {{-0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}, {0.0f, 1.0f}},
+//
+//    {{-0.5f, 0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f}},
+//    {{0.5f, 0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f}},
+//    {{0.5f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+//    {{0.5f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+//    {{-0.5f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+//    {{-0.5f, 0.5f, -0.5}, {0.0f, 1.0f, 0.0}, {0.0f, 1.0}},
+
     // pos-Z face
-    {{0.5f, 0.5f, 0.5f}, {1.0f, 1.0f}}, // top right
-    {{0.5f, -0.5f, 0.5f}, {1.0f, 0.0f}},   // bottom right
-    {{-0.5f, -0.5f, 0.5f}, {0.0f, 0.0f}}, // bottom left
-    {{-0.5f, 0.5f, 0.5f}, {0.0f, 1.0f}}, // top left
+    {{0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}}, // top right
+    {{0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},   // bottom right
+    {{-0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}}, // bottom left
+    {{-0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}}, // top left
     // neg-Z face
-    {{0.5f, 0.5f, -0.5f}, {1.0f, 1.0f},}, // top right
-    {{0.5f, -0.5f, -0.5f}, {1.0f, 0.0f},},  // bottom right
-    {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f},}, // bottom left
-    {{-0.5f, 0.5f, -0.5f}, {0.0f, 1.0f},},// top left
+    {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f},}, // top right
+    {{0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 0.0f},},  // bottom right
+    {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f},}, // bottom left
+    {{-0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f},},// top left
     // pos-Y face
-    {{0.5f, 0.5f, 0.5f}, {1.0f, 1.0f},},// top right
-    {{0.5f, 0.5f, -0.5f}, {1.0f, 0.0f},},  // bottom right
-    {{-0.5f, 0.5f, -0.5f}, {0.0f, 0.0f},}, // bottom left
-    {{-0.5f, 0.5f, 0.5f}, {0.0f, 1.0f},}, // top left
+    {{0.5f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f},},// top right
+    {{0.5f, 0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f},},  // bottom right
+    {{-0.5f, 0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f},}, // bottom left
+    {{-0.5f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f},}, // top left
     // neg-Y face
-    {{0.5f, -0.5f, 0.5f}, {1.0f, 1.0f},}, // top right
-    {{0.5f, -0.5f, -0.5f}, {1.0f, 0.0f},},  // bottom right
-    {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f},}, // bottom left
-    {{-0.5f, -0.5f, 0.5f}, {0.0f, 1.0f},},// top left
+    {{0.5f, -0.5f, 0.5f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f},}, // top right
+    {{0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f},},  // bottom right
+    {{-0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}, {0.0f, 0.0f},}, // bottom left
+    {{-0.5f, -0.5f, 0.5f}, {0.0f, -1.0f, 0.0f}, {0.0f, 1.0f},},// top left
     // pos-X face
-    {{0.5f, 0.5f, 0.5f}, {1.0f, 1.0f},}, // top right
-    {{0.5f, 0.5f, -0.5f}, {1.0f, 0.0f},},   // bottom right
-    {{0.5f, -0.5f, -0.5f}, {0.0f, 0.0f},}, // bottom left
-    {{0.5f, -0.5f, 0.5f}, {0.0f, 1.0f},}, // top left
+    {{0.5f, 0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f},}, // top right
+    {{0.5f, 0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f},},   // bottom right
+    {{0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f},}, // bottom left
+    {{0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f},}, // top left
     // neg-X face
-    {{-0.5f, 0.5f, 0.5f}, {1.0f, 1.0f},}, // top right
-    {{-0.5f, 0.5f, -0.5f}, {1.0f, 0.0f},},   // bottom right
-    {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f},},// bottom left
-    {{-0.5f, -0.5f, 0.5f}, {0.0f, 1.0f},},// top left
+    {{-0.5f, 0.5f, 0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 1.0f},}, // top right
+    {{-0.5f, 0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f},},   // bottom right
+    {{-0.5f, -0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 0.0f},},// bottom left
+    {{-0.5f, -0.5f, 0.5f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 1.0f},},// top left
 };
 
 std::unique_ptr<Mesh> Create(uint32_t scaleU, uint32_t scaleV) {
-  std::vector<Vertex> verts;
-  verts.reserve(Vertices.size());
-  for (auto& vert : Vertices) {
-    verts.push_back({vert.position, {vert.texCoords.x * scaleU, vert.texCoords.y * scaleV}});
+  if (scaleU != 1 || scaleV != 1) {
+    std::vector<Vertex> scaledVertices;
+    scaledVertices.reserve(Vertices.size());
+    for (auto& vert : Vertices) {
+      scaledVertices.push_back({vert.position, vert.normal, {vert.texCoords.x * scaleU, vert.texCoords.y * scaleV}});
+    }
+    return std::make_unique<Mesh>(scaledVertices, Indices);
+  } else {
+    return std::make_unique<Mesh>(Vertices, Indices);
   }
-  return std::make_unique<Mesh>(verts, Indices);
 }
 
 }

@@ -12,7 +12,7 @@
 
 #include "src/core/Logger.hpp"
 #include "src/renderer/Renderer.hpp"
-#include "Input.hpp"
+#include "src/core/Input.hpp"
 #include "Application.hpp"
 
 Window::Window() {
@@ -63,8 +63,13 @@ void Window::Init_Glfw() {
   // glfw may not have created a window at desired size
   int w, h;
   glfwGetFramebufferSize(m_window, &w, &h);
-  m_width = w;
-  m_height = h;
+  m_framebufferWidth = w;
+  m_framebufferHeight = h;
+
+  glfwGetWindowSize(m_window, &w, &h);
+  m_windowWidth = w;
+  m_windowHeight = h;
+
   glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int width, int height) {
     Application::Instance().OnViewportResize(width, height);
   });
@@ -89,8 +94,6 @@ void Window::Init_ImGui() {
   ImGui_ImplOpenGL3_Init(m_glsl_version);
 }
 
-
-
 void Window::SetVsync(bool state) {
   glfwSwapInterval(state);
 }
@@ -104,18 +107,22 @@ void Window::Close() {
 }
 
 float Window::GetAspectRatio() const {
-  return static_cast<float>(m_width) / static_cast<float>(m_height);
-}
-
-uint32_t Window::GetWidth() const {
-  return m_width;
-}
-uint32_t Window::GetHeight() const {
-  return m_height;
+  return static_cast<float>(m_framebufferWidth) / static_cast<float>(m_framebufferHeight);
 }
 
 void Window::SwapBuffers() {
   glfwSwapBuffers(m_window);
+}
+
+glm::ivec2 Window::GetWindowDimensions() const {
+  return {m_windowWidth, m_windowHeight};
+}
+
+glm::ivec2 Window::GetFrameBufferDimensions() const {
+  return {m_framebufferWidth, m_framebufferHeight};
+}
+void Window::SetShouldClose(bool shouldClose) {
+  glfwSetWindowShouldClose(m_window, shouldClose);
 }
 
 

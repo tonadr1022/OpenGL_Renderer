@@ -12,15 +12,19 @@
 
 class Renderer {
  public:
+  enum class Mode {
+    None, BlinnPhong
+  };
   struct RenderSettings {
     bool wireframe{false};
     bool renderToImGuiViewport{false};
   };
 
-  Renderer(Window& window, Camera& camera, bool renderToImGuiViewport);
+  Renderer(Window& window, bool renderToImGuiViewport);
   void Init();
-  void RenderScene(const Scene& scene, const Camera& camera);
-  void SetWindowSize(uint32_t width, uint32_t height);
+  void RenderScene(const Scene& scene, Camera* camera);
+  void SetFrameBufferSize(uint32_t width, uint32_t height);
+  void SetLights(const std::vector<std::unique_ptr<Light>>& lights);
 
   struct PerFrameStats {
     uint32_t drawCalls{0};
@@ -31,14 +35,18 @@ class Renderer {
   inline RenderSettings& GetSettings() { return m_settings; }
   inline const PerFrameStats& GetStats() { return stats; }
   inline const FrameCapturer& GetFrameCapturer() { return m_frameCapturer; }
+
+  Mode mode = Mode::BlinnPhong;
  private:
   struct RenderState {
     const Material* boundMaterial = nullptr;
     Shader* boundShader = nullptr;
   };
 
+  const std::vector<std::unique_ptr<Light>>* m_lights = nullptr;
+
   Window& m_window;
-  Camera& m_camera;
+  Camera* m_camera = nullptr;
   RenderState state;
   FrameCapturer m_frameCapturer;
   PerFrameStats stats;
@@ -49,6 +57,7 @@ class Renderer {
   void StartFrame(const Scene& scene);
   void EndFrame();
   void RenderGroup(const Group& group);
+  void SetLightingUniforms();
 
 };
 

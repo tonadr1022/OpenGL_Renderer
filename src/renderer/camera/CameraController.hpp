@@ -7,17 +7,18 @@
 
 #include "src/renderer/camera/OrbitCamera.hpp"
 #include "src/renderer/camera/FPSCamera.hpp"
+#include "src/renderer/Window.hpp"
 #include <memory>
 
 class CameraController {
  public:
-  explicit CameraController(float aspectRatio);
+  explicit CameraController(const Window& window);
   void SetAspectRatio(float aspectRatio);
   enum class Mode {
     FPS, ORBIT,
   };
 
-  [[nodiscard]] Camera& GetActiveCamera() const;
+  [[nodiscard]] Camera* GetActiveCamera() const;
 //  [[nodiscard]] inline Mode GetMode() const { return m_mode; }
 
   void SetMode(Mode mode);
@@ -36,6 +37,7 @@ class CameraController {
   Camera* m_activeCamera;
   std::unique_ptr<FPSCamera> m_fpsCamera;
   std::unique_ptr<OrbitCamera> m_orbitCamera;
+  const Window& m_window;
 
   static constexpr Mode DEFAULT_MODE = Mode::FPS;
 };

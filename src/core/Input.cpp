@@ -1,8 +1,8 @@
 #include "Input.hpp"
 #include "src/core/Logger.hpp"
-#include "Application.hpp"
-#include <imgui/imgui.h>
-#include <imgui/backends/imgui_impl_glfw.h>
+#include "src/renderer/Application.hpp"
+#include "imgui/imgui.h"
+#include "imgui/backends/imgui_impl_glfw.h"
 
 void Input::Update() {
   for (auto& mouseButtonState : mouseButtonStates) {
@@ -14,8 +14,9 @@ void Input::Update() {
     if (keyState & Pressed) keyState = Down;
     if (keyState & Released) keyState = Up;
   }
-  scrollOffset = glm::vec2(0);
-  screenOffset = glm::vec2(0);
+  mouseScrollOffset = glm::vec2(0);
+  mouseScreenOffset = glm::vec2(0);
+  mouseMoved = false;
   glfwPollEvents();
 }
 
@@ -75,28 +76,37 @@ bool Input::GetCursorVisible() {
 void Input::keypress_cb(GLFWwindow* window, int key, int scancode, int action, int mods) {
   ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
   ImGuiIO& io = ImGui::GetIO();
-  if (action == GLFW_PRESS) {
-    io.KeysDown[key] = true;
-  }
-  if (action == GLFW_RELEASE) {
-    io.KeysDown[key] = false;
-  }
+//  if (action == GLFW_PRESS) {
+//    io.KeysDown[key] = true;
+//  }
+//  if (action == GLFW_RELEASE) {
+//    io.KeysDown[key] = false;
+//  }
 
-  io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
-  io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
-  io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
-  io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
+//  io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
+//  io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
+//  io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
+//  io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
 
   if (action == GLFW_PRESS) {
     keyStates[key] = Pressed;
   } else if (action == GLFW_RELEASE) {
     keyStates[key] = Released;
   }
-//  Application::Instance().OnKeyEvent(key, action);
+  Application::Instance().OnKeyEvent(key, action);
 }
 
 void Input::mouse_pos_cb(GLFWwindow* window, double xpos, double ypos) {
   ImGui_ImplGlfw_CursorPosCallback(window, xpos, ypos);
+  static double lastX, lastY;
+  double xOffset = xpos - lastX;
+  double yOffset = ypos - lastY;
+  lastX = xpos;
+  lastY = ypos;
+  mouseScreenOffset = {xOffset, yOffset};
+  mouseScreenPos = {xpos, ypos};
+  mouseMoved = true;
+
   Application::Instance().OnMousePosMove(xpos, ypos);
 }
 
@@ -125,8 +135,19 @@ void Input::SetCursorPos(float x, float y) {
 }
 
 void Input::CenterCursor() {
-  int width,height;
+  int width, height;
   glfwGetWindowSize(m_window, &width, &height);
-  glfwSetCursorPos(m_window, width/2.0f, height / 2.0f);
+  glfwSetCursorPos(m_window, width / 2.0f, height / 2.0f);
+}
+
+const glm::vec2& Input::GetMousePosOffset() {
+  return mouseScreenOffset;
+}
+const glm::vec2& Input::GetMousePosition() {
+  return mouseScreenPos;
+}
+
+bool Input::MouseMoved() {
+  return mouseMoved;
 }
 

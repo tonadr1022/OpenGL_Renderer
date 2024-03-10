@@ -7,16 +7,18 @@
 
 #include <memory>
 #include "src/renderer/Mesh.hpp"
-#include "src/renderer/Transform.hpp"
+#include "Transform.hpp"
 #include "src/renderer/Material.hpp"
 
 class Object {
  public:
   Object(const Mesh* mesh, Material* material);
+  Object(const Mesh* mesh);
 
   Transform transform;
   void SetMaterial(Material* material);
   void SetMesh(const Mesh* mesh);
+  bool HasMaterial() const;
   const Material* GetMaterial() const;
   const Mesh* GetMesh() const;
 

@@ -17,13 +17,14 @@ class Shader {
  public:
   void Bind() const;
 
-  void SetInt(HashedString name, int value);
-  void SetFloat(HashedString name, float value);
-  void SetMat4(HashedString name, const glm::mat4& mat);
-  void SetIVec2(HashedString name, const glm::ivec2& vec);
-  void SetIVec3(HashedString name, const glm::ivec3& vec);
-  void SetVec3(HashedString name, const glm::vec3& vec);
-
+  void SetInt(HashedString name, int value) const;
+  void SetFloat(HashedString name, float value) const;
+  void SetMat4(HashedString name, const glm::mat4& mat) const;
+  void SetIVec2(HashedString name, const glm::ivec2& vec) const;
+  void SetIVec3(HashedString name, const glm::ivec3& vec) const;
+  void SetVec3(HashedString name, const glm::vec3& vec) const;
+  void SetMat3(HashedString name, const glm::mat3& vec, bool transpose = false) const;
+  void SetBool(HashedString name, bool value)const;
   Shader(uint32_t id, std::unordered_map<uint32_t, uint32_t>& uniformLocations);
 
  private:

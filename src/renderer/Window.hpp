@@ -16,13 +16,15 @@ class Window {
   static void SetVsync(bool state);
   void SwapBuffers();
   bool ShouldClose();
-  float GetAspectRatio() const;
-  uint32_t GetWidth() const;
-  uint32_t GetHeight() const;
+  void SetShouldClose(bool shouldClose);
+  [[nodiscard]] float GetAspectRatio() const;
+  [[nodiscard]] glm::ivec2 GetWindowDimensions() const;
+  [[nodiscard]] glm::ivec2 GetFrameBufferDimensions() const;
   void Close();
-  inline GLFWwindow* GetContext() { return m_window; }
+  [[nodiscard]] inline GLFWwindow* GetContext() const { return m_window; }
  private:
-  uint32_t m_width{}, m_height{};
+  uint32_t m_framebufferWidth{}, m_framebufferHeight{};
+  uint32_t m_windowWidth{}, m_windowHeight{};
   GLFWwindow* m_window = nullptr;
   const char* m_glsl_version = "#version 410";
 

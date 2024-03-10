@@ -54,7 +54,7 @@ void ImGuiMenu::StartFrame(bool imguiFullScreen) {
     ImGui::Begin("DockSpace", &p_open, window_flags);
     if (!usePadding) ImGui::PopStyleVar();
 
-    if (imguiFullScreen) ImGui::PopStyleVar(2);
+    ImGui::PopStyleVar(2);
 
     // Submit the DockSpace
     ImGuiIO& io = ImGui::GetIO();
@@ -65,7 +65,7 @@ void ImGuiMenu::StartFrame(bool imguiFullScreen) {
 
     if (ImGui::BeginMenuBar()) {
       if (ImGui::BeginMenu("Options")) {
-        if (ImGui::MenuItem("Close", nullptr, false, !p_open)) exit(0);
+        if (ImGui::MenuItem("Close", nullptr, false, p_open)) exit(0);
         ImGui::EndMenu();
       }
       ImGui::EndMenuBar();

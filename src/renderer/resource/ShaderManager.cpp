@@ -63,7 +63,7 @@ bool ShaderManager::CheckModuleCompilationSuccess(GLuint id, std::string_view sh
     glGetShaderInfoLog(id, 512, nullptr, buffer);
     LOG_ERROR("File: %s", shaderPath);
 
-    LOG_ERROR("Error Compiling Shader: %s", type == ShaderType::VERTEX
+    LOG_ERROR("Error Compiling Shader: %s, %s", type == ShaderType::VERTEX
                                             ? "Vertex" : type == ShaderType::FRAGMENT
                                                          ? "Fragment" : "Geometry", buffer);
     return false;
@@ -110,7 +110,7 @@ void ShaderManager::InitializeUniforms(ShaderData& shaderData) {
     for (GLint i = 0; i < uniformCount; i++) {
       glGetActiveUniform(shaderData.id, i, maxNameLength, &uniformNameLength,
                          &uniformSize, &uniformType, uniformName);
-      LOG_INFO("%s", uniformName);
+//      LOG_INFO("%s", uniformName);
       shaderData.uniformIds.emplace(HashedString(uniformName), glGetUniformLocation(shaderData.id, uniformName));
     }
   }
