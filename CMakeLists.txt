@@ -121,6 +121,9 @@ add_definitions(-Wall -v)
 
 add_subdirectory(dep/glfw)
 add_subdirectory(dep/glm)
+add_subdirectory(dep/assimp)
+
+include_directories(dep/assimp/include)
 
 find_package(OpenGL REQUIRED)
 

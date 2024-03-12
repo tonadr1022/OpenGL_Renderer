@@ -26,6 +26,7 @@ class ShaderManager {
   static Shader* GetShader(HashedString name);
   static Shader* AddShader(HashedString name, const std::vector<ShaderCreateInfo>& createInfos);
   static Shader* RecompileShader(HashedString name);
+  static void RecompileShaders();
 
  private:
   struct ShaderData {
@@ -41,7 +42,7 @@ class ShaderManager {
   static std::optional<ShaderData> CompileProgram(HashedString name,
                                                   const std::vector<ShaderCreateInfo>& moduleCreateInfos);
 
-  static std::unordered_map<uint32_t, std::unique_ptr<Shader>> m_shaders;
+  static std::unordered_map<HashedString, std::unique_ptr<Shader>> m_shaders;
   static std::unordered_map<uint32_t, ShaderData> m_shaderData;
 };
 

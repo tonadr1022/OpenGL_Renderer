@@ -17,18 +17,15 @@ OrbitCamera::OrbitCamera(float aspectRatio)
       m_polarAngle(0),
       m_fov(DEFAULT_FOV) {
   UpdatePosition();
-  UpdateViewMatrix();
-  UpdateProjectionMatrix();
+  UpdateMatrices();
 }
 
 void OrbitCamera::ProcessMouseMovement(double xOffset, double yOffset) {
   m_azimuthAngle += (float) xOffset * m_sensitivity;
   m_polarAngle += (float) yOffset * m_sensitivity;
   m_polarAngle = glm::clamp(m_polarAngle, -89.0f, 89.0f);
-
   UpdatePosition();
-  UpdateViewMatrix();
-  UpdateProjectionMatrix();
+  UpdateMatrices();
 }
 
 void OrbitCamera::OnImGui() {
@@ -40,34 +37,24 @@ void OrbitCamera::OnImGui() {
   float fovRad = glm::radians(m_fov);
   if (ImGui::SliderAngle("FOV", &fovRad, MIN_FOV, MAX_FOV)) {
     m_fov = glm::degrees(fovRad);
-    UpdateProjectionMatrix();
+    UpdateMatrices();
   }
-}
-
-void OrbitCamera::SetTarget(const glm::vec3& target) {
-  if (m_target != target) {
-    m_target = target;
-    // TODO dirty flag?
-    UpdateViewMatrix();
-  }
-
 }
 
 void OrbitCamera::Update(double dt) {
   const float zoomSpeed = 5;
-  bool dirty = false;
   if (Input::IsKeyDown(GLFW_KEY_H)) {
     m_distance -= zoomSpeed * (float) dt;
-    dirty = true;
+    m_dirty = true;
   }
   if (Input::IsKeyDown(GLFW_KEY_Y)) {
     m_distance += zoomSpeed * (float) dt;
-    dirty = true;
+    m_dirty = true;
   }
 
-  if (dirty) {
+  if (m_dirty) {
     UpdatePosition();
-    UpdateViewMatrix();
+    UpdateMatrices();
   }
 }
 
@@ -89,23 +76,20 @@ void OrbitCamera::OnMouseScrollEvent(double yOffset) {
   m_distance += yOffset * m_scrollSensitivity;
   if (m_distance < MIN_DISTANCE) m_distance = MIN_DISTANCE;
   UpdatePosition();
-  UpdateProjectionMatrix();
-  UpdateViewMatrix();
+  UpdateMatrices();
 }
 
 void OrbitCamera::ResetSettings() {
 
 }
-void OrbitCamera::UpdateViewMatrix() {
-  m_viewMatrix = glm::lookAt(m_pos, m_target, m_up);
-  m_VPMatrix = m_projectionMatrix * m_viewMatrix;
-}
-void OrbitCamera::UpdateProjectionMatrix() {
-  m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspectRatio, m_nearPlane, m_farPlane);
-  m_VPMatrix = m_projectionMatrix * m_viewMatrix;
-}
 
 void OrbitCamera::SetTargetPos(const glm::vec3& targetPos) {
-  m_viewMatrix = glm::lookAt(m_pos, targetPos, m_up);
+  m_target = targetPos;
+  UpdateMatrices();
+}
+
+void OrbitCamera::UpdateMatrices() {
+  m_viewMatrix = glm::lookAt(m_pos, m_target, m_up);
+  m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspectRatio, m_nearPlane, m_farPlane);
   m_VPMatrix = m_projectionMatrix * m_viewMatrix;
 }

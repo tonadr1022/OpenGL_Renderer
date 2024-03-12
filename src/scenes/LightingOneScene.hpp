@@ -6,14 +6,13 @@
 #define OPENGL_RENDERER_SRC_SCENES_LIGHTINGONESCENE_HPP_
 
 #include <src/renderer/group/Scene.hpp>
-class LightingOneScene:public Scene {
+class LightingOneScene : public Scene {
  public:
   LightingOneScene();
   void Update(double dt) override;
   void OnImGui() override;
  private:
   std::vector<Object*> m_cubes;
-
 };
 
 #endif //OPENGL_RENDERER_SRC_SCENES_LIGHTINGONESCENE_HPP_

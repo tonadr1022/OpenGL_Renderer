@@ -16,6 +16,7 @@
 class Shader {
  public:
   void Bind() const;
+  static void Unbind() ;
 
   void SetInt(HashedString name, int value) const;
   void SetFloat(HashedString name, float value) const;

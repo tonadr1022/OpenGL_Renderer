@@ -8,26 +8,47 @@
 #include "glm/glm.hpp"
 #include <string>
 
-struct Light {
-  enum class Type {
-    Point, Directional, Spotlight
-  };
+#define DEFAULT_SPECULAR_STRENGTH 1.0;
+#define DEFAULT_AMBIENT_STRENGTH  0.2;
+#define DEFAULT_DIFFUSE_STRENGTH  0.5;
 
-  static constexpr const char* TypeToString(Type type) {
-    switch (type) {
-      case Type::Point: return "Point";
-      case Type::Directional: return "Directional";
-      case Type::Spotlight: return "Spotlight";
-    }
-  }
+struct LightBase {
+  glm::vec3 color = {1.0f,1.0f,1.0f};
+  float ambientIntensity = 0.2f;
+  float diffuseIntensity = 0.5f;
+  float specularIntensity = 1.0f;
 
-  glm::vec3 position{0}, color{0};
-  glm::vec3 specular{0.5}, ambient{0.5}, diffuse{0.5};
-  float intensity{1};
-  Type type;
+  explicit LightBase(const glm::vec3& color);
+  LightBase() = default;
+};
 
-  Light( const glm::vec3& position,  const glm::vec3& color, Type type);
+struct PointLight : public LightBase {
+  glm::vec3 position;
+  float linear = 0.09;
+  float quadratic = 0.032;
 
+  // Default constructor
+  PointLight(const glm::vec3& position, const glm::vec3& color);
+  explicit PointLight(const glm::vec3& position);
+};
+
+struct SpotLight : public LightBase {
+  glm::vec3 position;
+  glm::vec3 direction;
+  float linear = 0.09;
+  float quadratic = 0.032;
+  float penumbra = 5.0f;
+  float angle = 17.5f;
+
+  SpotLight(const glm::vec3& position, const glm::vec3& color, const glm::vec3& direction);
+  SpotLight(const glm::vec3& position, const glm::vec3& direction);
+};
+
+struct DirectionalLight : public LightBase {
+  glm::vec3 direction;
+
+  DirectionalLight(const glm::vec3& color, const glm::vec3& direction);
+  explicit DirectionalLight(const glm::vec3& direction);
 };
 
 #endif //OPENGL_RENDERER_SRC_RENDERER_LIGHT_HPP_

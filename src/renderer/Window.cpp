@@ -44,7 +44,7 @@ void Window::Init_Glfw() {
 //  m_windowWidth = videoMode->width / 2;
 //  m_windowHeight = videoMode->height / 2;
 
-  m_window = glfwCreateWindow(1920, 1080, "OpenGL Renderer", nullptr, nullptr);
+  m_window = glfwCreateWindow(1600,900, "OpenGL Renderer", nullptr, nullptr);
 
   if (!m_window) {
     LOG_ERROR("Failed to create GLFW window");
@@ -52,7 +52,7 @@ void Window::Init_Glfw() {
     std::exit(EXIT_FAILURE);
   }
   glfwMakeContextCurrent(m_window);
-  glfwSetWindowPos(m_window, 100, 100);
+//  glfwSetWindowPos(m_window, 100, 100);
 
   if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
     LOG_ERROR("Failed to initialize Glad");

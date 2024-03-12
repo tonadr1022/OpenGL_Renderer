@@ -49,9 +49,13 @@ void Application::SetupResources() {
   MeshManager::AddMesh("cube1024", Cube::Create(1024, 1024));
   TextureManager::AddTexture("cow", GET_TEXTURE_PATH("cow.png"), Texture::Type::Diffuse);
 
-  std::vector<Texture*> textures = {TextureManager::AddTexture("woodContainerDiffuse", GET_TEXTURE_PATH("container_diffuse.png"), Texture::Type::Diffuse),
-                                    TextureManager::AddTexture("woodContainerSpecular", GET_TEXTURE_PATH("container_specular.png"), Texture::Type::Specular),
-                                    TextureManager::AddTexture("woodContainerEmission", GET_TEXTURE_PATH("container_emission.jpg"), Texture::Type::Emission)};
+  std::vector<Texture*> textures = {TextureManager::AddTexture("woodContainerDiffuse",
+                                                               GET_TEXTURE_PATH("container_diffuse.png"),
+                                                               Texture::Type::Diffuse),
+                                    TextureManager::AddTexture("woodContainerSpecular",
+                                                               GET_TEXTURE_PATH("container_specular.png"),
+                                                               Texture::Type::Specular)};
+//                                    TextureManager::AddTexture("woodContainerEmission", GET_TEXTURE_PATH("container_emission.jpg"), Texture::Type::Emission)};
   MaterialManager::AddMaterial("woodContainer", textures, "blinnPhong");
 }
 
@@ -59,7 +63,7 @@ void Application::Run() {
   m_sceneManager.AddScene(std::make_unique<PlaygroundScene>());
   m_sceneManager.AddScene(std::make_unique<LightingOneScene>());
   m_sceneManager.SetActiveScene("Lighting One");
-  m_cameraController.GetActiveCamera()->SetPosition(m_sceneManager.GetActiveScene()->defaultCameraPosition);
+  OnSceneChange();
 
   double currTime, lastTime = glfwGetTime(), deltaTime;
   while (!m_window.ShouldClose()) {
@@ -75,11 +79,12 @@ void Application::Run() {
     m_cameraController.Update(deltaTime);
 
     // render
-    ImGuiMenu::StartFrame(m_renderToImGuiViewport);
-    m_renderer.RenderScene(*m_sceneManager.GetActiveScene(), m_cameraController.GetActiveCamera());
-    OnImGui();
 
-    ImGuiMenu::EndFrame();
+    if (m_settings.showImGui) ImGuiMenu::StartFrame(m_renderToImGuiViewport);
+    m_renderer.RenderScene(*m_sceneManager.GetActiveScene(), m_cameraController.GetActiveCamera());
+    if (m_settings.showImGui) OnImGui();
+
+    if (m_settings.showImGui) ImGuiMenu::EndFrame();
     m_window.SwapBuffers();
   }
 }
@@ -105,6 +110,19 @@ void Application::OnImGui() {
   ImGui::End(); // settings
 
   ImGui::Begin("Main");
+
+  ImGui::Text("Mode");
+  if (ImGui::Button("Normals")) {
+    m_renderer.debugMode = Renderer::DebugMode::Normals;
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("None")) {
+    m_renderer.debugMode = Renderer::DebugMode::None;
+  }
+  if (ImGui::Button("Recompile Shaders")) {
+    ShaderManager::RecompileShaders();
+  }
+
   auto& names = m_sceneManager.GetSceneNames();
   if (ImGui::BeginMenu("Scenes")) {
     for (auto& name : names) {
@@ -115,10 +133,23 @@ void Application::OnImGui() {
     }
     ImGui::EndMenu();
   }
+
+
+  ImGui::End();
+
+  ImGui::Begin("Lights");
+  ImGui::Text("Enabled Lights");
+  ImGui::Checkbox("Directional", &rendererSettings.renderDirectionalLights);
+  ImGui::SameLine();
+  ImGui::Checkbox("Point", &rendererSettings.renderPointLights);
+  ImGui::SameLine();
+  ImGui::Checkbox("Spot", &rendererSettings.renderSpotlights);
+
+  m_sceneManager.GetActiveScene()->ImGuiLights();
   ImGui::End();
 
   m_cameraController.OnImGui();
-  m_sceneManager.GetActiveScene()->OnImGui();
+
 
   // need to set focus on window if user is aiming camera in it
   static bool imguiViewportFocused = false;
@@ -202,12 +233,22 @@ void Application::OnMouseScrollEvent(double yOffset) {
 void Application::OnSceneChange() {
   Scene* activeScene = m_sceneManager.GetActiveScene();
   m_cameraController.GetActiveCamera()->SetPosition(activeScene->defaultCameraPosition);
-  m_renderer.SetLights(activeScene->GetLights());
+  m_renderer.SetDirectionalLight(activeScene->GetDirectionalLight());
+  m_renderer.SetPointLights(activeScene->GetPointLights());
+  m_renderer.SetSpotLights(activeScene->GetSpotLights());
 //        m_cameraController.GetActiveCamera().SetTargetPos({0, 0, 0});
 }
 
 void Application::OnKeyEvent(int key, int action) {
-  if (action == GLFW_PRESS && key == GLFW_KEY_BACKSPACE) {
-    m_window.SetShouldClose(true);
+  bool pressed = action == GLFW_PRESS;
+  if (pressed) {
+    if (key == GLFW_KEY_BACKSPACE) {
+      m_window.SetShouldClose(true);
+    } else if (key == GLFW_KEY_M) {
+      ShaderManager::RecompileShaders();
+    } else if (key == GLFW_KEY_N) {
+      m_settings.showImGui = !m_settings.showImGui;
+      if (!m_settings.showImGui) m_renderToImGuiViewport = false;
+    }
   }
 }

@@ -22,12 +22,9 @@ class FPSCamera : public Camera {
   void SetTargetPos(const glm::vec3& targetPos) override;
  private:
   static constexpr const glm::vec3 UP = {0, 1, 0};
-
-  void UpdateProjectionMatrix();
-  void UpdateViewMatrix();
+  void UpdateMatrices();
   float m_fov;
   glm::vec3 m_right{};
-  glm::vec3 m_front;
 
 
   float m_yaw, m_pitch;

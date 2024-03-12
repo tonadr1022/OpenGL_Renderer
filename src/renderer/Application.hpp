@@ -38,6 +38,12 @@ class Application {
   SceneManager m_sceneManager;
   Renderer m_renderer;
 
+  struct Settings {
+    bool showImGui = true;
+  };
+
+  Settings m_settings;
+
 
   bool m_renderToImGuiViewport;
 

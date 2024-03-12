@@ -21,11 +21,11 @@ class OrbitCamera : public Camera {
 
  private:
 void UpdatePosition();
-void UpdateViewMatrix();
-void UpdateProjectionMatrix();
+void UpdateMatrices();
+
   glm::vec3 m_target;
   glm::vec3 m_up;
-  glm::vec3 m_front{};
+
 
   float m_distance;
   float m_azimuthAngle, m_polarAngle;

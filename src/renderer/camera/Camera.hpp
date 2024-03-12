@@ -18,16 +18,19 @@ class Camera {
   [[nodiscard]] inline const glm::mat4& GetProjectionMatrix() const { return m_projectionMatrix; }
   [[nodiscard]] inline const glm::mat4& GetViewMatrix() const { return m_viewMatrix; }
   [[nodiscard]] inline const glm::mat4& GetVPMatrix() const { return m_VPMatrix; }
+  [[nodiscard]] inline const glm::vec3& GetFront() const { return m_front; }
+
   void SetAspectRatio(float aspectRatio);
   virtual void OnImGui() = 0;
   virtual void ProcessMouseMovement(double xOffset, double yOffset) = 0;
   virtual void OnMouseScrollEvent(double yOffset) = 0;
-
  protected:
   glm::vec3 m_pos;
   glm::mat4 m_viewMatrix = {1.0f};
   glm::mat4 m_projectionMatrix = {1.0f};
   glm::mat4 m_VPMatrix = {1.0f};
+
+  glm::vec3 m_front;
   bool m_dirty = false;
 
   float m_aspectRatio;

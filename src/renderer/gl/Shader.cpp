@@ -14,6 +14,10 @@ void Shader::Bind() const {
   glUseProgram(m_id);
 }
 
+void Shader::Unbind() {
+  glUseProgram(0);
+}
+
 void Shader::SetInt(HashedString name, int value) const {
   ASSERT(m_uniformLocations.contains(name), "Uniform name not found");
   glUniform1i(m_uniformLocations[name], value);

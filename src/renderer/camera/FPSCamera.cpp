@@ -8,6 +8,12 @@
 #include "src/core/Logger.hpp"
 #include <imgui/imgui.h>
 
+
+void FPSCamera::UpdateMatrices() {
+  m_viewMatrix = glm::lookAt(m_pos, m_pos + m_front, UP);
+  m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspectRatio, m_nearPlane, m_farPlane);
+  m_VPMatrix = m_projectionMatrix * m_viewMatrix;
+}
 void FPSCamera::Update(double dt) {
   float offset = m_movementSpeed * (float) dt;
   if (Input::IsKeyDown(GLFW_KEY_W) || Input::IsKeyDown(GLFW_KEY_O)) {
@@ -34,19 +40,20 @@ void FPSCamera::Update(double dt) {
     m_pos -= UP * offset;
     m_dirty = true;
   }
-  if (m_dirty) UpdateViewMatrix();
+  if (m_dirty) {
+    UpdateMatrices();
+  }
 }
 
 FPSCamera::FPSCamera(float aspectRatio) :
     Camera(aspectRatio),
     m_fov(45.0f),
-    m_front({0,0,-1}),
     m_yaw(-90.0f),
     m_pitch(0),
     m_movementSpeed(DEFAULT_MOVEMENT_SPEED),
     m_mouseSensitivity(DEFAULT_MOUSE_SENSITIVITY) {
-  UpdateViewMatrix();
-  UpdateProjectionMatrix();
+  m_front = {0, 0, -1};
+  UpdateMatrices();
 }
 
 void FPSCamera::ProcessMouseMovement(double xOffset, double yOffset) {
@@ -58,8 +65,9 @@ void FPSCamera::ProcessMouseMovement(double xOffset, double yOffset) {
   eulers.y = glm::sin(glm::radians(m_pitch));
   eulers.z = glm::sin(glm::radians(m_yaw)) * glm::cos(glm::radians(m_pitch));
   m_front = glm::normalize(eulers);
+//  LOG_INFO("%f,%f,%f", m_front.x, m_front.y, m_front.z);
   m_right = glm::normalize(glm::cross(m_front, UP));
-  UpdateViewMatrix();
+  UpdateMatrices();
 }
 
 void FPSCamera::OnImGui() {
@@ -69,7 +77,7 @@ void FPSCamera::OnImGui() {
   float fovRad = glm::radians(m_fov);
   if (ImGui::SliderAngle("FOV", &fovRad, MIN_FOV, MAX_FOV)) {
     m_fov = glm::degrees(fovRad);
-    UpdateProjectionMatrix();
+    UpdateMatrices();
   }
   ImGui::SliderFloat("Movement Speed", &m_movementSpeed, MIN_MOVE_SPEED, MAX_MOVE_SPEED);
   ImGui::SliderFloat("Mouse Sensitivity", &m_mouseSensitivity, MIN_MOUSE_SENSITIVITY, MAX_MOUSE_SENSITIVITY);
@@ -82,17 +90,9 @@ void FPSCamera::OnImGui() {
 void FPSCamera::OnMouseScrollEvent(double yOffset) {
   m_fov += (float) yOffset;
   m_fov = glm::clamp(m_fov, MIN_FOV, MAX_FOV);
-  UpdateProjectionMatrix();
-}
-void FPSCamera::UpdateProjectionMatrix() {
-  m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspectRatio, m_nearPlane, m_farPlane);
-  m_VPMatrix = m_projectionMatrix * m_viewMatrix;
+  UpdateMatrices();
 }
 
-void FPSCamera::UpdateViewMatrix() {
-  m_viewMatrix = glm::lookAt(m_pos, m_pos + m_front, UP);
-  m_VPMatrix = m_projectionMatrix * m_viewMatrix;
-}
 
 void FPSCamera::SetTargetPos(const glm::vec3& targetPos) {
   m_viewMatrix = glm::lookAt(m_pos, targetPos, UP);

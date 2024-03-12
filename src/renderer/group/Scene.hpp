@@ -14,23 +14,28 @@ class Scene {
  public:
   Scene();
   explicit Scene(HashedString name);
-   Scene(HashedString name, const glm::vec3& defaultCameraPos);
+  Scene(HashedString name, const glm::vec3& defaultCameraPos);
   virtual ~Scene() = default;
-  void AddGroup(std::unique_ptr<Group> group);
-  void RemoveGroup(const Group* group);
   virtual void Update(double dt);
+  void ImGuiLights();
   virtual void OnImGui();
 
-
   [[nodiscard]] inline const std::vector<std::unique_ptr<Group>>& GetGroups() const { return m_groups; }
-  [[nodiscard]] inline const std::vector<std::unique_ptr<Light>>& GetLights() const { return m_lights; }
+  [[nodiscard]] const DirectionalLight* GetDirectionalLight() const;
+  [[nodiscard]] inline const std::vector<std::unique_ptr<PointLight>>* GetPointLights() const { return &m_pointLights; }
+  [[nodiscard]] inline const std::vector<std::unique_ptr<SpotLight>>* GetSpotLights() const { return &m_spotLights; }
 
-  inline HashedString GetName() const { return m_name; }
+  [[nodiscard]] inline HashedString GetName() const { return m_name; }
 
   glm::vec3 defaultCameraPosition;
  protected:
+  void AddGroup(std::unique_ptr<Group> group);
+  void RemoveGroup(const Group* group);
+
   HashedString m_name;
-  std::vector<std::unique_ptr<Light>> m_lights;
+  std::vector<std::unique_ptr<SpotLight>> m_spotLights;
+  std::vector<std::unique_ptr<PointLight>> m_pointLights;
+  std::unique_ptr<DirectionalLight> m_directionalLight = nullptr;
   std::vector<std::unique_ptr<Group>> m_groups;
 };
 

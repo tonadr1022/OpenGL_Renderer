@@ -8,7 +8,7 @@
 #include "src/core/Logger.hpp"
 #include "src/core/Utils.hpp"
 
-std::unordered_map<uint32_t, std::unique_ptr<Shader>> ShaderManager::m_shaders;
+std::unordered_map<HashedString, std::unique_ptr<Shader>> ShaderManager::m_shaders;
 std::unordered_map<uint32_t, ShaderManager::ShaderData> ShaderManager::m_shaderData;
 
 Shader* ShaderManager::AddShader(HashedString name, const std::vector<ShaderCreateInfo>& createInfos) {
@@ -42,7 +42,7 @@ Shader* ShaderManager::RecompileShader(HashedString name) {
   glDeleteProgram(oldIt->second.id);
   m_shaderData.erase(oldIt);
   auto it = m_shaderData.emplace(name, std::move(data.value()));
-  m_shaders.emplace(name, std::make_unique<Shader>(it.first->second.id, it.first->second.uniformIds));
+  m_shaders[name] = std::make_unique<Shader>(it.first->second.id, it.first->second.uniformIds);
   return m_shaders.at(name).get();
 }
 
@@ -110,7 +110,6 @@ void ShaderManager::InitializeUniforms(ShaderData& shaderData) {
     for (GLint i = 0; i < uniformCount; i++) {
       glGetActiveUniform(shaderData.id, i, maxNameLength, &uniformNameLength,
                          &uniformSize, &uniformType, uniformName);
-//      LOG_INFO("%s", uniformName);
       shaderData.uniformIds.emplace(HashedString(uniformName), glGetUniformLocation(shaderData.id, uniformName));
     }
   }
@@ -151,4 +150,12 @@ std::optional<ShaderManager::ShaderData> ShaderManager::CompileProgram(HashedStr
   InitializeUniforms(shaderData);
 
   return shaderData;
+}
+
+
+void ShaderManager::RecompileShaders() {
+  for (auto& shader: m_shaders) {
+    RecompileShader(shader.first);
+  }
+  LOG_INFO("Shaders Recompiled");
 }

@@ -4,6 +4,23 @@
 
 #include "Light.hpp"
 
-Light::Light(const  glm::vec3& position, const glm::vec3& color, Type type)
-    : position(position), color(color), type(type) {
-}
+LightBase::LightBase(const glm::vec3& color)
+    : color(color) {}
+
+PointLight::PointLight(const glm::vec3& position, const glm::vec3& color)
+    : LightBase(color), position(position) {}
+
+PointLight::PointLight(const glm::vec3& position)
+    : position(position) {}
+
+SpotLight::SpotLight(const glm::vec3& position, const glm::vec3& direction)
+    : position(position), direction(direction) {}
+
+SpotLight::SpotLight(const glm::vec3& position, const glm::vec3& color, const glm::vec3& direction)
+    : LightBase(color), position(position), direction(direction) {}
+
+DirectionalLight::DirectionalLight(const glm::vec3& color, const glm::vec3& direction)
+    : LightBase(color), direction(direction) {}
+
+DirectionalLight::DirectionalLight(const glm::vec3& direction)
+    : direction(direction) {}
