@@ -15,12 +15,9 @@ class TextureManager {
     m_textures[name] = std::make_unique<Texture>(std::forward<Args>(args)...);
     return m_textures.at(name).get();
   }
-
   static Texture* GetTexture(HashedString name);
  private:
   static std::unordered_map<HashedString , std::unique_ptr<Texture>> m_textures;
-
-
 };
 
 #endif //OPENGL_RENDERER_SRC_RENDERER_RESOURCE_TEXTUREMANAGER_HPP_

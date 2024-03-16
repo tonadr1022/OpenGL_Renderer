@@ -9,7 +9,6 @@
 #include "src/renderer/gl/VertexArray.hpp"
 #include "src/renderer/gl/VertexBuffer.hpp"
 #include "src/renderer/gl/ElementBuffer.hpp"
-#include "src/renderer/gl/Texture.hpp"
 
 #include <vector>
 #include <memory>

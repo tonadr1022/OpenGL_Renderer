@@ -13,14 +13,14 @@
 class Object {
  public:
   Object(const Mesh* mesh, Material* material);
-  Object(const Mesh* mesh);
+  explicit Object(const Mesh* mesh);
 
   Transform transform;
   void SetMaterial(Material* material);
   void SetMesh(const Mesh* mesh);
-  bool HasMaterial() const;
-  const Material* GetMaterial() const;
-  const Mesh* GetMesh() const;
+  [[nodiscard]] bool HasMaterial() const;
+  [[nodiscard]] const Material* GetMaterial() const;
+  [[nodiscard]] const Mesh* GetMesh() const;
 
  protected:
   const Material* m_material = nullptr;

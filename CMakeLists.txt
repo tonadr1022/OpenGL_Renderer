@@ -97,6 +97,10 @@ add_executable(opengl_renderer
         src/scenes/LightingOneScene.hpp
         src/renderer/Light.cpp
         src/renderer/Light.hpp
+        src/renderer/group/Model.cpp
+        src/renderer/group/Model.hpp
+        src/scenes/ModelViewerScene.cpp
+        src/scenes/ModelViewerScene.hpp
 )
 
 
@@ -121,13 +125,24 @@ add_definitions(-Wall -v)
 
 add_subdirectory(dep/glfw)
 add_subdirectory(dep/glm)
-add_subdirectory(dep/assimp)
 
-include_directories(dep/assimp/include)
+include(FetchContent)
+
+FetchContent_Declare(
+        assimp
+        GIT_REPOSITORY https://github.com/assimp/assimp.git
+)
+
+FetchContent_MakeAvailable(assimp)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build Assimp as static library" FORCE)
+set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "Build Assimp tools" FORCE)
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "Build Assimp tests" FORCE)
+set(ASSIMP_INSTALL OFF CACHE BOOL "Install Assimp" FORCE)
+
 
 find_package(OpenGL REQUIRED)
 
-target_link_libraries(opengl_renderer ${OPENGL_LIBRARIES} glfw glm)
+target_link_libraries(opengl_renderer ${OPENGL_LIBRARIES} glfw glm assimp::assimp)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
     set_property(TARGET opengl_renderer PROPERTY CXX_STANDARD 20)

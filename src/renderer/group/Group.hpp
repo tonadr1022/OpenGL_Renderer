@@ -9,9 +9,6 @@
 #include <memory>
 #include "Object.hpp"
 
-/**
- * @brief Lowest level of scene graph containing objects
- */
 class Group {
  public:
   Transform transform;
@@ -23,10 +20,9 @@ class Group {
   inline void SetWireFrame(bool wireFrame) { m_wireFrame = wireFrame; }
   inline void SetVisible(bool visible) { m_visible = visible; }
   [[nodiscard]] inline const std::vector<std::unique_ptr<Object>>& GetObjects() const { return m_objects; }
- private:
+ protected:
   bool m_visible{true}, m_wireFrame{false};
   std::vector<std::unique_ptr<Object>> m_objects;
-
 };
 
 #endif //OPENGL_RENDERER_SRC_RENDERER_GROUP_HPP_

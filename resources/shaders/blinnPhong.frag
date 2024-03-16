@@ -70,6 +70,7 @@ uniform bool hasDiffuseMap;
 uniform bool hasSpecularMap;
 uniform bool hasEmissionMap;
 
+
 uniform vec3 u_ViewPos;
 
 uniform int renderMode;// 0 normal, 1 normals
@@ -92,11 +93,24 @@ vec3 calcLightColor(LightBase light, vec3 lightDir, vec3 norm) {
 
     // specular
     vec3 viewDir = normalize(u_ViewPos - FragPos);
-    vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0), material.shininess);
+    float spec = 0.0;
+
+    // blinn vs no blinn
+    if (true) {
+        vec3 halfwayDir = normalize(lightDir + viewDir);
+        spec = pow(max(dot(norm, halfwayDir), 0.0), material.shininess);
+    } else {
+        vec3 reflectDir = reflect(-lightDir, norm);
+        spec = pow(max(dot(viewDir, reflectDir), 0), material.shininess);
+    }
     vec3 specular =  light.color * light.specularIntensity * spec * specularColor;
 
     return ambient + diffuse + specular;
+}
+
+float attenuate(Light light) {
+    float distToLight = length(light.position - FragPos);
+    return 1.0 / (1 + light.linear * distToLight + light.quadratic * distToLight * distToLight);
 }
 
 vec3 calcDirectionalLight(DirectionalLight light, vec3 norm) {
@@ -106,8 +120,7 @@ vec3 calcDirectionalLight(DirectionalLight light, vec3 norm) {
 
 vec3 calcPointLight(PointLight light, vec3 norm) {
     vec3 lightDir = normalize(light.position - FragPos);
-    float distToLight = length(light.position - FragPos);
-    float attenuation = 1.0 / (1 + light.linear * distToLight + light.quadratic * distToLight * distToLight);
+    float attenuation = attenuate(light, distToLight);
 
     vec3 lightColor = calcLightColor(light.base, lightDir, norm);
     return lightColor * attenuation;
@@ -116,8 +129,7 @@ vec3 calcPointLight(PointLight light, vec3 norm) {
 
 vec3 calcSpotLight(SpotLight light, vec3 norm) {
     vec3 lightDir = normalize(light.position - FragPos);
-    float distToLight = length(light.position -FragPos);
-    float attenuation = 1.0 / (1 + light.linear * distToLight + light.quadratic * distToLight * distToLight);
+    float attenuation = attenuate(light, distToLight);
 
     float theta = dot(lightDir, normalize(-light.direction));
     float epsilon = light.innerCutoff - light.outerCutoff;

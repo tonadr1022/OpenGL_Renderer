@@ -6,6 +6,9 @@
 #define OPENGL_RENDERER_SRC_RENDERER_RESOURCE_MESHMANAGER_HPP_
 
 #include "src/renderer/Mesh.hpp"
+#include <unordered_map>
+#include "src/core/HashedString.hpp"
+
 
 class MeshManager {
  public:

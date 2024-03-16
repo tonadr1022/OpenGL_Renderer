@@ -27,5 +27,6 @@ void MeshManager::RemoveMesh(HashedString name) {
 
 Mesh* MeshManager::AddMesh(HashedString name, std::unique_ptr<Mesh> mesh) {
   if (m_meshes.find(name) != m_meshes.end()) LOG_ERROR("Mesh of name %s already found", name.data());
-  m_meshes.emplace(name, std::move(mesh));
+  auto it = m_meshes.emplace(name, std::move(mesh));
+  return it.first->second.get();
 }

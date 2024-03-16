@@ -7,10 +7,10 @@
 #include "src/renderer/resource/MeshManager.hpp"
 #include "src/core/Logger.hpp"
 #include "imgui/imgui.h"
+#include "src/renderer/group/Model.hpp"
 
 LightingOneScene::LightingOneScene() : Scene("Lighting One", {1, 2, 4}) {
-  auto
-      plane = std::make_unique<Object>(MeshManager::GetMesh("cube1024"), MaterialManager::GetMaterial("woodContainer"));
+  auto plane = std::make_unique<Object>(MeshManager::GetMesh("cube1024"), MaterialManager::GetMaterial("woodContainer"));
   plane->transform.Scale({1000, 1, 1000});
   plane->transform.UpdateModelMatrix();
   auto g = std::make_unique<Group>();
@@ -34,11 +34,12 @@ LightingOneScene::LightingOneScene() : Scene("Lighting One", {1, 2, 4}) {
   m_directionalLight = std::make_unique<DirectionalLight>(directionalDir);
   glm::vec3 iter = {1, 1, 0};
 
-//  for (iter.x = 0.0f; iter.x < 20; iter.x += 10.0f) {
-//    for (iter.z = -10.0f; iter.z <= 0.0f; iter.z += 10.0f) {
-//      m_pointLights.emplace_back(std::make_unique<PointLight>(iter));
-//    }
-//  }
+  for (iter.x = 0.0f; iter.x < 20.0f; iter.x += 10.0f) {
+    for (iter.z = -10.0f; iter.z <= 0.0f; iter.z += 10.0f) {
+      m_pointLights.emplace_back(std::make_unique<PointLight>(iter));
+    }
+  }
+
 glm::vec3 dir = {0,-1,0};
 m_spotLights.emplace_back(std::make_unique<SpotLight>(iter, dir));
 }

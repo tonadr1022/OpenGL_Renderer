@@ -4,16 +4,21 @@
 
 #include "Application.hpp"
 #include "src/renderer/resource/ShaderManager.hpp"
-#include "src/scenes/PlaygroundScene.hpp"
 #include "imgui/imgui.h"
 #include "src/core/Logger.hpp"
 #include "src/imgui/ImGuiMenu.hpp"
 #include "src/Common.hpp"
-#include "src/scenes/LightingOneScene.hpp"
+
 #include "src/renderer/resource/MeshManager.hpp"
 #include "src/renderer/shapes/Cube.hpp"
 #include "src/renderer/resource/TextureManager.hpp"
 #include "src/renderer/resource/MaterialManager.hpp"
+
+
+#include "src/scenes/LightingOneScene.hpp"
+#include "src/scenes/PlaygroundScene.hpp"
+#include "src/scenes/ModelViewerScene.hpp"
+
 
 Application* Application::instancePtr = nullptr;
 
@@ -62,7 +67,8 @@ void Application::SetupResources() {
 void Application::Run() {
   m_sceneManager.AddScene(std::make_unique<PlaygroundScene>());
   m_sceneManager.AddScene(std::make_unique<LightingOneScene>());
-  m_sceneManager.SetActiveScene("Lighting One");
+  m_sceneManager.AddScene(std::make_unique<ModelViewerScene>());
+  m_sceneManager.SetActiveScene("Model Viewer");
   OnSceneChange();
 
   double currTime, lastTime = glfwGetTime(), deltaTime;

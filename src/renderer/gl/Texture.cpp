@@ -42,8 +42,20 @@ uint32_t Texture::GetHeight() const {
 void Texture::GenerateTextureFromBuffer(unsigned char* buffer) {
   glGenTextures(1, &m_id);
   Bind();
-  GLint type = m_numChannels == 3 ? GL_RGB : m_numChannels == 4 ? GL_RGBA : GL_RGB;
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, type, GL_UNSIGNED_BYTE, buffer);
+  GLenum format;
+  switch (m_numChannels) {
+    case 1:format = GL_RED;
+      break;
+    case 3:format = GL_RGB;
+      break;
+    case 4:format = GL_RGBA;
+      break;
+    default:
+      format = GL_RGB;
+      break;
+  }
+
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (GLsizei) m_width, (GLsizei) m_height, 0, format, GL_UNSIGNED_BYTE, buffer);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
