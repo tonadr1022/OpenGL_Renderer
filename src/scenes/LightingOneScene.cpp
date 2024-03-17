@@ -10,15 +10,17 @@
 #include "src/renderer/group/Model.hpp"
 
 LightingOneScene::LightingOneScene() : Scene("Lighting One", {1, 2, 4}) {
-  auto plane = std::make_unique<Object>(MeshManager::GetMesh("cube1024"), MaterialManager::GetMaterial("woodContainer"));
+  Material* woodContainerMat = MaterialManager::GetMaterial("woodContainer");
+  Mesh* cubeMesh = MeshManager::GetMesh("cube");
+
+  auto plane = std::make_unique<Object>(MeshManager::GetMesh("cube1024"), woodContainerMat);
   plane->transform.Scale({1000, 1, 1000});
   plane->transform.UpdateModelMatrix();
   auto g = std::make_unique<Group>();
   g->AddObject(std::move(plane));
-
   for (int z = -200; z <= 20; z += 5) {
     for (int x = -20; x <= 20; x += 5) {
-      auto cube = std::make_unique<Object>(MeshManager::GetMesh("cube"), MaterialManager::GetMaterial("woodContainer"));
+      auto cube = std::make_unique<Object>(cubeMesh, woodContainerMat);
       cube->transform.Translate({x, 3, z});
       m_cubes.push_back(cube.get());
       g->AddObject(std::move(cube));

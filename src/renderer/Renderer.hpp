@@ -16,15 +16,21 @@ class Renderer {
     None, BlinnPhong
   };
   enum class DebugMode {
-    None, Normals,
+    None, Normals, Diffuse, DepthBuffer
   };
 
   struct RenderSettings {
     bool wireframe{false};
     bool renderToImGuiViewport{false};
-    bool renderDirectionalLights{false};
+    bool renderDirectionalLights{true};
     bool renderSpotlights{true};
     bool renderPointLights{true};
+    bool useBlinn{true};
+
+    bool diffuseMapEnabled{true};
+    bool specularMapEnabled{true};
+    bool normalMapEnabled{true};
+    bool emissionMapEnabled{true};
   };
 
   Renderer(Window& window, bool renderToImGuiViewport);
@@ -34,6 +40,7 @@ class Renderer {
   void SetDirectionalLight(const DirectionalLight* directionalLight);
   void SetSpotLights(const std::vector<std::unique_ptr<SpotLight>>* spotLights);
   void SetPointLights(const std::vector<std::unique_ptr<PointLight>>* pointLights);
+  void Reset();
 
   struct PerFrameStats {
     uint32_t drawCalls{0};
@@ -58,12 +65,16 @@ class Renderer {
   const std::vector<std::unique_ptr<PointLight>>* m_pointLights = nullptr;
   const std::vector<std::unique_ptr<SpotLight>>* m_spotLights = nullptr;
 
+  Shader* m_screenShader = nullptr;
+
   Window& m_window;
   Camera* m_camera = nullptr;
   RenderState state;
   FrameCapturer m_frameCapturer;
   PerFrameStats stats;
   RenderSettings m_settings;
+
+  VertexArray m_quadVAO;
 
 
   void UpdateRenderState(const Object& object);

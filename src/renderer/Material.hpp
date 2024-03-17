@@ -38,8 +38,12 @@ struct Material {
   std::vector<Texture*> textures;
   std::vector<PerMaterialUniformData> materialUniforms;
   HashedString shaderName;
-  glm::vec3 color = {0.0f, 0.0f, 0.0f};
+  glm::vec3 specularColor = {1.0,1.0,1.0};
+  glm::vec3 diffuseColor = {1.0,1.0,1.0};
+  glm::vec3 ambientColor = {1.0,1.0,1.0};
   Type type;
+  float shininess = 32;
+  float strength = 1;
 
   Material(const std::vector<Texture*>& textures,
            const std::vector<PerMaterialUniformData>& materialUniforms,
@@ -55,11 +59,11 @@ struct Material {
   }
 
   Material(const glm::vec3& color, HashedString shaderName, Type type)
-      : shaderName(shaderName), color(color), type(type) {
+      : shaderName(shaderName), type(type) {
   }
 
   Material(HashedString shaderName, Type type)
-      : shaderName(shaderName), color(glm::vec3(1, 1, 1)), type(type) {
+      : shaderName(shaderName), type(type) {
   }
 
   Material(const std::vector<Texture*>& textures,
@@ -76,11 +80,11 @@ struct Material {
   }
 
   Material(const glm::vec3& color, HashedString shaderName)
-      : shaderName(shaderName), color(color), type(Type::BlinnPhong) {
+      : shaderName(shaderName), type(Type::BlinnPhong) {
   }
 
   explicit Material(HashedString shaderName)
-      : shaderName(shaderName), color(glm::vec3(1, 1, 1)), type(Type::BlinnPhong) {
+      : shaderName(shaderName), type(Type::BlinnPhong) {
   }
 
 };

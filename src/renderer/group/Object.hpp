@@ -19,11 +19,12 @@ class Object {
   void SetMaterial(Material* material);
   void SetMesh(const Mesh* mesh);
   [[nodiscard]] bool HasMaterial() const;
-  [[nodiscard]] const Material* GetMaterial() const;
+  [[nodiscard]] Material* GetMaterial() const;
   [[nodiscard]] const Mesh* GetMesh() const;
-
+  bool shouldDraw = true;
+  bool cameraVisible = true;
  protected:
-  const Material* m_material = nullptr;
+  Material* m_material = nullptr;
   const Mesh* m_mesh = nullptr;
 };
 

@@ -15,6 +15,7 @@ class OrbitCamera : public Camera {
   void OnImGui() override;
   void Update(double dt) override;
   void ResetSettings();
+  virtual void SetPosition(const glm::vec3& newPos);
   void ProcessMouseMovement(double xOffset, double yOffset) override;
   void OnMouseScrollEvent(double yOffset) override;
   void SetTargetPos(const glm::vec3& targetPos) override;

@@ -9,17 +9,18 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-
+struct Material;
 class Model : public Group {
  public:
-  explicit Model(const std::string& path);
+  explicit Model(const std::string& path, bool backfaceCull = true);
 
  private:
   std::string m_directory;
   std::string m_name;
   void ProcessNodes(aiNode* rootNode, const aiScene* scene);
   void ProcessMesh(aiMesh* mesh, const aiScene* scene);
-  std::vector<Texture*> LoadMaterialTextures(aiMaterial* material, aiTextureType aiType, Texture::Type textureType);
+  Material* LoadMaterial(aiMaterial* aiMat, HashedString matName);
+  std::vector<Texture*> LoadMaterialTextures(aiMaterial* aiMaterial, aiTextureType aiType, Texture::Type textureType);
 
 
 };

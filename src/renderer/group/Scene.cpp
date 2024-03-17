@@ -26,8 +26,8 @@ Scene::Scene() : defaultCameraPosition({0, 0, 0}), m_name("Default") {}
 
 Scene::Scene(HashedString name) : defaultCameraPosition({0, 0, 0}), m_name(name) {}
 
-Scene::Scene(HashedString name, const glm::vec3& defaultCameraPos)
-    : defaultCameraPosition(defaultCameraPos), m_name(name) {}
+Scene::Scene(HashedString name, const glm::vec3& defaultCameraPos, CameraController::Mode defaultCamMode)
+    : defaultCameraPosition(defaultCameraPos),defaultCameraMode(defaultCamMode), m_name(name) {}
 
 void Scene::ImGuiLights() {
   if (m_directionalLight != nullptr) {
@@ -41,7 +41,7 @@ void Scene::ImGuiLights() {
     std::string iStr = std::to_string(i);
     ImGui::DragFloat3(("Position##" + iStr).c_str(), &light->position.x, 0.1);
     ImGui::ColorEdit3(("Color##" + iStr).c_str(), &light->color.x);
-//    ImGui::DragFloat("Intensity")
+    ImGui::DragFloat(("Intensity##"+iStr).c_str(), &light->radius, 0.1, 0, 100);
     i++;
   }
 
@@ -51,8 +51,10 @@ void Scene::ImGuiLights() {
     std::string iStr = std::to_string(i);
     ImGui::DragFloat3(("Position##" + iStr).c_str(), &light->position.x, 0.1);
     ImGui::ColorEdit3(("Color##" + iStr).c_str(), &light->color.x);
+    ImGui::DragFloat(("Intensity##"+iStr).c_str(), &light->radius, 1, 100);
     ImGui::DragFloat(("Angle##" + iStr).c_str(), &light->angle, 0.1, 1, 90);
     ImGui::DragFloat(("Penumbra##" + iStr).c_str(), &light->penumbra, 0.1, 0, light->angle);
+    i++;
   }
 }
 
@@ -63,4 +65,10 @@ const DirectionalLight* Scene::GetDirectionalLight() const {
 
 void Scene::OnImGui() {
 
+}
+
+void Scene::PreRender() {
+  for (auto& group : m_groups) {
+    group->UpdateTransforms();
+  }
 }

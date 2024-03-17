@@ -12,7 +12,7 @@ class Camera {
   explicit Camera(float aspectRatio);
   virtual ~Camera() = default;
   virtual void Update(double dt);
-  void SetPosition(const glm::vec3& newPos);
+  virtual void SetPosition(const glm::vec3& newPos);
   virtual void SetTargetPos(const glm::vec3& targetPos) = 0;
   [[nodiscard]] inline const glm::vec3& GetPosition() const { return m_pos; };
   [[nodiscard]] inline const glm::mat4& GetProjectionMatrix() const { return m_projectionMatrix; }

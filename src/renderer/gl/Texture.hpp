@@ -13,8 +13,8 @@ class Texture {
  public:
   enum class Type { None, Diffuse, Specular, Emission, Normal };
 
-  Texture(const std::string& texturePath, Type type);
-  Texture(uint32_t width, uint32_t height, bool mipmap);
+  Texture(const std::string& texturePath, Type type, bool flip = true, bool mipmap = true);
+  Texture(uint32_t width, uint32_t height);
   ~Texture();
   void Bind() const;
   void Bind(int slot) const;
@@ -32,14 +32,12 @@ class Texture {
   inline Type GetType() const { return m_type; }
  private:
   static int count;
-  bool m_flipVertically;
-  bool m_generateMipmaps;
   uint32_t m_width{0}, m_height{0}, m_numChannels{0};
   GLuint m_id{0};
   Type m_type;
 //  GLint m_slot{0};
-  void GenerateTextureFromFile(const std::string& texturePath);
-  void GenerateTextureFromBuffer(unsigned char* buffer);
+  void GenerateTextureFromFile(const std::string& texturePath, bool flip, bool mipmap);
+  void GenerateTextureFromBuffer(unsigned char* buffer, bool mipmap);
 };
 
 #endif //OPENGL_RENDERER_SRC_RENDERER_GL_TEXTURE_HPP_

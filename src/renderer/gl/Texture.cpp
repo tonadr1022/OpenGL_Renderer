@@ -9,14 +9,14 @@
 
 int Texture::count = 0;
 
-Texture::Texture(const std::string& texturePath, Type type)
-    : m_flipVertically(true), m_generateMipmaps(true), m_type(type) {
-  GenerateTextureFromFile(texturePath);
+Texture::Texture(const std::string& texturePath, Type type, bool flip, bool mipmap)
+    :   m_type(type) {
+  GenerateTextureFromFile(texturePath, flip, mipmap);
 }
 
-Texture::Texture(uint32_t width, uint32_t height, bool mipmap)
-    : m_flipVertically(true), m_generateMipmaps(mipmap), m_width(width), m_height(height), m_type(Type::None) {
-  GenerateTextureFromBuffer(nullptr);
+Texture::Texture(uint32_t width, uint32_t height)
+    : m_width(width), m_height(height), m_type(Type::None) {
+  GenerateTextureFromBuffer(nullptr, false);
 }
 
 Texture::~Texture() {
@@ -39,7 +39,7 @@ uint32_t Texture::GetHeight() const {
   return m_height;
 }
 
-void Texture::GenerateTextureFromBuffer(unsigned char* buffer) {
+void Texture::GenerateTextureFromBuffer(unsigned char* buffer, bool mipmap) {
   glGenTextures(1, &m_id);
   Bind();
   GLenum format;
@@ -55,18 +55,17 @@ void Texture::GenerateTextureFromBuffer(unsigned char* buffer) {
       break;
   }
 
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (GLsizei) m_width, (GLsizei) m_height, 0, format, GL_UNSIGNED_BYTE, buffer);
+  glTexImage2D(GL_TEXTURE_2D, 0, format, (GLsizei) m_width, (GLsizei) m_height, 0, format, GL_UNSIGNED_BYTE, buffer);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  if (m_generateMipmaps) glGenerateMipmap(GL_TEXTURE_2D);
+  if (mipmap) glGenerateMipmap(GL_TEXTURE_2D);
 //  m_slot = GL_TEXTURE0 + count;
 //  count++;
 }
 
 void Texture::Bind() const {
-//  glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, m_id);
 }
 
@@ -79,15 +78,15 @@ void Texture::Unbind() {
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Texture::GenerateTextureFromFile(const std::string& texturePath) {
-  if (m_flipVertically) {
+void Texture::GenerateTextureFromFile(const std::string& texturePath, bool flip, bool mipmap) {
+  if (flip) {
     stbi_set_flip_vertically_on_load(true);
   }
 
   unsigned char* data = stbi_load(texturePath.c_str(), reinterpret_cast<int*>(&m_width),
                                   reinterpret_cast<int*>(&m_height), reinterpret_cast<int*>(&m_numChannels), 0);
   if (data) {
-    GenerateTextureFromBuffer(data);
+    GenerateTextureFromBuffer(data, mipmap);
     stbi_image_free(data);
   } else {
     LOG_ERROR("Error loading Texture: %s", texturePath);

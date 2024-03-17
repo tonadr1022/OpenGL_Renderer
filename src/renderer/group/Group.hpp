@@ -11,6 +11,7 @@
 
 class Group {
  public:
+  explicit Group(bool backFaceCull = true);
   Transform transform;
   void AddObject(std::unique_ptr<Object> object);
   void RemoveObject(const Object* object);
@@ -19,7 +20,9 @@ class Group {
   [[nodiscard]] inline bool GetWireFrame() const { return m_wireFrame; }
   inline void SetWireFrame(bool wireFrame) { m_wireFrame = wireFrame; }
   inline void SetVisible(bool visible) { m_visible = visible; }
+  void UpdateTransforms();
   [[nodiscard]] inline const std::vector<std::unique_ptr<Object>>& GetObjects() const { return m_objects; }
+  bool backFaceCull = true;
  protected:
   bool m_visible{true}, m_wireFrame{false};
   std::vector<std::unique_ptr<Object>> m_objects;

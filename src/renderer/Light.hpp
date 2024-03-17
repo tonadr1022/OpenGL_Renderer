@@ -24,8 +24,9 @@ struct LightBase {
 
 struct PointLight : public LightBase {
   glm::vec3 position;
-  float linear = 0.09;
-  float quadratic = 0.032;
+//  float linear = 0.09;
+//  float quadratic = 0.032;
+  float radius = 10;
 
   // Default constructor
   PointLight(const glm::vec3& position, const glm::vec3& color);
@@ -35,8 +36,9 @@ struct PointLight : public LightBase {
 struct SpotLight : public LightBase {
   glm::vec3 position;
   glm::vec3 direction;
-  float linear = 0.09;
-  float quadratic = 0.032;
+  float radius = 10;
+//  float linear = 0.09;
+//  float quadratic = 0.032;
   float penumbra = 5.0f;
   float angle = 17.5f;
 

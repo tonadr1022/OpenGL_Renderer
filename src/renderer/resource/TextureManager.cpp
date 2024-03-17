@@ -10,7 +10,7 @@
 Texture* TextureManager::GetTexture(HashedString name) {
   auto it = m_textures.find(name);
   if (it == m_textures.end()) {
-    LOG_ERROR("Texture not found: %s", name.data());
+//    LOG_ERROR("Texture not found: %s", name.data());
     return nullptr;
   }
   return it->second.get();

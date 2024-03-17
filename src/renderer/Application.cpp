@@ -14,11 +14,9 @@
 #include "src/renderer/resource/TextureManager.hpp"
 #include "src/renderer/resource/MaterialManager.hpp"
 
-
 #include "src/scenes/LightingOneScene.hpp"
 #include "src/scenes/PlaygroundScene.hpp"
 #include "src/scenes/ModelViewerScene.hpp"
-
 
 Application* Application::instancePtr = nullptr;
 
@@ -52,8 +50,6 @@ void Application::SetupResources() {
 
   MeshManager::AddMesh("cube", Cube::Vertices, Cube::Indices);
   MeshManager::AddMesh("cube1024", Cube::Create(1024, 1024));
-  TextureManager::AddTexture("cow", GET_TEXTURE_PATH("cow.png"), Texture::Type::Diffuse);
-
   std::vector<Texture*> textures = {TextureManager::AddTexture("woodContainerDiffuse",
                                                                GET_TEXTURE_PATH("container_diffuse.png"),
                                                                Texture::Type::Diffuse),
@@ -62,6 +58,14 @@ void Application::SetupResources() {
                                                                Texture::Type::Specular)};
 //                                    TextureManager::AddTexture("woodContainerEmission", GET_TEXTURE_PATH("container_emission.jpg"), Texture::Type::Emission)};
   MaterialManager::AddMaterial("woodContainer", textures, "blinnPhong");
+
+  textures.clear();
+//  TextureManager::AddTexture("cowbasic", GET_TEXTURE_PATH("cow.png"), Texture::Type::Diffuse);
+
+  textures.push_back(TextureManager::AddTexture("spotTextured",
+                                                "resources/models/spot/spot_texture.png",
+                                                Texture::Type::Diffuse));
+  MaterialManager::AddMaterial("spotTextured", textures, "blinnPhong");
 }
 
 void Application::Run() {
@@ -84,8 +88,9 @@ void Application::Run() {
     m_sceneManager.GetActiveScene()->Update(deltaTime);
     m_cameraController.Update(deltaTime);
 
-    // render
+    m_sceneManager.GetActiveScene()->PreRender();
 
+    // render
     if (m_settings.showImGui) ImGuiMenu::StartFrame(m_renderToImGuiViewport);
     m_renderer.RenderScene(*m_sceneManager.GetActiveScene(), m_cameraController.GetActiveCamera());
     if (m_settings.showImGui) OnImGui();
@@ -98,64 +103,80 @@ void Application::Run() {
 void Application::OnImGui() {
   auto& rendererStats = m_renderer.GetStats();
   auto& rendererSettings = m_renderer.GetSettings();
-  ImGui::Begin("Metrics");
-  ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-              1000.0f / ImGui::GetIO().Framerate,
-              ImGui::GetIO().Framerate);
-  ImGui::Text("Draw Calls: %i", rendererStats.drawCalls);
-  ImGui::Text("Vertices: %i", rendererStats.vertices);
-  ImGui::Text("Indices: %i", rendererStats.indices);
-  ImGui::End(); // metrics
-
-  ImGui::Begin("Settings");
-
-  ImGui::Checkbox("Wireframe", &rendererSettings.wireframe);
-  if (ImGui::Checkbox("Render to ImGui Viewport", &m_renderToImGuiViewport)) {
-    rendererSettings.renderToImGuiViewport = m_renderToImGuiViewport;
-  }
-  ImGui::End(); // settings
 
   ImGui::Begin("Main");
 
-  ImGui::Text("Mode");
-  if (ImGui::Button("Normals")) {
-    m_renderer.debugMode = Renderer::DebugMode::Normals;
-  }
-  ImGui::SameLine();
-  if (ImGui::Button("None")) {
-    m_renderer.debugMode = Renderer::DebugMode::None;
-  }
-  if (ImGui::Button("Recompile Shaders")) {
-    ShaderManager::RecompileShaders();
+  static bool demoWindow = false;
+  ImGui::Checkbox("Show Demo", &demoWindow);
+
+  m_sceneManager.ImGuiSceneSelect();
+  bool metricsOpen = true;
+  if (ImGui::CollapsingHeader("Metrics", metricsOpen)) {
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+                1000.0f / ImGui::GetIO().Framerate,
+                ImGui::GetIO().Framerate);
+    ImGui::Text("Draw Calls: %i", rendererStats.drawCalls);
+    ImGui::Text("Vertices: %i", rendererStats.vertices);
+    ImGui::Text("Indices: %i", rendererStats.indices);
   }
 
-  auto& names = m_sceneManager.GetSceneNames();
-  if (ImGui::BeginMenu("Scenes")) {
-    for (auto& name : names) {
-      if (ImGui::MenuItem(name.data(), nullptr, false)) {
-        m_sceneManager.SetActiveScene(name);
-        OnSceneChange();
+  if (ImGui::CollapsingHeader("Render Settings")) {
+    constexpr std::array<const char*, 4> items = { "Default", "Normals", "Diffuse", "Depth Buffer" };
+    int selectedItem = static_cast<int>(m_renderer.debugMode);
+    if (ImGui::BeginCombo("##RenderModeCombo", ("Mode: " + std::string(items[selectedItem])).c_str())) {
+      for (int i =0; i < items.size(); i++) {
+        const bool isSelected = (selectedItem == i);
+        if (ImGui::Selectable(items[i], isSelected)) {
+          selectedItem = i;
+          m_renderer.debugMode = (Renderer::DebugMode)selectedItem;
+          if (isSelected) ImGui::SetItemDefaultFocus();
+        }
       }
+      ImGui::EndCombo();
     }
-    ImGui::EndMenu();
+
+    if (ImGui::TreeNode("Maps")) {
+      ImGui::Checkbox("Diffuse", &rendererSettings.diffuseMapEnabled);
+      ImGui::SameLine();
+      ImGui::Checkbox("Specular", &rendererSettings.specularMapEnabled);
+      ImGui::Checkbox("Normal", &rendererSettings.normalMapEnabled);
+      ImGui::SameLine();
+      ImGui::Checkbox("Emission", &rendererSettings.emissionMapEnabled);
+      ImGui::TreePop();
+    }
+
+    ImGui::Checkbox("Wireframe", &rendererSettings.wireframe);
+    ImGui::Checkbox("Use Blinn", &rendererSettings.useBlinn);
+    if (ImGui::Checkbox("Render to ImGui Viewport", &m_renderToImGuiViewport)) {
+      rendererSettings.renderToImGuiViewport = m_renderToImGuiViewport;
+    }
+    if (ImGui::Button("Recompile Shaders")) {
+      ShaderManager::RecompileShaders();
+    }
+
+
   }
 
+  if (ImGui::CollapsingHeader("Camera")) {
+    m_cameraController.OnImGui();
+  }
+
+  if (ImGui::CollapsingHeader("Lights")) {
+    ImGui::Text("Enabled Lights");
+    ImGui::Checkbox("Directional", &rendererSettings.renderDirectionalLights);
+    ImGui::SameLine();
+    ImGui::Checkbox("Point", &rendererSettings.renderPointLights);
+    ImGui::SameLine();
+    ImGui::Checkbox("Spot", &rendererSettings.renderSpotlights);
+    m_sceneManager.GetActiveScene()->ImGuiLights();
+  }
 
   ImGui::End();
 
-  ImGui::Begin("Lights");
-  ImGui::Text("Enabled Lights");
-  ImGui::Checkbox("Directional", &rendererSettings.renderDirectionalLights);
-  ImGui::SameLine();
-  ImGui::Checkbox("Point", &rendererSettings.renderPointLights);
-  ImGui::SameLine();
-  ImGui::Checkbox("Spot", &rendererSettings.renderSpotlights);
+  m_sceneManager.GetActiveScene()->OnImGui();
 
-  m_sceneManager.GetActiveScene()->ImGuiLights();
-  ImGui::End();
-
-  m_cameraController.OnImGui();
-
+  if (demoWindow)
+    ImGui::ShowDemoWindow(&demoWindow);
 
   // need to set focus on window if user is aiming camera in it
   static bool imguiViewportFocused = false;
@@ -238,6 +259,7 @@ void Application::OnMouseScrollEvent(double yOffset) {
 
 void Application::OnSceneChange() {
   Scene* activeScene = m_sceneManager.GetActiveScene();
+  m_cameraController.SetMode(activeScene->defaultCameraMode);
   m_cameraController.GetActiveCamera()->SetPosition(activeScene->defaultCameraPosition);
   m_renderer.SetDirectionalLight(activeScene->GetDirectionalLight());
   m_renderer.SetPointLights(activeScene->GetPointLights());
@@ -245,10 +267,10 @@ void Application::OnSceneChange() {
 //        m_cameraController.GetActiveCamera().SetTargetPos({0, 0, 0});
 }
 
-void Application::OnKeyEvent(int key, int action) {
+void Application::OnKeyEvent(int key, int action, int mods) {
   bool pressed = action == GLFW_PRESS;
   if (pressed) {
-    if (key == GLFW_KEY_BACKSPACE) {
+    if (key == GLFW_KEY_BACKSPACE && mods == GLFW_MOD_SHIFT) {
       m_window.SetShouldClose(true);
     } else if (key == GLFW_KEY_M) {
       ShaderManager::RecompileShaders();

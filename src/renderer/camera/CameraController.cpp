@@ -22,10 +22,11 @@ CameraController::CameraController(const Window& window)
 
 void CameraController::SetMode(CameraController::Mode mode) {
   m_mode = mode;
+  std::cout << "settingmode  " << (int) m_mode << "  " << (int) mode << '\n';
   switch (m_mode) {
     case Mode::FPS:m_activeCamera = m_fpsCamera.get();
       break;
-    case Mode::ORBIT: m_activeCamera = m_orbitCamera.get();
+    case Mode::Orbit: m_activeCamera = m_orbitCamera.get();
       break;
   }
 }
@@ -43,17 +44,16 @@ void CameraController::Update(double dt) {
 }
 
 void CameraController::OnImGui() {
-  ImGui::Begin("Camera");
-  if (ImGui::Button("FPS")) {
-    SetMode(CameraController::Mode::FPS);
+  if (ImGui::BeginCombo("##cameramode", ("Mode: " + std::string(ModeToString[(int) m_mode])).c_str())) {
+    if (ImGui::Selectable("FPS", m_mode == Mode::FPS)) {
+      SetMode(Mode::FPS);
+    }
+    if (ImGui::Selectable("Orbit", m_mode == Mode::Orbit)) {
+      SetMode(Mode::Orbit);
+    }
+    ImGui::EndCombo();
   }
-  ImGui::SameLine();
-  if (ImGui::Button("Orbit")) {
-    SetMode(CameraController::Mode::ORBIT);
-  }
-  ImGui::Text("Mode: %s", m_mode == Mode::FPS ? "FPS" : "ORBIT");
   m_activeCamera->OnImGui();
-  ImGui::End();
 }
 
 void CameraController::OnMouseButtonEvent(int button, int action) {
@@ -85,7 +85,7 @@ void CameraController::ProcessMouseMovement(double xOffset, double yOffset) {
         Input::SetCursorPos(centerX, centerY);
       }
       break;
-    case Mode::ORBIT:
+    case Mode::Orbit:
       if (Input::IsMouseDown(GLFW_MOUSE_BUTTON_LEFT)) {
         m_activeCamera->ProcessMouseMovement(xOffset, yOffset);
       }
@@ -118,7 +118,7 @@ Camera* CameraController::GetActiveCamera() const {
 void CameraController::OnMouseScrollEvent(double yOffset) {
   if (m_mode == Mode::FPS && m_focused) {
     m_activeCamera->OnMouseScrollEvent(yOffset);
-  } else if (m_mode == Mode::ORBIT) {
+  } else if (m_mode == Mode::Orbit) {
     m_activeCamera->OnMouseScrollEvent(yOffset);
   }
 }

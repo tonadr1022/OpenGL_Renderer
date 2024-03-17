@@ -9,14 +9,15 @@
 #include "src/renderer/camera/FPSCamera.hpp"
 #include "src/renderer/Window.hpp"
 #include <memory>
-
+#include <array>
 class CameraController {
  public:
   explicit CameraController(const Window& window);
   void SetAspectRatio(float aspectRatio);
   enum class Mode {
-    FPS, ORBIT,
+    FPS, Orbit,
   };
+  static constexpr std::array<const char*, 2> ModeToString = {"FPS", "Orbit"};
 
   [[nodiscard]] Camera* GetActiveCamera() const;
 //  [[nodiscard]] inline Mode GetMode() const { return m_mode; }

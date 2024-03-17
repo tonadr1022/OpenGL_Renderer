@@ -9,16 +9,18 @@
 #include "src/renderer/camera/Camera.hpp"
 #include "src/renderer/Light.hpp"
 #include <memory>
+#include "src/renderer/camera/CameraController.hpp"
 
 class Scene {
  public:
   Scene();
   explicit Scene(HashedString name);
-  Scene(HashedString name, const glm::vec3& defaultCameraPos);
+  Scene(HashedString name, const glm::vec3& defaultCameraPos, CameraController::Mode defaultCamMode = CameraController::Mode::FPS);
   virtual ~Scene() = default;
   virtual void Update(double dt);
   void ImGuiLights();
   virtual void OnImGui();
+  virtual void PreRender();
 
   [[nodiscard]] inline const std::vector<std::unique_ptr<Group>>& GetGroups() const { return m_groups; }
   [[nodiscard]] const DirectionalLight* GetDirectionalLight() const;
@@ -28,6 +30,7 @@ class Scene {
   [[nodiscard]] inline HashedString GetName() const { return m_name; }
 
   glm::vec3 defaultCameraPosition;
+  CameraController::Mode defaultCameraMode;
  protected:
   void AddGroup(std::unique_ptr<Group> group);
   void RemoveGroup(const Group* group);

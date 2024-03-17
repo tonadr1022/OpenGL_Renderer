@@ -26,7 +26,7 @@ class Application {
   void OnMousePosMove(double xoffset, double yoffset);
   void OnMouseButtonEvent(int button, int action);
   void OnMouseScrollEvent(double yOffset);
-  void OnKeyEvent(int key, int action);
+  void OnKeyEvent(int key, int action, int mods);
 
  private:
   void OnSceneChange();

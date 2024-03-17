@@ -4,13 +4,12 @@
 
 #include "SceneManager.hpp"
 #include "src/core/Logger.hpp"
+#include <imgui/imgui.h>
 
 SceneManager::SceneManager() = default;
 
 void SceneManager::AddScene(std::unique_ptr<Scene> scene) {
   auto res = m_sceneMap.emplace(scene->GetName(), std::move(scene));
-  m_sceneNames.push_back(res.first->first);
-
 }
 
 void SceneManager::SetActiveScene(HashedString name) {
@@ -24,6 +23,16 @@ Scene* SceneManager::GetActiveScene() {
   return m_activeScene;
 }
 
-const std::vector<HashedString>& SceneManager::GetSceneNames() {
-  return m_sceneNames;
+void SceneManager::ImGuiSceneSelect() {
+  if (!m_activeScene) return;
+  if (ImGui::BeginCombo("##SceneSelectCombo", ("Scene: " + std::string(m_activeScene->GetName())).c_str())) {
+    for (auto& [first, scene] : m_sceneMap) {
+      const bool isSelected = scene.get() == m_activeScene;
+      if (ImGui::Selectable(scene->GetName(), isSelected)) {
+        m_activeScene = scene.get();
+        if (isSelected) ImGui::SetItemDefaultFocus();
+      }
+    }
+    ImGui::EndCombo();
+  }
 }

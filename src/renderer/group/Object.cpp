@@ -23,7 +23,7 @@ const Mesh* Object::GetMesh() const {
   return m_mesh;
 }
 
-const Material* Object::GetMaterial() const {
+Material* Object::GetMaterial() const {
   return m_material;
 }
 

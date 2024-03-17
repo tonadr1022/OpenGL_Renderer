@@ -93,7 +93,7 @@ void Input::keypress_cb(GLFWwindow* window, int key, int scancode, int action, i
   } else if (action == GLFW_RELEASE) {
     keyStates[key] = Released;
   }
-  Application::Instance().OnKeyEvent(key, action);
+  Application::Instance().OnKeyEvent(key, action, mods);
 }
 
 void Input::mouse_pos_cb(GLFWwindow* window, double xpos, double ypos) {

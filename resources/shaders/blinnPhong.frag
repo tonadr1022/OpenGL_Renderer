@@ -2,6 +2,8 @@
 
 #define MAX_POINT_LIGHTS 20
 #define MAX_SPOT_LIGHTS 20
+#define far 1000
+#define near 0.01
 
 out vec4 FragColor;
 
@@ -38,16 +40,18 @@ struct DirectionalLight {
 struct PointLight {
     LightBase base;
     vec3 position;
-    float linear;
-    float quadratic;
+//    float linear;
+//    float quadratic;
+    float radius;
 };
 
 struct SpotLight {
     LightBase base;
     vec3 position;
     vec3 direction;
-    float linear;
-    float quadratic;
+    float radius;
+//    float linear;
+//    float quadratic;
     float innerCutoff;
     float outerCutoff;
 };
@@ -74,73 +78,76 @@ uniform bool hasEmissionMap;
 uniform vec3 u_ViewPos;
 
 uniform int renderMode;// 0 normal, 1 normals
+uniform bool useBlinn;
 
 
 
-
-vec3 calcLightColor(LightBase light, vec3 lightDir, vec3 norm) {
-
-    vec3 diffuseColor = hasDiffuseMap ? texture(materialMaps.diffuseMap, TexCoord).rgb : material.diffuse;
-    vec3 specularColor = hasSpecularMap ? texture(materialMaps.specularMap, TexCoord).rgb : material.specular;
+vec4 calcLightColor(LightBase light, vec3 lightDir, vec3 norm) {
+    vec4 diffuseColor = hasDiffuseMap ? texture(materialMaps.diffuseMap, TexCoord) : vec4(material.diffuse, 1.0);
+    if (diffuseColor.a < 1.0) {
+        discard;
+    }
+    vec4 specularColor = hasSpecularMap ? texture(materialMaps.specularMap, TexCoord) : vec4(material.specular, 1.0);
 
     // ambient
-    vec3 ambientColor = hasDiffuseMap ? diffuseColor : material.ambient;
-    vec3 ambient = light.color * light.ambientIntensity * ambientColor;
+    vec4 ambientColor = hasDiffuseMap ? diffuseColor : vec4(material.ambient, 1.0);
+    vec4 ambient = vec4(light.color, 1.0) * light.ambientIntensity * ambientColor;
 
     // diffuse
     float diff = max(dot(norm, lightDir), 0);
-    vec3 diffuse = light.color * light.diffuseIntensity * diff * diffuseColor;
+    vec4 diffuse = vec4(light.color, 1.0) * light.diffuseIntensity * diff * diffuseColor;
 
     // specular
     vec3 viewDir = normalize(u_ViewPos - FragPos);
     float spec = 0.0;
-
-    // blinn vs no blinn
-    if (true) {
+    if (useBlinn) {
         vec3 halfwayDir = normalize(lightDir + viewDir);
         spec = pow(max(dot(norm, halfwayDir), 0.0), material.shininess);
     } else {
         vec3 reflectDir = reflect(-lightDir, norm);
         spec = pow(max(dot(viewDir, reflectDir), 0), material.shininess);
     }
-    vec3 specular =  light.color * light.specularIntensity * spec * specularColor;
+    vec4 specular =  vec4(light.color, 1.0) * light.specularIntensity * spec * specularColor;
 
     return ambient + diffuse + specular;
 }
 
-float attenuate(Light light) {
-    float distToLight = length(light.position - FragPos);
-    return 1.0 / (1 + light.linear * distToLight + light.quadratic * distToLight * distToLight);
+float attenuate(vec3 lightPos, float lightRadius) {
+    //    float distToLight = length(lightPos - FragPos);
+    vec3 toLight = lightPos - FragPos;
+    float distToLightSq = dot(toLight, toLight);
+    return clamp(1.0 - distToLightSq/(lightRadius*lightRadius), 0.0, 1.0);
+    //        return 1.0 / (1 + 0.09 * distToLight + 0.032 * distToLight * distToLight);
+
 }
 
-vec3 calcDirectionalLight(DirectionalLight light, vec3 norm) {
+vec4 calcDirectionalLight(DirectionalLight light, vec3 norm) {
     vec3 lightDir = normalize(-light.direction);
     return calcLightColor(light.base, lightDir, norm);
 }
 
-vec3 calcPointLight(PointLight light, vec3 norm) {
+vec4 calcPointLight(PointLight light, vec3 norm) {
     vec3 lightDir = normalize(light.position - FragPos);
-    float attenuation = attenuate(light, distToLight);
+    float attenuation = attenuate(light.position, light.radius);
 
-    vec3 lightColor = calcLightColor(light.base, lightDir, norm);
+    vec4 lightColor = calcLightColor(light.base, lightDir, norm);
     return lightColor * attenuation;
-    //    return vec3(1.0,0,0);
 }
 
-vec3 calcSpotLight(SpotLight light, vec3 norm) {
+vec4 calcSpotLight(SpotLight light, vec3 norm) {
     vec3 lightDir = normalize(light.position - FragPos);
-    float attenuation = attenuate(light, distToLight);
+    float attenuation = attenuate(light.position, light.radius);
 
     float theta = dot(lightDir, normalize(-light.direction));
     float epsilon = light.innerCutoff - light.outerCutoff;
     float intensity = clamp((theta - light.outerCutoff) / epsilon, 0.0, 1.0);
 
-    vec3 lightColor = calcLightColor(light.base, lightDir, norm);
+    vec4 lightColor = calcLightColor(light.base, lightDir, norm);
     return lightColor * attenuation * intensity;
 }
 
-vec3 calcTotalLight() {
-    vec3 totalLight = vec3(0);
+vec4 calcTotalLight() {
+    vec4 totalLight = vec4(0);
     vec3 norm = normalize(Normal);
     // directional
     if (directionalLightEnabled) {
@@ -161,18 +168,38 @@ vec3 calcTotalLight() {
     return totalLight;
 }
 
+float linearizeDepth(float depth) {
+    float z = depth * 2.0 - 1.0;// 0,1 to NDC
+    // inverse projection transformation
+    return (2.0 * near * far) / (far + near - z * (far - near));
+}
+
 void main() {
     if (renderMode == 0) {
-        vec3 totalLight = calcTotalLight();
+        vec4 totalLight = calcTotalLight();
         // emission
         vec3 emission = vec3(0.0);
         if (hasEmissionMap) {
             emission = texture(materialMaps.emissionMap, TexCoord).rgb;
         }
-        FragColor = vec4((totalLight + emission), 1.0);
+        vec4 color = totalLight + vec4(emission, 1.0);
+        if (color.a < 0.1) {
+            discard;
+        }
+        FragColor = color;
     } else if (renderMode == 1) {
         FragColor = vec4(normalize(Normal)*0.5 + 0.5, 1.0);
+    } else if (renderMode == 2) {
+        vec4 color = hasDiffuseMap ? texture(materialMaps.diffuseMap, TexCoord) : vec4(material.diffuse, 1.0);
+        if (color.a < 1.0) {
+            discard;
+        }
+        FragColor = color;
+    } else if (renderMode == 3) {
+        float depth = linearizeDepth(gl_FragCoord.z);
+        FragColor = vec4(vec3(depth), 1.0);
     } else {
         FragColor = vec4(1.0);
     }
+
 }

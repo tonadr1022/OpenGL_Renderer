@@ -12,7 +12,7 @@ OrbitCamera::OrbitCamera(float aspectRatio)
     : Camera(aspectRatio),
       m_target({0, 0, 0}),
       m_up({0, 1, 0}),
-      m_distance(1),
+      m_distance(10),
       m_azimuthAngle(0),
       m_polarAngle(0),
       m_fov(DEFAULT_FOV) {
@@ -92,4 +92,10 @@ void OrbitCamera::UpdateMatrices() {
   m_viewMatrix = glm::lookAt(m_pos, m_target, m_up);
   m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspectRatio, m_nearPlane, m_farPlane);
   m_VPMatrix = m_projectionMatrix * m_viewMatrix;
+}
+
+void OrbitCamera::SetPosition(const glm::vec3& newPos) {
+  m_pos = newPos;
+  UpdatePosition();
+  UpdateMatrices();
 }

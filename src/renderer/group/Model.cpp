@@ -9,9 +9,10 @@
 #include "src/renderer/resource/TextureManager.hpp"
 #include "src/renderer/resource/MaterialManager.hpp"
 
-Model::Model(const std::string& path) {
+Model::Model(const std::string& path, bool backfaceCull) : Group(backfaceCull) {
   Assimp::Importer importer;
-  const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+  const aiScene* scene = importer.ReadFile(path,aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals
+                                               | aiProcess_CalcTangentSpace);
   if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
     LOG_ERROR("Assimp Error: %s", importer.GetErrorString());
     return;
@@ -39,34 +40,27 @@ void Model::ProcessNodes(aiNode* rootNode, const aiScene* scene) {
       meshStack.push(currNode->mChildren[i]);
     }
   }
+  LOG_INFO("Done");
 }
 
 void Model::ProcessMesh(aiMesh* aiMesh, const aiScene* scene) {
   std::vector<Vertex> vertices;
+  vertices.reserve(aiMesh->mNumVertices);
   std::vector<uint32_t> indices;
-  std::vector<Texture*> textures;
 
-  // process vertices
   for (uint32_t i = 0; i < aiMesh->mNumVertices; i++) {
     Vertex v;
-    glm::vec3 tmp;
-    tmp.x = aiMesh->mVertices[i].x;
-    tmp.y = aiMesh->mVertices[i].y;
-    tmp.z = aiMesh->mVertices[i].z;
-    v.position = tmp;
-    tmp.x = aiMesh->mNormals[i].x;
-    tmp.y = aiMesh->mNormals[i].y;
-    tmp.z = aiMesh->mNormals[i].z;
-    v.normal = tmp;
 
-    // Assimp allows up to 8 texture coordinates per vertex, only using first for now
-    if (aiMesh->mTextureCoords[0]) {
-      glm::vec2 tmp;
-      tmp.x = aiMesh->mTextureCoords[0][i].x;
-      tmp.y = aiMesh->mTextureCoords[0][i].y;
-      v.texCoords = tmp;
+    if (aiMesh->HasPositions()) {
+      v.position = glm::vec3(aiMesh->mVertices[i].x, aiMesh->mVertices[i].y, aiMesh->mVertices[i].z);
+    }
+    if (aiMesh->HasNormals()) {
+      v.normal = glm::vec3(aiMesh->mNormals[i].x, aiMesh->mNormals[i].y, aiMesh->mNormals[i].z);
+    }
+    if (aiMesh->HasTextureCoords(0)) {
+      v.texCoords = glm::vec2(aiMesh->mTextureCoords[0][i].x, aiMesh->mTextureCoords[0][i].y);
     } else {
-      v.texCoords = glm::vec2(0, 0);
+      v.texCoords = glm::vec2(0);
     }
 
     vertices.push_back(v);
@@ -79,35 +73,41 @@ void Model::ProcessMesh(aiMesh* aiMesh, const aiScene* scene) {
       indices.push_back(face.mIndices[j]);
     }
   }
+  auto meshName = HashedString((m_name + std::to_string(m_objects.size())).c_str());
+  Mesh* mesh = MeshManager::AddMesh(meshName, vertices, indices);
 
-  // process material if mesh has one
+  // process material if mesh has one and hasn't been made already
   if (aiMesh->mMaterialIndex >= 0) {
-    aiMaterial* material = scene->mMaterials[aiMesh->mMaterialIndex];
-    auto diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, Texture::Type::Diffuse);
-    textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-    auto specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, Texture::Type::Specular);
-    textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-  }
+    auto matName = HashedString((m_name + std::to_string(aiMesh->mMaterialIndex)).c_str());
 
-  auto meshMatName = HashedString((m_name + std::to_string(m_objects.size())).c_str());
-  Mesh* mesh = MeshManager::AddMesh(meshMatName, vertices, indices);
-  MaterialManager::AddMaterial(meshMatName, textures, "blinnPhong", Material::Type::BlinnPhong);
-  m_objects.push_back(std::make_unique<Object>(mesh, MaterialManager::GetMaterial(meshMatName)));
+    Material* existingMat = MaterialManager::GetMaterial(matName);
+    if (existingMat == nullptr) {
+//      LOG_INFO("index %i", aiMesh->mMaterialIndex);
+      aiMaterial* aiMat = scene->mMaterials[aiMesh->mMaterialIndex];
+      Material* mat = LoadMaterial(aiMat, matName);
+      m_objects.push_back(std::make_unique<Object>(mesh, mat));
+//    LOG_INFO("Mesh vertices: %d, Indices: %d, Textures: %d", vertices.size(), indices.size(), textures.size());
+    } else {
+      m_objects.push_back(std::make_unique<Object>(mesh, existingMat));
+    }
+  } else {
+    m_objects.push_back(std::make_unique<Object>(mesh));
+  }
 }
 
-std::vector<Texture*> Model::LoadMaterialTextures(aiMaterial* material,
+std::vector<Texture*> Model::LoadMaterialTextures(aiMaterial* aiMaterial,
                                                   aiTextureType aiType,
                                                   Texture::Type textureType) {
   std::vector<Texture*> textures;
-  for (uint32_t i = 0; i < material->GetTextureCount(aiType); i++) {
+  for (uint32_t i = 0; i < aiMaterial->GetTextureCount(aiType); i++) {
     aiString textureFilename;
-    material->GetTexture(aiType, i, &textureFilename);
+    aiMaterial->GetTexture(aiType, i, &textureFilename);
 
 
     // add or get the texture
 //    auto t = std::string(m_name + textureFilename.data);
     auto textureName = HashedString((m_name + textureFilename.data).c_str());
-//    std::cout << textureName.data() << std::endl;
+//    std::cout << m_name << " " << textureFilename.data << std::endl;
     Texture* texture = TextureManager::GetTexture(textureName);
     if (texture == nullptr) {
       texture = TextureManager::AddTexture(textureName, m_directory + '/' + textureFilename.data, textureType);
@@ -116,4 +116,41 @@ std::vector<Texture*> Model::LoadMaterialTextures(aiMaterial* material,
   }
 
   return textures;
+}
+
+Material* Model::LoadMaterial(aiMaterial* aiMat, HashedString matName) {
+  std::vector<Texture*> textures;
+  auto diffuseMaps = LoadMaterialTextures(aiMat, aiTextureType_DIFFUSE, Texture::Type::Diffuse);
+  textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+  auto specularMaps = LoadMaterialTextures(aiMat, aiTextureType_SPECULAR, Texture::Type::Specular);
+  textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+
+  MaterialManager::AddMaterial(matName, textures, "blinnPhong", Material::Type::BlinnPhong);
+  Material* mat = MaterialManager::GetMaterial(matName);
+
+  aiColor4D color;
+  if (AI_SUCCESS == aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_DIFFUSE, &color)) {
+    mat->diffuseColor = glm::vec3(color.r, color.g, color.b);
+  } else {
+    LOG_INFO("NO DIFF COLOR ON MATERIAL");
+  }
+  if (AI_SUCCESS == aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_SPECULAR, &color)) {
+    mat->specularColor = glm::vec3(color.r, color.g, color.b);
+  } else {
+    LOG_INFO("NO SPECULAR COLOR ON MATERIAL");
+  }
+  if (AI_SUCCESS == aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_AMBIENT, &color)) {
+    mat->ambientColor = glm::vec3(color.r, color.g, color.b);
+  } else {
+    LOG_INFO("NO AMBIENT COLOR ON MATERIAL");
+  }
+  ai_real shininess;
+  int res1;
+  res1 = aiGetMaterialFloat(aiMat, AI_MATKEY_SHININESS, &shininess);
+  if (res1 == AI_SUCCESS && shininess > 0) {
+    mat->shininess = shininess;
+  } else {
+    LOG_INFO("NO SHININESS ON MATERIAL");
+  }
+  return mat;
 }
