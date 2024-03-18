@@ -12,7 +12,8 @@ class RenderBuffer {
   ~RenderBuffer();
 
   void Bind() const;
-  void Unbind() const;
+  void Unbind();
+
   void BufferStorage(uint32_t width, uint32_t height, GLint internalFormat);
   [[nodiscard]] inline GLuint Id() const { return m_id; }
  private:

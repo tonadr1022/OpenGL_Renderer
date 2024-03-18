@@ -13,6 +13,7 @@ class VertexBuffer {
   VertexBuffer();
   ~VertexBuffer();
 
+
   void Bind() const;
   void Unbind() const;
   [[nodiscard]] inline GLuint Id() const { return m_id; }

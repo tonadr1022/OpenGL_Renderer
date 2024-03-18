@@ -8,7 +8,6 @@
 #include "src/Common.hpp"
 #include <string>
 #include "src/core/HashedString.hpp"
-
 class Texture {
  public:
   enum class Type { None, Diffuse, Specular, Emission, Normal };
@@ -21,8 +20,6 @@ class Texture {
   static void Unbind();
   [[nodiscard]] GLuint Id() const { return m_id; }
   void Resize(uint32_t width, uint32_t height);
-//  [[nodiscard]] uint32_t GetWidth() const;
-//  [[nodiscard]] uint32_t GetHeight() const;
   void SetWrapMode(GLint s, GLint t, GLint r);
   void SetWrapMode(GLint s, GLint t);
   void SetWrapMode(GLint all);

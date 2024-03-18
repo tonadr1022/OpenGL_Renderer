@@ -12,7 +12,7 @@ class FrameBuffer {
   FrameBuffer();
   ~FrameBuffer();
   void Bind() const;
-  void Unbind() const;
+  static void BindDefault();
   bool IsComplete() const;
   void AttachColorBuffer(GLuint textureColorBuffer);
   void AttachRenderBuffer(GLuint rbo);

@@ -8,7 +8,6 @@
 
 
 void VertexArray::Bind() const {
-  ASSERT(m_id != 0, "Vertex Array Id is valid");
   glBindVertexArray(m_id);
 }
 
@@ -19,15 +18,13 @@ void VertexArray::Unbind() const {
 void VertexArray::AttachBuffer(const size_t id, const BufferType type,
                                const size_t size,
                                const DrawMode mode,
-                               const void* data) const {
+                               const void* data) const noexcept {
   glBindBuffer(type, id);
   glBufferData(type, size, data, mode);
 }
-
 VertexArray::VertexArray() {
   glGenVertexArrays(1, &m_id);
 }
-
 VertexArray::~VertexArray() {
   glDeleteVertexArrays(1, &m_id);
 }

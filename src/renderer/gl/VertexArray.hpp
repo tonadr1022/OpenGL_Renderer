@@ -19,7 +19,7 @@ class VertexArray {
   void Bind() const;
   void Unbind() const;
 
-  void AttachBuffer(size_t id, BufferType type, size_t size, DrawMode mode, const void* data) const;
+  void AttachBuffer(size_t id, BufferType type, size_t size, DrawMode mode, const void* data) const noexcept;
 
   template<typename T>
   void EnableAttribute(size_t index, size_t size, size_t stride, const void* ptr) const {

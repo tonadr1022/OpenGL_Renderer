@@ -9,6 +9,7 @@
 #include "src/renderer/group/Scene.hpp"
 #include "FrameBufferRenderer.hpp"
 #include "Window.hpp"
+#include "Quad.hpp"
 
 class Renderer {
  public:
@@ -42,6 +43,8 @@ class Renderer {
   void SetPointLights(const std::vector<std::unique_ptr<PointLight>>* pointLights);
   void Reset();
 
+  void RecompileShaders();
+
   struct PerFrameStats {
     uint32_t drawCalls{0};
     uint32_t vertices{0};
@@ -54,6 +57,8 @@ class Renderer {
 
   Mode mode = Mode::BlinnPhong;
   DebugMode debugMode = DebugMode::None;
+
+
  private:
   struct RenderState {
     const Material* boundMaterial = nullptr;
@@ -66,6 +71,7 @@ class Renderer {
   const std::vector<std::unique_ptr<SpotLight>>* m_spotLights = nullptr;
 
   Shader* m_screenShader = nullptr;
+  Quad m_screenQuad;
 
   Window& m_window;
   Camera* m_camera = nullptr;
@@ -74,14 +80,15 @@ class Renderer {
   PerFrameStats stats;
   RenderSettings m_settings;
 
-  VertexArray m_quadVAO;
-
-
   void UpdateRenderState(const Object& object);
   void ResetStats();
   void StartFrame(const Scene& scene);
   void RenderGroup(const Group& group);
+  void ApplyPostProcessingEffects();
   void SetLightingUniforms();
+  void SetBlinnPhongUniforms();
+
+  void AssignShaders();
 
 };
 

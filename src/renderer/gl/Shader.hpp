@@ -16,7 +16,7 @@
 class Shader {
  public:
   void Bind() const;
-  static void Unbind() ;
+  static void Unbind();
 
   void SetInt(HashedString name, int value) const;
   void SetFloat(HashedString name, float value) const;
@@ -27,6 +27,7 @@ class Shader {
   void SetMat3(HashedString name, const glm::mat3& vec, bool transpose = false) const;
   void SetBool(HashedString name, bool value)const;
   Shader(uint32_t id, std::unordered_map<uint32_t, uint32_t>& uniformLocations);
+  ~Shader();
 
  private:
   uint32_t m_id{0};
