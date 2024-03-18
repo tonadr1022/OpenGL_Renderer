@@ -13,156 +13,6 @@
 #include "FrameCapturer.hpp"
 
 #define MAX_USED_TEXTURE_SLOTS 5
-
-void Renderer::UpdateRenderState(const Object& object) {
-  if (object.GetMaterial() != state.boundMaterial) {
-    state.boundMaterial = object.GetMaterial();
-    if (state.boundMaterial->shaderName != state.boundShaderName) {
-      state.boundShaderName = state.boundMaterial->shaderName;
-      state.boundShader = ShaderManager::GetShader(state.boundMaterial->shaderName);
-      state.boundShader->Bind();
-//      state.boundShader->SetMat4("u_View", m_camera->GetViewMatrix());
-      state.boundShader->SetInt("renderMode", static_cast<int>(debugMode));
-      state.boundShader->SetBool("useBlinn", m_settings.useBlinn);
-      state.boundShader->SetVec3("u_ViewPos", m_camera->GetPosition());
-      state.boundShader->SetMat4("u_VP", m_camera->GetVPMatrix());
-//      state.boundShader->SetMat4("u_Projection", m_camera->GetProjectionMatrix());
-      if (mode == Mode::BlinnPhong) SetLightingUniforms();
-    }
-    // For now, this assumes only one type per material. will need to refactor if otherwise
-    uint32_t numDiffuseMaps = 0, numSpecularMaps = 0, numEmissionMaps = 0;
-    for (auto&& texture : state.boundMaterial->textures) {
-      switch (texture->GetType()) {
-        case Texture::Type::Diffuse:texture->Bind(GL_TEXTURE0);
-          state.boundShader->SetInt("materialMaps.diffuseMap", 0);
-          numDiffuseMaps++;
-          break;
-        case Texture::Type::Specular:texture->Bind(GL_TEXTURE1);
-          state.boundShader->SetInt("materialMaps.specularMap", 1);
-          numSpecularMaps++;
-          break;
-        case Texture::Type::Emission:texture->Bind(GL_TEXTURE2);
-          state.boundShader->SetInt("materialMaps.emissionMap", 2);
-          numEmissionMaps++;
-          break;
-        default:break;
-      }
-    }
-    state.boundShader->SetBool("hasDiffuseMap", m_settings.diffuseMapEnabled && numDiffuseMaps > 0);
-    state.boundShader->SetBool("hasSpecularMap", m_settings.specularMapEnabled && numSpecularMaps > 0);
-    state.boundShader->SetBool("hasEmissionMap", m_settings.emissionMapEnabled && numEmissionMaps > 0);
-
-    state.boundShader->SetVec3("material.ambient", state.boundMaterial->ambientColor);
-    state.boundShader->SetVec3("material.diffuse", state.boundMaterial->diffuseColor);
-    state.boundShader->SetVec3("material.specular", state.boundMaterial->specularColor);
-    state.boundShader->SetFloat("material.shininess", state.boundMaterial->shininess);
-  }
-}
-
-void Renderer::ResetStats() {
-  memset(&stats, 0, sizeof(PerFrameStats));
-}
-
-void Renderer::StartFrame(const Scene& scene) {
-  state.boundShader = nullptr;
-  state.boundMaterial = nullptr;
-  state.boundShaderName = "";
-  ResetStats();
-  glPolygonMode(GL_FRONT_AND_BACK, m_settings.wireframe ? GL_LINE : GL_FILL);
-//  if (m_settings.renderToImGuiViewport) {
-  m_frameCapturer.StartCapture();
-//  } else {
-//    glClearColor(0, 0, 0, 1);
-//    glEnable(GL_DEPTH_TEST);
-//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//  }
-}
-
-
-void Renderer::RenderGroup(const Group& group) {
-  if (!group.GetVisible()) return;
-  if (group.GetWireFrame() && !m_settings.wireframe) {
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  } else if (!group.GetWireFrame() && m_settings.wireframe) {
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  }
-
-  if (!group.backFaceCull) {
-    glDisable(GL_CULL_FACE);
-  }
-
-  for (auto&& object : group.GetObjects()) {
-    if (!object->shouldDraw) continue;
-    auto mesh = object->GetMesh();
-    UpdateRenderState(*object);
-    mesh->GetVAO().Bind();
-    auto& modelMatrix = object->transform.GetModelMatrix();
-    state.boundShader->SetMat4("u_Model", modelMatrix);
-//    state.boundShader->SetMat3("u_NormalMatrix", glm::inverse( modelMatrix), true);
-
-    glDrawElements(GL_TRIANGLES, (GLsizei) mesh->NumIndices(), GL_UNSIGNED_INT, nullptr);
-    stats.drawCalls++;
-    stats.vertices += mesh->NumIndices();
-    stats.indices += mesh->NumIndices();
-  }
-
-  if (!group.backFaceCull) {
-    glEnable(GL_CULL_FACE);
-  }
-}
-
-void Renderer::Init() {
-  ShaderManager::AddShader("screen1", {{GET_SHADER_PATH("contrast.vert"), ShaderType::VERTEX},
-                                       {GET_SHADER_PATH("contrast.frag"), ShaderType::FRAGMENT}});
-  m_screenShader = ShaderManager::GetShader("screen1");
-
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);
-}
-
-void Renderer::Reset() {
-
-}
-
-void Renderer::RenderScene(const Scene& scene, Camera* camera) {
-  m_camera = camera;
-  StartFrame(scene);
-  for (auto& group : scene.GetGroups()) {
-    RenderGroup(*group);
-  }
-  m_frameCapturer.EndCapture();
-  glDisable(GL_DEPTH_TEST);
-  m_screenShader->Bind();
-  m_frameCapturer.GetTexture().Bind(GL_TEXTURE0);
-  m_screenQuad.Draw();
-}
-
-void Renderer::ApplyPostProcessingEffects() {
-
-}
-
-
-void Renderer::SetFrameBufferSize(uint32_t width, uint32_t height) {
-  glViewport(0, 0, (int) width, (int) height);
-  m_frameCapturer.UpdateViewport(width, height);
-}
-
-Renderer::Renderer(Window& window, bool renderToImGuiViewport)
-    : m_window(window), m_frameCapturer(window.GetFrameBufferDimensions().x, m_window.GetFrameBufferDimensions().y) {
-  m_settings.renderToImGuiViewport = renderToImGuiViewport;
-}
-
-void Renderer::SetPointLights(const std::vector<std::unique_ptr<PointLight>>* pointLights) {
-  m_pointLights = pointLights;
-}
-
-void Renderer::SetDirectionalLight(const DirectionalLight* directionalLight) {
-  m_directionalLight = directionalLight;
-}
-void Renderer::SetSpotLights(const std::vector<std::unique_ptr<SpotLight>>* spotLights) {
-  m_spotLights = spotLights;
-}
-
 namespace { // detail
 #define NUM_SPOT_PARAMS 9
 #define NUM_POINT_PARAMS 6
@@ -213,8 +63,165 @@ std::vector<HashedString> spotLightStrings = GenerateSpotLightStrings(50);
 
 } // namespace detail
 
-void Renderer::SetLightingUniforms() {
 
+void Renderer::UpdateRenderState(const Object& object) {
+  if (object.GetMaterial() != state.boundMaterial) {
+    state.boundMaterial = object.GetMaterial();
+    if (state.boundMaterial->shaderName != state.boundShaderName) {
+      state.boundShaderName = state.boundMaterial->shaderName;
+      state.boundShader = ShaderManager::GetShader(state.boundMaterial->shaderName);
+      state.boundShader->Bind();
+//      state.boundShader->SetMat4("u_View", m_camera->GetViewMatrix());
+      state.boundShader->SetInt("renderMode", static_cast<int>(debugMode));
+      state.boundShader->SetBool("useBlinn", m_settings.useBlinn);
+      state.boundShader->SetVec3("u_ViewPos", m_camera->GetPosition());
+      state.boundShader->SetMat4("u_VP", m_camera->GetVPMatrix());
+//      state.boundShader->SetMat4("u_Projection", m_camera->GetProjectionMatrix());
+
+      if (mode == Mode::BlinnPhong) SetBlinnPhongUniforms();
+      if (mode == Mode::BlinnPhong) SetLightingUniforms();
+    }
+  }
+}
+
+void Renderer::SetBlinnPhongUniforms() {
+  // For now, this assumes only one type per material. will need to refactor if otherwise
+  uint32_t numDiffuseMaps = 0, numSpecularMaps = 0, numEmissionMaps = 0;
+  for (auto&& texture : state.boundMaterial->textures) {
+    switch (texture->GetType()) {
+      case Texture::Type::Diffuse:texture->Bind(GL_TEXTURE0);
+        state.boundShader->SetInt("materialMaps.diffuseMap", 0);
+        numDiffuseMaps++;
+        break;
+      case Texture::Type::Specular:texture->Bind(GL_TEXTURE1);
+        state.boundShader->SetInt("materialMaps.specularMap", 1);
+        numSpecularMaps++;
+        break;
+      case Texture::Type::Emission:texture->Bind(GL_TEXTURE2);
+        state.boundShader->SetInt("materialMaps.emissionMap", 2);
+        numEmissionMaps++;
+        break;
+      default:break;
+    }
+  }
+  state.boundShader->SetBool("hasDiffuseMap", m_settings.diffuseMapEnabled && numDiffuseMaps > 0);
+  state.boundShader->SetBool("hasSpecularMap", m_settings.specularMapEnabled && numSpecularMaps > 0);
+  state.boundShader->SetBool("hasEmissionMap", m_settings.emissionMapEnabled && numEmissionMaps > 0);
+
+  state.boundShader->SetVec3("material.ambient", state.boundMaterial->ambientColor);
+  state.boundShader->SetVec3("material.diffuse", state.boundMaterial->diffuseColor);
+  state.boundShader->SetVec3("material.specular", state.boundMaterial->specularColor);
+  state.boundShader->SetFloat("material.shininess", state.boundMaterial->shininess);
+
+
+}
+void Renderer::ResetStats() {
+  memset(&stats, 0, sizeof(PerFrameStats));
+}
+
+void Renderer::StartFrame(const Scene& scene) {
+  state.boundShader = nullptr;
+  state.boundMaterial = nullptr;
+  state.boundShaderName = "";
+  ResetStats();
+  glPolygonMode(GL_FRONT_AND_BACK, m_settings.wireframe ? GL_LINE : GL_FILL);
+//  if (m_settings.renderToImGuiViewport) {
+  m_frameCapturer.StartCapture();
+//  } else {
+//    glClearColor(0, 0, 0, 1);
+//    glEnable(GL_DEPTH_TEST);
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//  }
+}
+
+void Renderer::RenderGroup(const Group& group) {
+  if (!group.GetVisible()) return;
+  if (group.GetWireFrame() && !m_settings.wireframe) {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  } else if (!group.GetWireFrame() && m_settings.wireframe) {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  }
+
+  if (!group.backFaceCull) {
+    glDisable(GL_CULL_FACE);
+  }
+
+  for (auto&& object : group.GetObjects()) {
+    if (!object->shouldDraw) continue;
+    auto mesh = object->GetMesh();
+    UpdateRenderState(*object);
+    mesh->GetVAO().Bind();
+    auto& modelMatrix = object->transform.GetModelMatrix();
+    state.boundShader->SetMat4("u_Model", modelMatrix);
+//    state.boundShader->SetMat3("u_NormalMatrix", glm::inverse( modelMatrix), true);
+
+    glDrawElements(GL_TRIANGLES, (GLsizei) mesh->NumIndices(), GL_UNSIGNED_INT, nullptr);
+    stats.drawCalls++;
+    stats.vertices += mesh->NumIndices();
+    stats.indices += mesh->NumIndices();
+  }
+
+  if (!group.backFaceCull) {
+    glEnable(GL_CULL_FACE);
+  }
+}
+
+void Renderer::Init() {
+  ShaderManager::AddShader("screen1", {{GET_SHADER_PATH("contrast.vert"), ShaderType::VERTEX},
+                                       {GET_SHADER_PATH("contrast.frag"), ShaderType::FRAGMENT}});
+  AssignShaders();
+
+  glEnable(GL_MULTISAMPLE);
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+}
+
+void Renderer::Reset() {
+
+}
+
+void Renderer::RenderScene(const Scene& scene, Camera* camera) {
+  m_camera = camera;
+  StartFrame(scene);
+  for (auto& group : scene.GetGroups()) {
+    RenderGroup(*group);
+  }
+  m_frameCapturer.EndCapture();
+
+  glDisable(GL_DEPTH_TEST);
+  m_screenShader->Bind();
+  m_frameCapturer.GetTexture().Bind(GL_TEXTURE0);
+  m_screenQuad.Draw();
+}
+
+void Renderer::ApplyPostProcessingEffects() {
+
+}
+
+void Renderer::SetFrameBufferSize(uint32_t width, uint32_t height) {
+  glViewport(0, 0, (int) width, (int) height);
+  m_frameCapturer.UpdateViewport(width, height);
+}
+
+Renderer::Renderer(Window& window, bool renderToImGuiViewport)
+    : m_window(window), m_frameCapturer(window.GetFrameBufferDimensions().x, m_window.GetFrameBufferDimensions().y) {
+  m_settings.renderToImGuiViewport = renderToImGuiViewport;
+}
+
+void Renderer::SetPointLights(const std::vector<std::unique_ptr<PointLight>>* pointLights) {
+  m_pointLights = pointLights;
+}
+
+void Renderer::SetDirectionalLight(const DirectionalLight* directionalLight) {
+  m_directionalLight = directionalLight;
+}
+void Renderer::SetSpotLights(const std::vector<std::unique_ptr<SpotLight>>* spotLights) {
+  m_spotLights = spotLights;
+}
+
+
+
+void Renderer::SetLightingUniforms() {
   if (m_settings.renderDirectionalLights && m_directionalLight != nullptr) {
     state.boundShader->SetBool("directionalLightEnabled", true);
     state.boundShader->SetVec3(directionalLightStrings[0], m_directionalLight->color);
@@ -263,4 +270,13 @@ void Renderer::SetLightingUniforms() {
   } else {
     state.boundShader->SetBool("spotLightEnabled", false);
   }
+}
+
+void Renderer::RecompileShaders() {
+  ShaderManager::RecompileShaders();
+  AssignShaders();
+}
+
+void Renderer::AssignShaders() {
+  m_screenShader = ShaderManager::GetShader("screen1");
 }

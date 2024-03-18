@@ -43,6 +43,8 @@ class Renderer {
   void SetPointLights(const std::vector<std::unique_ptr<PointLight>>* pointLights);
   void Reset();
 
+  void RecompileShaders();
+
   struct PerFrameStats {
     uint32_t drawCalls{0};
     uint32_t vertices{0};
@@ -55,6 +57,8 @@ class Renderer {
 
   Mode mode = Mode::BlinnPhong;
   DebugMode debugMode = DebugMode::None;
+
+
  private:
   struct RenderState {
     const Material* boundMaterial = nullptr;
@@ -82,6 +86,9 @@ class Renderer {
   void RenderGroup(const Group& group);
   void ApplyPostProcessingEffects();
   void SetLightingUniforms();
+  void SetBlinnPhongUniforms();
+
+  void AssignShaders();
 
 };
 

@@ -151,7 +151,7 @@ void Application::OnImGui() {
       rendererSettings.renderToImGuiViewport = m_renderToImGuiViewport;
     }
     if (ImGui::Button("Recompile Shaders")) {
-      ShaderManager::RecompileShaders();
+      m_renderer.RecompileShaders();
     }
 
 
@@ -273,7 +273,7 @@ void Application::OnKeyEvent(int key, int action, int mods) {
     if (key == GLFW_KEY_BACKSPACE && mods == GLFW_MOD_SHIFT) {
       m_window.SetShouldClose(true);
     } else if (key == GLFW_KEY_M) {
-      ShaderManager::RecompileShaders();
+     m_renderer.RecompileShaders();
     } else if (key == GLFW_KEY_N) {
       m_settings.showImGui = !m_settings.showImGui;
       if (!m_settings.showImGui) m_renderToImGuiViewport = false;

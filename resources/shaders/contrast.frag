@@ -6,10 +6,10 @@ out vec4 FragColor;
 
 uniform sampler2D tex;
 //uniform float contrast;
-const float contrast = 0.3;
+const float contrast = 0.1;
 
 void main() {
     vec4 color = texture(tex, TexCoords);
-    color.rgb = (color.rgb - 0.5) * (0.5 + contrast) + 0.5;
+    color.rgb = (color.rgb - 0.5) * (1.0 + contrast) + 0.5;
     FragColor = color;
 }

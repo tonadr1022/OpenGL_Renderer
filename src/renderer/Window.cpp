@@ -15,6 +15,8 @@
 #include "src/core/Input.hpp"
 #include "Application.hpp"
 
+#define NUM_SAMPLES 4
+
 Window::Window() {
   Init_Glfw();
   Init_ImGui();
@@ -38,6 +40,8 @@ void Window::Init_Glfw() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_SAMPLES, NUM_SAMPLES);
+
   m_glsl_version = "#version 410";
 
 //  const GLFWvidmode* videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
