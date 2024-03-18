@@ -9,6 +9,7 @@
 #include "src/renderer/group/Scene.hpp"
 #include "FrameCapturer.hpp"
 #include "Window.hpp"
+#include "Quad.hpp"
 
 class Renderer {
  public:
@@ -66,6 +67,7 @@ class Renderer {
   const std::vector<std::unique_ptr<SpotLight>>* m_spotLights = nullptr;
 
   Shader* m_screenShader = nullptr;
+  Quad m_screenQuad;
 
   Window& m_window;
   Camera* m_camera = nullptr;
@@ -74,14 +76,11 @@ class Renderer {
   PerFrameStats stats;
   RenderSettings m_settings;
 
-  VertexArray m_quadVAO;
-
-
   void UpdateRenderState(const Object& object);
   void ResetStats();
   void StartFrame(const Scene& scene);
-  void EndFrame();
   void RenderGroup(const Group& group);
+  void ApplyPostProcessingEffects();
   void SetLightingUniforms();
 
 };

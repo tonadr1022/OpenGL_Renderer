@@ -101,6 +101,8 @@ add_executable(opengl_renderer
         src/renderer/group/Model.hpp
         src/scenes/ModelViewerScene.cpp
         src/scenes/ModelViewerScene.hpp
+        src/renderer/Quad.cpp
+        src/renderer/Quad.hpp
 )
 
 

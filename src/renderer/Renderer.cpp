@@ -78,11 +78,6 @@ void Renderer::StartFrame(const Scene& scene) {
 //  }
 }
 
-void Renderer::EndFrame() {
-//  if (m_settings.renderToImGuiViewport) {
-  m_frameCapturer.EndCapture();
-//  }
-}
 
 void Renderer::RenderGroup(const Group& group) {
   if (!group.GetVisible()) return;
@@ -117,28 +112,9 @@ void Renderer::RenderGroup(const Group& group) {
 }
 
 void Renderer::Init() {
-  ShaderManager::AddShader("screen1", {{GET_SHADER_PATH("screen1.vert"), ShaderType::VERTEX},
-                                       {GET_SHADER_PATH("screen1.frag"), ShaderType::FRAGMENT}});
+  ShaderManager::AddShader("screen1", {{GET_SHADER_PATH("contrast.vert"), ShaderType::VERTEX},
+                                       {GET_SHADER_PATH("contrast.frag"), ShaderType::FRAGMENT}});
   m_screenShader = ShaderManager::GetShader("screen1");
-  const float quadVertices[] = {
-      // positions   // texCoords
-      -1.0f, 1.0f, 0.0f, 1.0f,
-      -1.0f, -1.0f, 0.0f, 0.0f,
-      1.0f, -1.0f, 1.0f, 0.0f,
-
-      -1.0f, 1.0f, 0.0f, 1.0f,
-      1.0f, -1.0f, 1.0f, 0.0f,
-      1.0f, 1.0f, 1.0f, 1.0f
-  };
-
-  m_quadVAO.Generate();
-  VertexBuffer quadVBO;
-  quadVBO.Generate();
-  m_quadVAO.Bind();
-  quadVBO.Bind();
-  m_quadVAO.AttachBuffer(quadVBO.Id(), BufferType::ARRAY, sizeof(quadVertices), STATIC, quadVertices);
-  m_quadVAO.EnableAttribute<float>(0, 2, sizeof(float) * 4, nullptr);
-  m_quadVAO.EnableAttribute<float>(1, 2, sizeof(float) * 4, (void*) (sizeof(float) * 2));
 
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
@@ -149,22 +125,22 @@ void Renderer::Reset() {
 }
 
 void Renderer::RenderScene(const Scene& scene, Camera* camera) {
-
   m_camera = camera;
   StartFrame(scene);
   for (auto& group : scene.GetGroups()) {
     RenderGroup(*group);
   }
-  EndFrame();
-//  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  m_frameCapturer.EndCapture();
   glDisable(GL_DEPTH_TEST);
-//  glClear(GL_COLOR_BUFFER_BIT);
   m_screenShader->Bind();
-  m_screenShader->SetInt("tex", 0);
-  m_frameCapturer.GetTexture().Bind();
-  m_quadVAO.Bind();
-  glDrawArrays(GL_TRIANGLES, 0, 6);
+  m_frameCapturer.GetTexture().Bind(GL_TEXTURE0);
+  m_screenQuad.Draw();
 }
+
+void Renderer::ApplyPostProcessingEffects() {
+
+}
+
 
 void Renderer::SetFrameBufferSize(uint32_t width, uint32_t height) {
   glViewport(0, 0, (int) width, (int) height);

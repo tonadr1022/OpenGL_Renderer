@@ -9,13 +9,13 @@
 class RenderBuffer {
  public:
   RenderBuffer();
-  ~RenderBuffer() = default;
-  void Gen();
+  ~RenderBuffer();
+
   void Bind() const;
-  static void Unbind() ;
-  void Delete();
+  void Unbind();
+
   void BufferStorage(uint32_t width, uint32_t height, GLint internalFormat);
-  [[nodiscard]] inline GLuint Id() const {return m_id; }
+  [[nodiscard]] inline GLuint Id() const { return m_id; }
  private:
   GLuint m_id;
 };

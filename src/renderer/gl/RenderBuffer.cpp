@@ -5,10 +5,12 @@
 #include "RenderBuffer.hpp"
 #include "src/core/Logger.hpp"
 
-RenderBuffer::RenderBuffer() = default;
-
-void RenderBuffer::Gen() {
+RenderBuffer::RenderBuffer() {
   glGenRenderbuffers(1, &m_id);
+}
+
+RenderBuffer::~RenderBuffer() {
+  glDeleteRenderbuffers(1, &m_id);
 }
 
 void RenderBuffer::Bind() const {
@@ -20,13 +22,8 @@ void RenderBuffer::Unbind() {
   glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
-void RenderBuffer::Delete() {
-  glDeleteRenderbuffers(1, &m_id);
-  m_id = 0;
-}
 
 void RenderBuffer::BufferStorage(uint32_t width, uint32_t height, GLint internalFormat) {
-  Bind();
   glRenderbufferStorage(GL_RENDERBUFFER, internalFormat, width, height);
-  Unbind();
 }
+
