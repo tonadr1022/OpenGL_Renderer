@@ -10,7 +10,7 @@
 class FrameBuffer {
  public:
   FrameBuffer();
-  void Gen();
+  ~FrameBuffer();
   void Bind() const;
   void Unbind() const;
   bool IsComplete() const;

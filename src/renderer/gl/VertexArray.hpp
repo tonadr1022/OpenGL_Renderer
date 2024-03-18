@@ -13,13 +13,13 @@
 class VertexArray {
  public:
 
-  VertexArray() = default;
-  ~VertexArray() = default;
-  void Generate();
-  void Bind() const noexcept;
-  void Unbind() const noexcept;
-  void Delete();
-  void AttachBuffer(size_t id, BufferType type, size_t size, DrawMode mode, const void* data) const noexcept;
+  VertexArray();
+  ~VertexArray();
+
+  void Bind() const;
+  void Unbind() const;
+
+  void AttachBuffer(size_t id, BufferType type, size_t size, DrawMode mode, const void* data) const;
 
   template<typename T>
   void EnableAttribute(size_t index, size_t size, size_t stride, const void* ptr) const {

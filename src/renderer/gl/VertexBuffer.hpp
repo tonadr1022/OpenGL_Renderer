@@ -10,10 +10,8 @@
 
 class VertexBuffer {
  public:
-  VertexBuffer() = default;
-  ~VertexBuffer() = default;
-  void Delete();
-  void Generate();
+  VertexBuffer();
+  ~VertexBuffer();
 
   void Bind() const;
   void Unbind() const;

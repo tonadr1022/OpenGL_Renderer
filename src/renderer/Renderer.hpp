@@ -7,7 +7,7 @@
 
 #include <cstdint>
 #include "src/renderer/group/Scene.hpp"
-#include "FrameCapturer.hpp"
+#include "FrameBufferRenderer.hpp"
 #include "Window.hpp"
 
 class Renderer {
@@ -50,7 +50,7 @@ class Renderer {
 
   inline RenderSettings& GetSettings() { return m_settings; }
   inline const PerFrameStats& GetStats() { return stats; }
-  inline const FrameCapturer& GetFrameCapturer() { return m_frameCapturer; }
+  inline const FrameBufferRenderer& GetFrameCapturer() { return m_frameCapturer; }
 
   Mode mode = Mode::BlinnPhong;
   DebugMode debugMode = DebugMode::None;
@@ -70,7 +70,7 @@ class Renderer {
   Window& m_window;
   Camera* m_camera = nullptr;
   RenderState state;
-  FrameCapturer m_frameCapturer;
+  FrameBufferRenderer m_frameCapturer;
   PerFrameStats stats;
   RenderSettings m_settings;
 
@@ -80,7 +80,6 @@ class Renderer {
   void UpdateRenderState(const Object& object);
   void ResetStats();
   void StartFrame(const Scene& scene);
-  void EndFrame();
   void RenderGroup(const Group& group);
   void SetLightingUniforms();
 

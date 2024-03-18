@@ -21,12 +21,10 @@ struct Vertex {
   glm::vec2 texCoords;
 };
 
-
 class Mesh {
  public:
   Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices);
   ~Mesh();
-  void SetWireFrameMode(bool state);
   [[nodiscard]] inline uint32_t NumVertices() const {return m_verticesLength; }
   [[nodiscard]] inline uint32_t NumIndices() const {return m_indicesLength; }
   inline const VertexArray& GetVAO() const {return m_vao; }

@@ -51,7 +51,6 @@ add_executable(opengl_renderer
         src/renderer/camera/FPSCamera.cpp
         src/renderer/camera/OrbitCamera.cpp
         src/renderer/shapes/Cube.hpp
-        src/renderer/shapes/Quad.hpp
         src/imgui/ImguiStyles.h
         src/imgui/ImguiStyles.h
         src/imgui/ImguiStyles.h
@@ -83,8 +82,8 @@ add_executable(opengl_renderer
         src/renderer/camera/Camera.cpp
         src/renderer/camera/Camera.hpp
         src/Common.hpp
-        src/renderer/FrameCapturer.cpp
-        src/renderer/FrameCapturer.hpp
+        src/renderer/FrameBufferRenderer.cpp
+        src/renderer/FrameBufferRenderer.hpp
         src/renderer/gl/RenderBuffer.cpp
         src/renderer/gl/RenderBuffer.hpp
         src/scenes/SceneManager.cpp

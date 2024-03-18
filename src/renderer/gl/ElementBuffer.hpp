@@ -10,12 +10,12 @@
 
 class ElementBuffer {
  public:
-  ElementBuffer() = default;
-  ~ElementBuffer() = default;
-  void Generate();
+  ElementBuffer();
+  ~ElementBuffer();
+
   void Bind() const;
   void Unbind() const;
-  void Delete();
+
   [[nodiscard]] inline GLuint Id() const { return m_id; }
 
  private:

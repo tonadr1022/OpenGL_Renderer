@@ -7,9 +7,6 @@
 
 Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices)
     : m_verticesLength(vertices.size()), m_indicesLength(indices.size()) {
-  m_vao.Generate();
-  m_vbo.Generate();
-  m_ebo.Generate();
   m_vao.Bind();
   m_vbo.Bind();
   m_ebo.Bind();
@@ -20,8 +17,4 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& ind
   m_vao.EnableAttribute<float>(2, 2, sizeof(Vertex), (void*) offsetof(Vertex, texCoords));
 }
 
-Mesh::~Mesh() {
-  m_vao.Delete();
-  m_vbo.Delete();
-  m_ebo.Delete();
-}
+Mesh::~Mesh() = default;

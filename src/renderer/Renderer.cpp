@@ -10,7 +10,7 @@
 
 #include "src/Common.hpp"
 #include "src/renderer/gl/FrameBuffer.hpp"
-#include "FrameCapturer.hpp"
+#include "FrameBufferRenderer.hpp"
 
 #define MAX_USED_TEXTURE_SLOTS 5
 
@@ -78,11 +78,7 @@ void Renderer::StartFrame(const Scene& scene) {
 //  }
 }
 
-void Renderer::EndFrame() {
-//  if (m_settings.renderToImGuiViewport) {
-  m_frameCapturer.EndCapture();
-//  }
-}
+
 
 void Renderer::RenderGroup(const Group& group) {
   if (!group.GetVisible()) return;
@@ -131,9 +127,8 @@ void Renderer::Init() {
       1.0f, 1.0f, 1.0f, 1.0f
   };
 
-  m_quadVAO.Generate();
+
   VertexBuffer quadVBO;
-  quadVBO.Generate();
   m_quadVAO.Bind();
   quadVBO.Bind();
   m_quadVAO.AttachBuffer(quadVBO.Id(), BufferType::ARRAY, sizeof(quadVertices), STATIC, quadVertices);
@@ -149,19 +144,19 @@ void Renderer::Reset() {
 }
 
 void Renderer::RenderScene(const Scene& scene, Camera* camera) {
-
   m_camera = camera;
   StartFrame(scene);
   for (auto& group : scene.GetGroups()) {
     RenderGroup(*group);
   }
-  EndFrame();
+
+  m_frameCapturer.EndCapture();
 //  glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glDisable(GL_DEPTH_TEST);
 //  glClear(GL_COLOR_BUFFER_BIT);
   m_screenShader->Bind();
-  m_screenShader->SetInt("tex", 0);
-  m_frameCapturer.GetTexture().Bind();
+//  m_screenShader->SetInt("tex", 0);
+  m_frameCapturer.GetTexture().Bind(GL_TEXTURE0);
   m_quadVAO.Bind();
   glDrawArrays(GL_TRIANGLES, 0, 6);
 }
