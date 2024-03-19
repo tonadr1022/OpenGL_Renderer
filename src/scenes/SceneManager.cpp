@@ -9,7 +9,7 @@
 SceneManager::SceneManager() = default;
 
 void SceneManager::AddScene(std::unique_ptr<Scene> scene) {
-  auto res = m_sceneMap.emplace(scene->GetName(), std::move(scene));
+   m_sceneMap.emplace(scene->GetName(), std::move(scene));
 }
 
 void SceneManager::SetActiveScene(HashedString name) {

@@ -6,7 +6,7 @@ out vec4 FragColor;
 
 uniform sampler2D tex;
 //uniform float contrast;
-const float contrast = 0.1;
+const float contrast = 0.0; // 0 contrast for now
 
 void main() {
     vec4 color = texture(tex, TexCoords);

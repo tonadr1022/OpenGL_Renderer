@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include "src/renderer/group/Scene.hpp"
+#include "src/renderer/Skybox.hpp"
 #include "FrameCapturer.hpp"
 #include "Window.hpp"
 #include "Quad.hpp"
@@ -26,6 +27,7 @@ class Renderer {
     bool renderDirectionalLights{true};
     bool renderSpotlights{true};
     bool renderPointLights{true};
+    bool renderSkybox{true};
     bool useBlinn{true};
 
     bool diffuseMapEnabled{true};
@@ -71,7 +73,10 @@ class Renderer {
   const std::vector<std::unique_ptr<SpotLight>>* m_spotLights = nullptr;
 
   Shader* m_screenShader = nullptr;
+  Shader* m_skyboxShader = nullptr;
+
   Quad m_screenQuad;
+  Skybox m_skybox;
 
   Window& m_window;
   Camera* m_camera = nullptr;
@@ -87,6 +92,7 @@ class Renderer {
   void ApplyPostProcessingEffects();
   void SetLightingUniforms();
   void SetBlinnPhongUniforms();
+  void RenderSkybox(Camera* camera);
 
   void AssignShaders();
 

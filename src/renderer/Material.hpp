@@ -32,10 +32,15 @@ struct PerMaterialUniformData {
   HashedString id;
   std::function<void(HashedString id, Shader& shader)> SetterFunction;
 };
+enum class MatTextureType {
+  None, Diffuse, Specular, Emission, Normal
+};
+
+using TexturePair = std::pair<MatTextureType, Texture*>;
 
 struct Material {
   enum class Type { Default, BlinnPhong };
-  std::vector<Texture*> textures;
+  std::vector<TexturePair> textures;
   std::vector<PerMaterialUniformData> materialUniforms;
   HashedString shaderName;
   glm::vec3 specularColor = {1.0,1.0,1.0};
@@ -45,7 +50,7 @@ struct Material {
   float shininess = 32;
   float strength = 1;
 
-  Material(const std::vector<Texture*>& textures,
+  Material(const std::vector<TexturePair>& textures,
            const std::vector<PerMaterialUniformData>& materialUniforms,
            HashedString shaderName, Type type)
       : textures(textures),
@@ -54,7 +59,7 @@ struct Material {
         type(type) {
   }
 
-  Material(const std::vector<Texture*>& textures, HashedString shaderName, Type type)
+  Material(const std::vector<TexturePair>& textures, HashedString shaderName, Type type)
       : textures(textures), shaderName(shaderName), type(type) {
   }
 
@@ -66,7 +71,7 @@ struct Material {
       : shaderName(shaderName), type(type) {
   }
 
-  Material(const std::vector<Texture*>& textures,
+  Material(const std::vector<TexturePair>& textures,
            const std::vector<PerMaterialUniformData>& materialUniforms,
            HashedString shaderName)
       : textures(textures),
@@ -75,7 +80,7 @@ struct Material {
         type(Type::BlinnPhong) {
   }
 
-  Material(const std::vector<Texture*>& textures, HashedString shaderName)
+  Material(const std::vector<TexturePair>& textures, HashedString shaderName)
       : textures(textures), shaderName(shaderName), type(Type::BlinnPhong) {
   }
 

@@ -25,15 +25,16 @@ ModelViewerScene::ModelViewerScene() : Scene("Model Viewer", {10, 10, 10}, Camer
 
   auto spot = std::make_unique<Model>("resources/models/spot/spot_quadrangulated.obj");
   auto spotMat = MaterialManager::GetMaterial("spotTextured");
+//  auto spotMat = MaterialManager::GetMaterial("woodContainer");
   for (auto& obj : spot->GetObjects()) {
     obj->SetMaterial(spotMat);
   }
   m_modelSelectMap.emplace("Spot", spot.get());
   m_groups.push_back(std::move(spot));
 
-  glm::vec3 directionalDir = {0.2f, -0.5f, 0.5f};
+  glm::vec3 directionalDir = {0.4f, -0.7f, -0.7f};
   m_directionalLight = std::make_unique<DirectionalLight>(directionalDir);
-  m_pointLights.emplace_back(std::make_unique<PointLight>(glm::vec3(0, 0, 1)));
+  m_pointLights.emplace_back(std::make_unique<PointLight>(glm::vec3(10, 10, 10)));
 
   for (auto& group : m_groups) {
     group->SetVisible(false);
@@ -41,6 +42,10 @@ ModelViewerScene::ModelViewerScene() : Scene("Model Viewer", {10, 10, 10}, Camer
   m_visibleModel = m_modelSelectMap.find("Teapot")->second;
   m_visibleModel->SetVisible(true);
   m_activeModelName = "Teapot";
+
+  for (auto &obj : m_visibleModel->GetObjects()) {
+    obj->SetMaterial(spotMat);
+  }
 }
 
 void ModelViewerScene::Update(double dt) {

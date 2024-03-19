@@ -20,9 +20,7 @@ class Model : public Group {
   void ProcessNodes(aiNode* rootNode, const aiScene* scene);
   void ProcessMesh(aiMesh* mesh, const aiScene* scene);
   Material* LoadMaterial(aiMaterial* aiMat, HashedString matName);
-  std::vector<Texture*> LoadMaterialTextures(aiMaterial* aiMaterial, aiTextureType aiType, Texture::Type textureType);
-
-
+  std::vector<TexturePair> LoadMaterialTextures(aiMaterial* aiMaterial, aiTextureType aiType, MatTextureType matTextureType);
 };
 
 #endif //OPENGL_RENDERER_SRC_RENDERER_GROUP_MODEL_HPP_

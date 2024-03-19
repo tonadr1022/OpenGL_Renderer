@@ -47,25 +47,52 @@ void Application::SetupResources() {
                                        {GET_SHADER_PATH("default.frag"), ShaderType::FRAGMENT}});
   ShaderManager::AddShader("blinnPhong", {{GET_SHADER_PATH("blinnPhong.vert"), ShaderType::VERTEX},
                                           {GET_SHADER_PATH("blinnPhong.frag"), ShaderType::FRAGMENT}});
+  ShaderManager::AddShader("skybox", {{GET_SHADER_PATH("skybox.vert"), ShaderType::VERTEX},
+                                      {GET_SHADER_PATH("skybox.frag"), ShaderType::FRAGMENT}});
+
 
   MeshManager::AddMesh("cube", Cube::Vertices, Cube::Indices);
   MeshManager::AddMesh("cube1024", Cube::Create(1024, 1024));
-  std::vector<Texture*> textures = {TextureManager::AddTexture("woodContainerDiffuse",
-                                                               GET_TEXTURE_PATH("container_diffuse.png"),
-                                                               Texture::Type::Diffuse),
-                                    TextureManager::AddTexture("woodContainerSpecular",
-                                                               GET_TEXTURE_PATH("container_specular.png"),
-                                                               Texture::Type::Specular)};
+  std::vector<TexturePair> textures = {{MatTextureType::Diffuse,
+                                        TextureManager::AddTexture("woodContainerDiffuse", GET_TEXTURE_PATH(
+                                            "container_diffuse.png"), Texture::SamplerType::TwoD)},
+                                       {MatTextureType::Specular,
+                                        TextureManager::AddTexture("woodContainerSpecular", GET_TEXTURE_PATH(
+                                            "container_specular.png"), Texture::SamplerType::TwoD)}};
+
 //                                    TextureManager::AddTexture("woodContainerEmission", GET_TEXTURE_PATH("container_emission.jpg"), Texture::Type::Emission)};
   MaterialManager::AddMaterial("woodContainer", textures, "blinnPhong");
 
   textures.clear();
-//  TextureManager::AddTexture("cowbasic", GET_TEXTURE_PATH("cow.png"), Texture::Type::Diffuse);
 
-  textures.push_back(TextureManager::AddTexture("spotTextured",
-                                                "resources/models/spot/spot_texture.png",
-                                                Texture::Type::Diffuse));
+  textures.push_back({MatTextureType::Diffuse, TextureManager::AddTexture("spot_texture",
+                                                                            "resources/models/spot/spot_texture.png",
+                                                                            Texture::SamplerType::TwoD)});
+//  textures.push_back({MatTextureType::Specular,
+//                      TextureManager::AddTexture("woodContainerSpecular", GET_TEXTURE_PATH(
+//                          "container_specular.png"), Texture::SamplerType::TwoD)});
   MaterialManager::AddMaterial("spotTextured", textures, "blinnPhong");
+  textures.clear();
+  std::vector<std::string> sky1Strings = {
+      GET_TEXTURE_PATH("skybox1/px.png"),
+      GET_TEXTURE_PATH("skybox1/nx.png"),
+      GET_TEXTURE_PATH("skybox1/py.png"),
+      GET_TEXTURE_PATH("skybox1/ny.png"),
+      GET_TEXTURE_PATH("skybox1/pz.png"),
+      GET_TEXTURE_PATH("skybox1/nz.png"),
+  };
+  std::vector<std::string> sky2Strings = {
+      GET_TEXTURE_PATH("skybox2/right.jpg"),
+      GET_TEXTURE_PATH("skybox2/left.jpg"),
+      GET_TEXTURE_PATH("skybox2/top.jpg"),
+      GET_TEXTURE_PATH("skybox2/bottom.jpg"),
+      GET_TEXTURE_PATH("skybox2/front.jpg"),
+      GET_TEXTURE_PATH("skybox2/back.jpg"),
+  };
+  TextureManager::AddTexture("skybox", sky1Strings);
+
+//  textures.emplace_back(MatTextureType::Diffuse, TextureManager::GetTexture("cow"));
+//  MaterialManager::AddMaterial("cowMat", textures, "blinnPhong");
 }
 
 void Application::Run() {
@@ -121,14 +148,14 @@ void Application::OnImGui() {
   }
 
   if (ImGui::CollapsingHeader("Render Settings")) {
-    constexpr std::array<const char*, 4> items = { "Default", "Normals", "Diffuse", "Depth Buffer" };
+    constexpr std::array<const char*, 4> items = {"Default", "Normals", "Diffuse", "Depth Buffer"};
     int selectedItem = static_cast<int>(m_renderer.debugMode);
     if (ImGui::BeginCombo("##RenderModeCombo", ("Mode: " + std::string(items[selectedItem])).c_str())) {
-      for (int i =0; i < items.size(); i++) {
+      for (int i = 0; i < items.size(); i++) {
         const bool isSelected = (selectedItem == i);
         if (ImGui::Selectable(items[i], isSelected)) {
           selectedItem = i;
-          m_renderer.debugMode = (Renderer::DebugMode)selectedItem;
+          m_renderer.debugMode = (Renderer::DebugMode) selectedItem;
           if (isSelected) ImGui::SetItemDefaultFocus();
         }
       }
@@ -153,7 +180,6 @@ void Application::OnImGui() {
     if (ImGui::Button("Recompile Shaders")) {
       m_renderer.RecompileShaders();
     }
-
 
   }
 
@@ -273,7 +299,7 @@ void Application::OnKeyEvent(int key, int action, int mods) {
     if (key == GLFW_KEY_BACKSPACE && mods == GLFW_MOD_SHIFT) {
       m_window.SetShouldClose(true);
     } else if (key == GLFW_KEY_M) {
-     m_renderer.RecompileShaders();
+      m_renderer.RecompileShaders();
     } else if (key == GLFW_KEY_N) {
       m_settings.showImGui = !m_settings.showImGui;
       if (!m_settings.showImGui) m_renderToImGuiViewport = false;

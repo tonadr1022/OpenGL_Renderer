@@ -7,6 +7,7 @@
 #include "src/core/Logger.hpp"
 #include "src/renderer/resource/MaterialManager.hpp"
 #include "src/renderer/resource/ShaderManager.hpp"
+#include "src/renderer/resource/TextureManager.hpp"
 
 #include "src/Common.hpp"
 #include "src/renderer/gl/FrameBuffer.hpp"
@@ -18,7 +19,7 @@ namespace { // detail
 #define NUM_POINT_PARAMS 6
 #define NUM_DIRECTIONAL_PARAMS 5
 
-auto GenerateSpotLightStrings(int num) {
+std::vector<HashedString> GenerateSpotLightStrings(int num) {
   std::vector<HashedString> ret;
   ret.reserve(num * NUM_SPOT_PARAMS);
   for (int i = 0; i < num; i++) {
@@ -78,8 +79,10 @@ void Renderer::UpdateRenderState(const Object& object) {
       state.boundShader->SetMat4("u_VP", m_camera->GetVPMatrix());
 //      state.boundShader->SetMat4("u_Projection", m_camera->GetProjectionMatrix());
 
-      if (mode == Mode::BlinnPhong) SetBlinnPhongUniforms();
-      if (mode == Mode::BlinnPhong) SetLightingUniforms();
+      if (mode == Mode::BlinnPhong) {
+        SetBlinnPhongUniforms();
+      }
+      SetLightingUniforms();
     }
   }
 }
@@ -87,23 +90,24 @@ void Renderer::UpdateRenderState(const Object& object) {
 void Renderer::SetBlinnPhongUniforms() {
   // For now, this assumes only one type per material. will need to refactor if otherwise
   uint32_t numDiffuseMaps = 0, numSpecularMaps = 0, numEmissionMaps = 0;
-  for (auto&& texture : state.boundMaterial->textures) {
-    switch (texture->GetType()) {
-      case Texture::Type::Diffuse:texture->Bind(GL_TEXTURE0);
+  for (auto&& texturePair : state.boundMaterial->textures) {
+    switch (texturePair.first) {
+      case MatTextureType::Diffuse: texturePair.second->Bind(GL_TEXTURE0);
         state.boundShader->SetInt("materialMaps.diffuseMap", 0);
         numDiffuseMaps++;
         break;
-      case Texture::Type::Specular:texture->Bind(GL_TEXTURE1);
+      case MatTextureType::Specular:texturePair.second->Bind(GL_TEXTURE1);
         state.boundShader->SetInt("materialMaps.specularMap", 1);
         numSpecularMaps++;
         break;
-      case Texture::Type::Emission:texture->Bind(GL_TEXTURE2);
+      case MatTextureType::Emission:texturePair.second->Bind(GL_TEXTURE2);
         state.boundShader->SetInt("materialMaps.emissionMap", 2);
         numEmissionMaps++;
         break;
       default:break;
     }
   }
+
   state.boundShader->SetBool("hasDiffuseMap", m_settings.diffuseMapEnabled && numDiffuseMaps > 0);
   state.boundShader->SetBool("hasSpecularMap", m_settings.specularMapEnabled && numSpecularMaps > 0);
   state.boundShader->SetBool("hasEmissionMap", m_settings.emissionMapEnabled && numEmissionMaps > 0);
@@ -112,9 +116,8 @@ void Renderer::SetBlinnPhongUniforms() {
   state.boundShader->SetVec3("material.diffuse", state.boundMaterial->diffuseColor);
   state.boundShader->SetVec3("material.specular", state.boundMaterial->specularColor);
   state.boundShader->SetFloat("material.shininess", state.boundMaterial->shininess);
-
-
 }
+
 void Renderer::ResetStats() {
   memset(&stats, 0, sizeof(PerFrameStats));
 }
@@ -154,10 +157,10 @@ void Renderer::RenderGroup(const Group& group) {
     auto& modelMatrix = object->transform.GetModelMatrix();
     state.boundShader->SetMat4("u_Model", modelMatrix);
 //    state.boundShader->SetMat3("u_NormalMatrix", glm::inverse( modelMatrix), true);
-
     glDrawElements(GL_TRIANGLES, (GLsizei) mesh->NumIndices(), GL_UNSIGNED_INT, nullptr);
+
     stats.drawCalls++;
-    stats.vertices += mesh->NumIndices();
+    stats.vertices += mesh->NumVertices();
     stats.indices += mesh->NumIndices();
   }
 
@@ -170,7 +173,6 @@ void Renderer::Init() {
   ShaderManager::AddShader("screen1", {{GET_SHADER_PATH("contrast.vert"), ShaderType::VERTEX},
                                        {GET_SHADER_PATH("contrast.frag"), ShaderType::FRAGMENT}});
   AssignShaders();
-
   glEnable(GL_MULTISAMPLE);
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
@@ -186,12 +188,27 @@ void Renderer::RenderScene(const Scene& scene, Camera* camera) {
   for (auto& group : scene.GetGroups()) {
     RenderGroup(*group);
   }
+  RenderSkybox(camera);
+
   m_frameCapturer.EndCapture();
 
   glDisable(GL_DEPTH_TEST);
   m_screenShader->Bind();
   m_frameCapturer.GetTexture().Bind(GL_TEXTURE0);
   m_screenQuad.Draw();
+}
+
+void Renderer::RenderSkybox(Camera* camera) {
+  glDepthFunc(GL_LEQUAL);
+  m_skyboxShader->Bind();
+  Texture* t = TextureManager::GetTexture("skybox");
+  t->Bind(GL_TEXTURE0);
+  glm::mat4 vp = camera->GetProjectionMatrix() * glm::mat4(glm::mat3(camera->GetViewMatrix()));
+  m_skyboxShader->SetMat4("VP", vp);
+  m_skyboxShader->SetInt("tex", 0);
+  // hacky for now, will hopefully assert or use references for skybox texture
+  m_skybox.Draw();
+  glDepthFunc(GL_LESS);
 }
 
 void Renderer::ApplyPostProcessingEffects() {
@@ -218,8 +235,6 @@ void Renderer::SetDirectionalLight(const DirectionalLight* directionalLight) {
 void Renderer::SetSpotLights(const std::vector<std::unique_ptr<SpotLight>>* spotLights) {
   m_spotLights = spotLights;
 }
-
-
 
 void Renderer::SetLightingUniforms() {
   if (m_settings.renderDirectionalLights && m_directionalLight != nullptr) {
@@ -279,4 +294,5 @@ void Renderer::RecompileShaders() {
 
 void Renderer::AssignShaders() {
   m_screenShader = ShaderManager::GetShader("screen1");
+  m_skyboxShader = ShaderManager::GetShader("skybox");
 }

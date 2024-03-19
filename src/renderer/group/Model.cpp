@@ -11,8 +11,8 @@
 
 Model::Model(const std::string& path, bool backfaceCull) : Group(backfaceCull) {
   Assimp::Importer importer;
-  const aiScene* scene = importer.ReadFile(path,aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals
-                                               | aiProcess_CalcTangentSpace);
+  const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals
+      | aiProcess_CalcTangentSpace);
   if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
     LOG_ERROR("Assimp Error: %s", importer.GetErrorString());
     return;
@@ -40,7 +40,6 @@ void Model::ProcessNodes(aiNode* rootNode, const aiScene* scene) {
       meshStack.push(currNode->mChildren[i]);
     }
   }
-  LOG_INFO("Done");
 }
 
 void Model::ProcessMesh(aiMesh* aiMesh, const aiScene* scene) {
@@ -95,10 +94,10 @@ void Model::ProcessMesh(aiMesh* aiMesh, const aiScene* scene) {
   }
 }
 
-std::vector<Texture*> Model::LoadMaterialTextures(aiMaterial* aiMaterial,
-                                                  aiTextureType aiType,
-                                                  Texture::Type textureType) {
-  std::vector<Texture*> textures;
+std::vector<TexturePair> Model::LoadMaterialTextures(aiMaterial* aiMaterial,
+                                                     aiTextureType aiType,
+                                                     MatTextureType matTextureType) {
+  std::vector<TexturePair> textures;
   for (uint32_t i = 0; i < aiMaterial->GetTextureCount(aiType); i++) {
     aiString textureFilename;
     aiMaterial->GetTexture(aiType, i, &textureFilename);
@@ -110,19 +109,20 @@ std::vector<Texture*> Model::LoadMaterialTextures(aiMaterial* aiMaterial,
 //    std::cout << m_name << " " << textureFilename.data << std::endl;
     Texture* texture = TextureManager::GetTexture(textureName);
     if (texture == nullptr) {
-      texture = TextureManager::AddTexture(textureName, m_directory + '/' + textureFilename.data, textureType);
+      texture =
+          TextureManager::AddTexture(textureName, m_directory + '/' + textureFilename.data, Texture::SamplerType::TwoD);
     }
-    textures.push_back(texture);
+    textures.emplace_back(matTextureType, texture);
   }
 
   return textures;
 }
 
 Material* Model::LoadMaterial(aiMaterial* aiMat, HashedString matName) {
-  std::vector<Texture*> textures;
-  auto diffuseMaps = LoadMaterialTextures(aiMat, aiTextureType_DIFFUSE, Texture::Type::Diffuse);
+  std::vector<TexturePair> textures;
+  auto diffuseMaps = LoadMaterialTextures(aiMat, aiTextureType_DIFFUSE, MatTextureType::Diffuse);
   textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-  auto specularMaps = LoadMaterialTextures(aiMat, aiTextureType_SPECULAR, Texture::Type::Specular);
+  auto specularMaps = LoadMaterialTextures(aiMat, aiTextureType_SPECULAR, MatTextureType::Specular);
   textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
   MaterialManager::AddMaterial(matName, textures, "blinnPhong", Material::Type::BlinnPhong);
@@ -131,26 +131,18 @@ Material* Model::LoadMaterial(aiMaterial* aiMat, HashedString matName) {
   aiColor4D color;
   if (AI_SUCCESS == aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_DIFFUSE, &color)) {
     mat->diffuseColor = glm::vec3(color.r, color.g, color.b);
-  } else {
-    LOG_INFO("NO DIFF COLOR ON MATERIAL");
   }
   if (AI_SUCCESS == aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_SPECULAR, &color)) {
     mat->specularColor = glm::vec3(color.r, color.g, color.b);
-  } else {
-    LOG_INFO("NO SPECULAR COLOR ON MATERIAL");
   }
   if (AI_SUCCESS == aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_AMBIENT, &color)) {
     mat->ambientColor = glm::vec3(color.r, color.g, color.b);
-  } else {
-    LOG_INFO("NO AMBIENT COLOR ON MATERIAL");
   }
   ai_real shininess;
   int res1;
   res1 = aiGetMaterialFloat(aiMat, AI_MATKEY_SHININESS, &shininess);
   if (res1 == AI_SUCCESS && shininess > 0) {
     mat->shininess = shininess;
-  } else {
-    LOG_INFO("NO SHININESS ON MATERIAL");
   }
   return mat;
 }
