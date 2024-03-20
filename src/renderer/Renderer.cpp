@@ -11,7 +11,9 @@
 
 #include "src/Common.hpp"
 #include "src/renderer/gl/FrameBuffer.hpp"
-#include "FrameCapturer.hpp"
+#include "src/core/Utils.hpp"
+
+#include <chrono>
 
 namespace { // detail
 #define NUM_SPOT_PARAMS 9
@@ -138,19 +140,18 @@ void Renderer::StartFrame(const Scene& scene) {
   state.boundMaterial = nullptr;
   state.boundShaderName = "";
   ResetStats();
-
-//  glStencilFunc(GL_ALWAYS, 1, 0xFF);
-//  glStencilMask(0xFF); // nothing writes to stencil buffer for now
-
-  // set if all wireframe
   glPolygonMode(GL_FRONT_AND_BACK, m_settings.wireframe ? GL_LINE : GL_FILL);
 
-  m_frameCapturer.StartCapture();
+  if (m_settings.useMSAA) {
+    m_multiSampleFBOContainer->FBO().Bind();
+  } else {
+    m_singleSampleFBOContainer->FBO().Bind();
+  }
 
-//  glEnable(GL_DEPTH_TEST);
-//  glEnable(GL_STENCIL_TEST);
-//  glClearColor(1.0, 0.0, 0.0, 1.0);
-//  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_STENCIL_TEST);
+  glClearColor(0.0, 0.0, 0.0, 1.0);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
 void Renderer::RenderGroup(const Group& group) {
@@ -164,27 +165,27 @@ void Renderer::RenderGroup(const Group& group) {
   if (!group.backFaceCull) {
     glDisable(GL_CULL_FACE);
   }
+
+  for (auto&& object : group.GetObjects()) {
+    if (!object->shouldDraw) continue;
+    auto mesh = object->GetMesh();
+    UpdateRenderState(*object);
+    mesh->GetVAO().Bind();
+    state.boundShader->SetMat4("u_Model", object->transform.GetModelMatrix());
+    glDrawElements(GL_TRIANGLES, (GLsizei) mesh->NumIndices(), GL_UNSIGNED_INT, nullptr);
+    IncStats(mesh->NumVertices(), mesh->NumIndices());
+  }
+
   if (group.selected) {
     // if selected, render twice, once as normal, writing to the stencil buffer,
     // then enlarged, disabling stencil wiring using the border color
-    for (auto&& object : group.GetObjects()) {
-      if (!object->shouldDraw) continue;
-      auto mesh = object->GetMesh();
-      UpdateRenderState(*object);
-      mesh->GetVAO().Bind();
-      state.boundShader->SetMat4("u_Model", object->transform.GetModelMatrix());
-      glDrawElements(GL_TRIANGLES, (GLsizei) mesh->NumIndices(), GL_UNSIGNED_INT, nullptr);
-      IncStats(mesh->NumVertices(), mesh->NumIndices());
-    }
     m_singleColorShader->Bind();
     state.boundShader = m_singleColorShader;
     state.boundShaderName = "";
 
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilMask(0x00);
-
     m_singleColorShader->SetMat4("u_VP", m_camera->GetVPMatrix());
-
     for (auto&& object : group.GetObjects()) {
       if (!object->shouldDraw) continue;
       auto mesh = object->GetMesh();
@@ -193,22 +194,9 @@ void Renderer::RenderGroup(const Group& group) {
       glDrawElements(GL_TRIANGLES, (GLsizei) mesh->NumIndices(), GL_UNSIGNED_INT, nullptr);
       IncStats(mesh->NumVertices(), mesh->NumIndices());
     }
-//    glClear(GL_STENCIL_BUFFER_BIT);
     // reset stencil buffer state
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilMask(0xFF);
-  } else {
-    for (auto&& object : group.GetObjects()) {
-      if (!object->shouldDraw) continue;
-      auto mesh = object->GetMesh();
-      UpdateRenderState(*object);
-      mesh->GetVAO().Bind();
-      auto& modelMatrix = object->transform.GetModelMatrix();
-      state.boundShader->SetMat4("u_Model", modelMatrix);
-//    state.boundShader->SetMat3("u_NormalMatrix", glm::inverse( modelMatrix), true);
-      glDrawElements(GL_TRIANGLES, (GLsizei) mesh->NumIndices(), GL_UNSIGNED_INT, nullptr);
-      IncStats(mesh->NumVertices(), mesh->NumIndices());
-    }
   }
 
   if (!group.backFaceCull) {
@@ -218,19 +206,15 @@ void Renderer::RenderGroup(const Group& group) {
 }
 
 void Renderer::Init() {
-  ShaderManager::AddShader("screen1", {{GET_SHADER_PATH("contrast.vert"), ShaderType::VERTEX},
-                                       {GET_SHADER_PATH("contrast.frag"), ShaderType::FRAGMENT}});
   AssignShaders();
   glEnable(GL_MULTISAMPLE);
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
 
-//  glEnable(GL_STENCIL_TEST);
   // action to take when any stencil test passes or fails, replace when pass stencil
-  //// test and depth test (or only stencil if no depth test)
+  // test and depth test (or only stencil if no depth test)
   glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
   glStencilFunc(GL_NOTEQUAL, 1, 0xFF); // all fragments should pass stencil test
-//  glStencilMask(0x00);
 }
 
 void Renderer::Reset() {
@@ -244,14 +228,41 @@ void Renderer::RenderScene(const Scene& scene, Camera* camera) {
   for (auto& group : scene.GetGroups()) {
     RenderGroup(*group);
   }
-  RenderSkybox(camera);
+  if (m_settings.renderSkybox) RenderSkybox(camera);
 
-  m_frameCapturer.EndCapture();
+  // blit from multi-sampled result to the intermediate FBO
+  glBindFramebuffer(GL_READ_FRAMEBUFFER,
+                    m_settings.useMSAA ? m_multiSampleFBOContainer->FBO().Id()
+                                       : m_singleSampleFBOContainer->FBO().Id());
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_contrastFBOContainer->FBO().Id());
+  glBlitFramebuffer(0, 0, (GLsizei) m_width, (GLsizei) m_height, 0, 0, (GLsizei) m_width,
+                    (GLsizei) m_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+  if (ppUniforms.invert) {
+    m_invertFBO->FBO().Bind();
+  } else {
+    FrameBuffer::BindDefault();
+  }
+
+  GL_LOG_ERROR();
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
   glDisable(GL_DEPTH_TEST);
-  m_screenShader->Bind();
-////  m_frameCapturer.GetTexture().Bind();
-  m_frameCapturer.GetTexture().Bind(GL_TEXTURE0);
+
+  m_contrastShader->Bind();
+  m_contrastShader->SetFloat("u_Contrast", ppUniforms.contrast);
+  m_contrastFBOContainer->Textures()[0]->Bind();
   m_screenQuad.Draw();
+
+  GL_LOG_ERROR();
+  if (ppUniforms.invert) {
+    FrameBuffer::BindDefault();
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    m_invertShader->Bind();
+    m_invertFBO->Textures()[0]->Bind();
+    m_screenQuad.Draw();
+    GL_LOG_ERROR();
+  }
 }
 
 void Renderer::RenderSkybox(Camera* camera) {
@@ -278,14 +289,17 @@ void Renderer::ApplyPostProcessingEffects() {
 
 }
 
-void Renderer::SetFrameBufferSize(uint32_t width, uint32_t height) {
+void Renderer::ResizeViewport(uint32_t width, uint32_t height) {
   glViewport(0, 0, (int) width, (int) height);
-  m_frameCapturer.UpdateViewport(width, height);
+  m_width = width;
+  m_height = height;
+  AllocateFBOContainers(width, height);
 }
 
-Renderer::Renderer(Window& window, bool renderToImGuiViewport)
-    : m_window(window), m_frameCapturer(window.GetFrameBufferDimensions().x, m_window.GetFrameBufferDimensions().y) {
-  m_settings.renderToImGuiViewport = renderToImGuiViewport;
+Renderer::Renderer(Window& window)
+    : m_window(window) {
+  auto frameBufferDims = window.GetFrameBufferDimensions();
+  ResizeViewport(frameBufferDims.x, frameBufferDims.y);
 }
 
 void Renderer::SetPointLights(const std::vector<std::unique_ptr<PointLight>>* pointLights) {
@@ -354,7 +368,8 @@ void Renderer::RecompileShaders() {
 }
 
 void Renderer::AssignShaders() {
-  m_screenShader = ShaderManager::GetShader("screen1");
+  m_contrastShader = ShaderManager::GetShader("contrast");
+  m_invertShader = ShaderManager::GetShader("invert");
   m_skyboxShader = ShaderManager::GetShader("skybox");
   m_singleColorShader = ShaderManager::GetShader("singleColor");
   m_skyboxShader->Bind();
@@ -369,4 +384,75 @@ void Renderer::IncStats(uint32_t numVertices, uint32_t numIndices) {
   stats.drawCalls++;
   stats.vertices += numVertices;
   stats.indices += numIndices;
+}
+
+void Renderer::Screenshot(std::string_view filename) {
+  if (std::isalpha(filename[0])) {
+    const Texture& finalTexture = GetFinalImageTexture();
+    finalTexture.Screenshot(m_width, m_height, std::string(filename) + ".png");
+  } else {
+    Screenshot();
+  }
+}
+
+void Renderer::Screenshot() {
+  std::string dtString = Utils::GetDateTimeString();
+  std::string screenshotName = "screenshot_" + dtString + ".png";
+  const Texture& finalTexture = GetFinalImageTexture();
+  finalTexture.Screenshot(m_width, m_height, screenshotName);
+}
+
+const Texture& Renderer::GetFinalImageTexture() {
+  ASSERT(!m_contrastFBOContainer->Textures().empty(), "Unexpected error, no textures attached to final framebuffer");
+  return *m_contrastFBOContainer->Textures()[0];
+}
+void Renderer::AllocateFBOContainers(uint32_t width, uint32_t height) {
+  // MSAA Framebuffer
+  int samples = 4;
+  m_multiSampleFBOContainer = std::make_unique<FBOContainer>();
+  m_multiSampleFBOContainer->FBO().Bind();
+  // attach color buffer
+  auto multiSampleTexture = std::make_unique<Texture>(width, height, samples);
+  m_multiSampleFBOContainer->AttachColorBuffer(GL_COLOR_ATTACHMENT0,
+                                               GL_TEXTURE_2D_MULTISAMPLE,
+                                               std::move(multiSampleTexture));
+  // attach stencil and depth buffer
+  auto multiSampleRBO = std::make_unique<RenderBuffer>(GL_DEPTH24_STENCIL8);
+  multiSampleRBO->Bind();
+  multiSampleRBO->BufferStorageMultiSample(width, height, samples);
+  m_multiSampleFBOContainer->AttachRenderBuffer(std::move(multiSampleRBO));
+  // FBO to blit store color on blit from MSAA framebuffer, contains only color attachment
+
+  // Single sample FBO
+  m_singleSampleFBOContainer = std::make_unique<FBOContainer>();
+  m_singleSampleFBOContainer->FBO().Bind();
+  auto singleSampleTexture = std::make_unique<Texture>(width, height);
+  m_singleSampleFBOContainer->AttachColorBuffer(GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, std::move(singleSampleTexture));
+  auto singleSampleRBO = std::make_unique<RenderBuffer>(GL_DEPTH24_STENCIL8);
+  singleSampleRBO->Bind();
+  singleSampleRBO->BufferStorage(width, height);
+  m_singleSampleFBOContainer->AttachRenderBuffer(std::move(singleSampleRBO));
+
+  m_invertFBO = std::make_unique<FBOContainer>();
+  m_invertFBO->FBO().Bind();
+  auto invertTexture = std::make_unique<Texture>(width, height);
+  m_invertFBO->AttachColorBuffer(GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, std::move(invertTexture));
+
+  m_contrastFBOContainer = std::make_unique<FBOContainer>();
+  m_contrastFBOContainer->FBO().Bind();
+  auto tex1 = std::make_unique<Texture>(width, height);
+  m_contrastFBOContainer->AttachColorBuffer(GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, std::move(tex1));
+
+//  if (!m_contrastFBOContainer->FBO().IsComplete()) {
+//    LOG_ERROR("contrast fbo incomplete");
+//  }
+//  if (!m_singleSampleFBOContainer->FBO().IsComplete()) {
+//    LOG_ERROR("single sample fbo incomplete");
+//  }
+//  if (!m_multiSampleFBOContainer->FBO().IsComplete()) {
+//    LOG_ERROR("multi sample fbo incomplete");
+//  }
+//  if (!m_invertFBO->FBO().IsComplete()) {
+//    LOG_ERROR("invert fbo incomplete");
+//  }
 }

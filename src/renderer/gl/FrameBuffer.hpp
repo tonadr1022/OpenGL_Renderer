@@ -17,7 +17,7 @@ class FrameBuffer {
   void AttachColorBuffer(GLuint textureColorBuffer);
   void AttachColorBuffer(GLenum attachment, GLenum textureTarget, GLuint textureId);
   void AttachRenderBuffer(GLuint rbo);
-
+  inline GLuint Id() const { return m_id; }
  private:
   GLuint m_id{0};
 

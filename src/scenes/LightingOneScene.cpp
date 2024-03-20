@@ -35,13 +35,13 @@ LightingOneScene::LightingOneScene() : Scene({1, 2, 4}) {
   AddGroup(std::move(cubeGroup));
   AddGroup(std::move(planeGroup));
 
-  auto backpack = ModelManager::CopyLoadedModel("backpack");
+//  auto backpack = ModelManager::CopyLoadedModel("backpack");
   // copy the contents of backpack 10 times
-  for (int i =0; i < 10; i++) {
-    auto bpI = std::make_unique<Group>(*backpack);
-    bpI->transform.Translate(glm::vec3(i*10,0,i*10));
-    m_groups.emplace_back(std::move(bpI));
-  }
+//  for (int i =0; i < 10; i++) {
+//    auto bpI = std::make_unique<Group>(*backpack);
+//    bpI->transform.Translate(glm::vec3(i*10,0,i*10));
+//    m_groups.emplace_back(std::move(bpI));
+//  }
 
   glm::vec3 directionalDir = {0.2f, -0.5f, 0.5f};
   m_directionalLight = std::make_unique<DirectionalLight>(directionalDir);

@@ -8,9 +8,9 @@
 #include <cstdint>
 #include "src/renderer/group/Scene.hpp"
 #include "src/renderer/Skybox.hpp"
-#include "FrameCapturer.hpp"
 #include "Window.hpp"
 #include "Quad.hpp"
+#include "src/renderer/gl/FBOContainer.hpp"
 
 class Renderer {
  public:
@@ -23,12 +23,12 @@ class Renderer {
 
   struct RenderSettings {
     bool wireframe{false};
-    bool renderToImGuiViewport{false};
     bool renderDirectionalLights{true};
     bool renderSpotlights{true};
     bool renderPointLights{true};
     bool renderSkybox{true};
     bool useBlinn{true};
+    bool useMSAA{true};
 
     bool diffuseMapEnabled{true};
     bool specularMapEnabled{true};
@@ -36,10 +36,18 @@ class Renderer {
     bool emissionMapEnabled{true};
   };
 
-  Renderer(Window& window, bool renderToImGuiViewport);
+  struct PostProcessingUniforms {
+    float contrast = 0.0f;
+    bool invert = false;
+    bool flip = false;
+  };
+
+  PostProcessingUniforms ppUniforms;
+
+  Renderer(Window& window);
   void Init();
   void RenderScene(const Scene& scene, Camera* camera);
-  void SetFrameBufferSize(uint32_t width, uint32_t height);
+  void ResizeViewport(uint32_t width, uint32_t height);
   void SetDirectionalLight(const DirectionalLight* directionalLight);
   void SetSpotLights(const std::vector<std::unique_ptr<SpotLight>>* spotLights);
   void SetPointLights(const std::vector<std::unique_ptr<PointLight>>* pointLights);
@@ -56,13 +64,16 @@ class Renderer {
     uint32_t numMaterialSwitches{0};
   };
 
+
   inline RenderSettings& GetSettings() { return m_settings; }
   inline const PerFrameStats& GetStats() { return stats; }
-  inline const FrameCapturer& GetFrameCapturer() { return m_frameCapturer; }
 
   Mode mode = Mode::BlinnPhong;
   DebugMode debugMode = DebugMode::None;
 
+  void Screenshot(std::string_view filename);
+  void Screenshot();
+  const Texture& GetFinalImageTexture();
 
  private:
   struct RenderState {
@@ -75,7 +86,8 @@ class Renderer {
   const std::vector<std::unique_ptr<PointLight>>* m_pointLights = nullptr;
   const std::vector<std::unique_ptr<SpotLight>>* m_spotLights = nullptr;
 
-  Shader* m_screenShader = nullptr;
+  Shader* m_contrastShader = nullptr;
+  Shader* m_invertShader = nullptr;
   Shader* m_skyboxShader = nullptr;
   Shader* m_singleColorShader = nullptr;
 
@@ -85,11 +97,20 @@ class Renderer {
   Window& m_window;
   Camera* m_camera = nullptr;
   Texture* m_skyboxTexture = nullptr;
+
   RenderState state;
-  FrameCapturer m_frameCapturer;
+
+  std::unique_ptr<FBOContainer> m_multiSampleFBOContainer = nullptr;
+  std::unique_ptr<FBOContainer> m_singleSampleFBOContainer = nullptr;
+  std::unique_ptr<FBOContainer> m_contrastFBOContainer = nullptr;
+  std::unique_ptr<FBOContainer> m_invertFBO = nullptr;
+  std::unique_ptr<FBOContainer> m_finalTextureFBO = nullptr;
+
+
   PerFrameStats stats;
   RenderSettings m_settings;
 
+  uint32_t m_width{}, m_height{};
 
   void UpdateRenderState(const Object& object);
   void ResetStats();
@@ -100,6 +121,8 @@ class Renderer {
   void SetLightingUniforms();
   void SetBlinnPhongUniforms();
   void RenderSkybox(Camera* camera);
+
+  void AllocateFBOContainers(uint32_t width, uint32_t height);
 
   void AssignShaders();
 

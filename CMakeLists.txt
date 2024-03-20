@@ -102,8 +102,9 @@ add_executable(opengl_renderer
         src/renderer/Skybox.hpp
         src/renderer/ModelManager.cpp
         src/renderer/ModelManager.hpp
-        src/renderer/FrameCapturer.hpp
-        src/renderer/FrameCapturer.cpp
+        src/renderer/gl/FBOContainer.cpp
+        src/renderer/gl/FBOContainer.hpp
+        src/core/Utils.cpp
 )
 
 
@@ -111,6 +112,8 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
     add_compile_definitions(DEBUG_MODE)
     set(CMAKE_CXX_FLAGS "-g")
 endif ()
+
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/screenshots)
 
 
 if (WIN32)

@@ -8,27 +8,14 @@
 
 #include <fstream>
 #include <sstream>
+#include <chrono>
 #include "src/core/Logger.hpp"
 
 namespace Utils {
-std::string LoadFromFile(const std::string& path) {
-  std::ifstream file;
-  std::stringstream lines;
-  std::string line;
+extern std::string LoadFromFile(const std::string& path);
 
-  file.open(path);
-  if (!file.is_open()) {
-    LOG_ERROR("File could not be opened: %s", path);
-    // TODO: handle better
-    return "";
-  }
+extern std::string GetDateTimeString();
 
-  while (std::getline(file, line)) {
-    lines << line << '\n';
-  }
-  file.close();
-  return lines.str();
-}
 }
 
 #endif //OPENGL_RENDERER_SRC_CORE_UTILS_HPP_

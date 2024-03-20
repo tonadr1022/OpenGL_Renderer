@@ -17,6 +17,7 @@ bool FrameBuffer::IsComplete() const {
   return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 }
 
+
 void FrameBuffer::AttachColorBuffer(GLuint textureColorBuffer) {
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer, 0);
 }

@@ -21,19 +21,16 @@
 
 Application* Application::instancePtr = nullptr;
 
-#define INIT_IMGUIRENDER false
+#define DEFAULT_RENDER_TO_IMGUI_VIEWPORT false
 
 Application::Application()
-    : m_cameraController(m_window), m_renderer(m_window, INIT_IMGUIRENDER) {
+    : m_cameraController(m_window), m_renderer(m_window) {
   instancePtr = this;
   Window::SetVsync(false);
   SetupResources();
 
-  m_renderToImGuiViewport = INIT_IMGUIRENDER;
-  auto frameBufferDimensions = m_window.GetFrameBufferDimensions();
-  m_renderer.SetFrameBufferSize(frameBufferDimensions.x, frameBufferDimensions.y);
+  m_renderToImGuiViewport = DEFAULT_RENDER_TO_IMGUI_VIEWPORT;
   auto& renderSettings = m_renderer.GetSettings();
-  renderSettings.renderToImGuiViewport = m_renderToImGuiViewport;
 
   Input::Initialize(m_window.GetContext());
 
@@ -44,19 +41,11 @@ Application::Application()
 }
 
 void Application::SetupResources() {
-  ShaderManager::AddShader("default", {{GET_SHADER_PATH("default.vert"), ShaderType::VERTEX},
-                                       {GET_SHADER_PATH("default.frag"), ShaderType::FRAGMENT}});
-  ShaderManager::AddShader("blinnPhong", {{GET_SHADER_PATH("blinnPhong.vert"), ShaderType::VERTEX},
-                                          {GET_SHADER_PATH("blinnPhong.frag"), ShaderType::FRAGMENT}});
-  ShaderManager::AddShader("skybox", {{GET_SHADER_PATH("skybox.vert"), ShaderType::VERTEX},
-                                      {GET_SHADER_PATH("skybox.frag"), ShaderType::FRAGMENT}});
-  ShaderManager::AddShader("singleColor", {{GET_SHADER_PATH("singleColor.vert"), ShaderType::VERTEX},
-                                      {GET_SHADER_PATH("singleColor.frag"), ShaderType::FRAGMENT}});
-
-  ModelManager::LoadModel("backpack", "resources/models/backpack/backpack.obj");
-  ModelManager::LoadModel("teapot", "resources/models/teapot/teapot.obj");
-  ModelManager::LoadModel("sponza", "/Users/tony/Desktop/sponza/sponza.obj");
-  ModelManager::LoadModel("spot", "resources/models/spot/spot_quadrangulated.obj");
+  LoadShaders();
+//  ModelManager::LoadModel("backpack", "resources/models/backpack/backpack.obj");
+//  ModelManager::LoadModel("teapot", "resources/models/teapot/teapot.obj");
+//  ModelManager::LoadModel("sponza", "/Users/tony/Desktop/sponza/sponza.obj");
+//  ModelManager::LoadModel("spot", "resources/models/spot/spot_quadrangulated.obj");
 
   MeshManager::AddMesh("cube", Cube::Vertices, Cube::Indices);
   MeshManager::AddMesh("cube1024", Cube::Create(1024, 1024));
@@ -110,26 +99,29 @@ void Application::SetupResources() {
   TextureManager::AddTexture("woodContainerSpecular",
                              GET_TEXTURE_PATH("container_specular.png"),
                              Texture::SamplerType::TwoD);
-  TextureManager::AddTexture("woodContainerEmission", GET_TEXTURE_PATH("container_emission.jpg"), Texture::SamplerType::TwoD);
-
+  TextureManager::AddTexture("woodContainerEmission",
+                             GET_TEXTURE_PATH("container_emission.jpg"),
+                             Texture::SamplerType::TwoD);
 
   std::vector<TexturePair> spotTextures = {
       {MatTextureType::Diffuse, TextureManager::GetTexture("oak")}
   };
   MaterialManager::AddMaterial("spotTextured", spotTextures, "blinnPhong");
 
-
-  std::vector<TexturePair> woodContainerTextures = {{MatTextureType::Diffuse, TextureManager::GetTexture("woodContainerDiffuse")},
-                                        {MatTextureType::Specular, TextureManager::GetTexture("woodContainerDiffuse")}};
+  std::vector<TexturePair>
+      woodContainerTextures = {{MatTextureType::Diffuse, TextureManager::GetTexture("woodContainerDiffuse")},
+                               {MatTextureType::Specular, TextureManager::GetTexture("woodContainerDiffuse")}};
   MaterialManager::AddMaterial("woodContainer", woodContainerTextures, "blinnPhong");
 }
 
 void Application::Run() {
-  m_sceneManager.AddScene("Playground", std::make_unique<PlaygroundScene>());
+  m_renderer.SetSkyboxTexture(TextureManager::GetTexture(HashedString("Sky 2")));
+//  m_sceneManager.AddScene("Playground", std::make_unique<PlaygroundScene>());
   m_sceneManager.AddScene("Lighting One", std::make_unique<LightingOneScene>());
-  m_sceneManager.AddScene("Model Viewer", std::make_unique<ModelViewerScene>());
+//  m_sceneManager.AddScene("Model Viewer", std::make_unique<ModelViewerScene>());
 
-  m_sceneManager.SetActiveScene("Model Viewer");
+//  m_sceneManager.SetActiveScene("Model Viewer");
+  m_sceneManager.SetActiveScene("Lighting One");
   OnSceneChange();
 
   double currTime, lastTime = glfwGetTime(), deltaTime;
@@ -167,8 +159,7 @@ void Application::OnImGui() {
   ImGui::Checkbox("Show Demo", &demoWindow);
 
   m_sceneManager.ImGuiSceneSelect();
-  bool metricsOpen = true;
-  if (ImGui::CollapsingHeader("Metrics", metricsOpen)) {
+  if (ImGui::CollapsingHeader("Metrics", ImGuiTreeNodeFlags_DefaultOpen)) {
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
                 1000.0f / ImGui::GetIO().Framerate,
                 ImGui::GetIO().Framerate);
@@ -179,7 +170,7 @@ void Application::OnImGui() {
     ImGui::Text("Material Swaps: %i", rendererStats.numMaterialSwitches);
   }
 
-  if (ImGui::CollapsingHeader("Render Settings")) {
+  if (ImGui::CollapsingHeader("Render Settings", ImGuiTreeNodeFlags_DefaultOpen)) {
     constexpr std::array<const char*, 4> items = {"Default", "Normals", "Diffuse", "Depth Buffer"};
     int selectedItem = static_cast<int>(m_renderer.debugMode);
     if (ImGui::BeginCombo("##RenderModeCombo", ("Mode: " + std::string(items[selectedItem])).c_str())) {
@@ -204,15 +195,31 @@ void Application::OnImGui() {
       ImGui::TreePop();
     }
 
+    ImGui::Checkbox("MSAA", &rendererSettings.useMSAA);
     ImGui::Checkbox("Wireframe", &rendererSettings.wireframe);
     ImGui::Checkbox("Use Blinn", &rendererSettings.useBlinn);
-    if (ImGui::Checkbox("Render to ImGui Viewport", &m_renderToImGuiViewport)) {
-      rendererSettings.renderToImGuiViewport = m_renderToImGuiViewport;
-    }
+    ImGui::Checkbox("Skybox", &rendererSettings.renderSkybox);
+    ImGui::Checkbox("Render to ImGui Viewport", &m_renderToImGuiViewport);
+    auto& ppSettings = m_renderer.ppUniforms;
+    ImGui::Checkbox("Invert", &ppSettings.invert);
+    ImGui::Checkbox("Flip", &ppSettings.flip);
+    ImGui::DragFloat("Contrast", &m_renderer.ppUniforms.contrast, 0.01, -1, 1);
+
     if (ImGui::Button("Recompile Shaders")) {
       m_renderer.RecompileShaders();
     }
 
+    static char screenshotBuffer[50];
+    ImGui::SameLine();
+    if (ImGui::Button("Screenshot")) {
+      m_screenshotFilename = screenshotBuffer;
+      if (m_screenshotFilename.empty()) {
+        m_renderer.Screenshot();
+      } else {
+        m_renderer.Screenshot(m_screenshotFilename);
+      }
+    }
+    ImGui::InputTextWithHint("##screenshotFilename", "Screenshot Filename", screenshotBuffer, sizeof(screenshotBuffer));
   }
 
   if (ImGui::CollapsingHeader("Camera")) {
@@ -239,14 +246,15 @@ void Application::OnImGui() {
   // need to set focus on window if user is aiming camera in it
   static bool imguiViewportFocused = false;
   static bool isFirstMouse = true;
+  static ImGuiWindowFlags viewportFlags = ImGuiWindowFlags_NoNav;
+
   if (m_renderToImGuiViewport) {
-    ImGui::Begin("Viewport");
+    bool viewportOpen = true;
+    ImGui::Begin("Viewport", &viewportOpen, viewportFlags);
     imguiViewportFocused = ImGui::IsWindowHovered() || ImGui::IsWindowFocused();
     // ImGui flips UV coords, need to swap
-    ImGui::Image((void*) (intptr_t) m_renderer.GetFrameCapturer().GetTexture().Id(),
-                 ImGui::GetContentRegionAvail(),
-                 ImVec2(0, 1),
-                 ImVec2(1, 0));
+    ImGui::Image((void*) (intptr_t) m_renderer.GetFinalImageTexture().Id(),
+                 ImGui::GetContentRegionAvail(), ImVec2(0, 1), ImVec2(1, 0));
 
     // handle window resize
     static ImVec2 prevDimensions{0, 0};
@@ -279,7 +287,7 @@ void Application::OnImGui() {
 }
 
 void Application::OnViewportResize(uint32_t width, uint32_t height) {
-  m_renderer.SetFrameBufferSize(width, height);
+  m_renderer.ResizeViewport(width, height);
   float aspectRatio = static_cast<float>(width) / static_cast<float>(height);
   m_cameraController.SetAspectRatio(aspectRatio);
 }
@@ -327,14 +335,35 @@ void Application::OnSceneChange() {
 
 void Application::OnKeyEvent(int key, int action, int mods) {
   bool pressed = action == GLFW_PRESS;
-  if (pressed) {
-    if (key == GLFW_KEY_BACKSPACE && mods == GLFW_MOD_SHIFT) {
-      m_window.SetShouldClose(true);
-    } else if (key == GLFW_KEY_M) {
-      m_renderer.RecompileShaders();
-    } else if (key == GLFW_KEY_N) {
-      m_settings.showImGui = !m_settings.showImGui;
-      if (!m_settings.showImGui) m_renderToImGuiViewport = false;
-    }
+  if (!pressed) return;
+
+  if (key == GLFW_KEY_BACKSPACE && mods == GLFW_MOD_SHIFT) {
+    m_window.SetShouldClose(true);
   }
+
+  if (ImGui::GetIO().WantCaptureKeyboard) return;
+
+  if (key == GLFW_KEY_M) {
+    m_renderer.RecompileShaders();
+  } else if (key == GLFW_KEY_N) {
+    m_settings.showImGui = !m_settings.showImGui;
+    if (!m_settings.showImGui) m_renderToImGuiViewport = false;
+  } else if (key == GLFW_KEY_C) {
+    m_renderer.Screenshot();
+  }
+}
+
+void Application::LoadShaders() {
+  ShaderManager::AddShader("default", {{GET_SHADER_PATH("default.vert"), ShaderType::VERTEX},
+                                       {GET_SHADER_PATH("default.frag"), ShaderType::FRAGMENT}});
+  ShaderManager::AddShader("blinnPhong", {{GET_SHADER_PATH("blinnPhong.vert"), ShaderType::VERTEX},
+                                          {GET_SHADER_PATH("blinnPhong.frag"), ShaderType::FRAGMENT}});
+  ShaderManager::AddShader("skybox", {{GET_SHADER_PATH("skybox.vert"), ShaderType::VERTEX},
+                                      {GET_SHADER_PATH("skybox.frag"), ShaderType::FRAGMENT}});
+  ShaderManager::AddShader("singleColor", {{GET_SHADER_PATH("singleColor.vert"), ShaderType::VERTEX},
+                                           {GET_SHADER_PATH("singleColor.frag"), ShaderType::FRAGMENT}});
+  ShaderManager::AddShader("contrast", {{GET_SHADER_PATH("contrast.vert"), ShaderType::VERTEX},
+                                        {GET_SHADER_PATH("contrast.frag"), ShaderType::FRAGMENT}});
+  ShaderManager::AddShader("invert", {{GET_SHADER_PATH("postprocessing/invert.vert"), ShaderType::VERTEX},
+                                      {GET_SHADER_PATH("postprocessing/invert.frag"), ShaderType::FRAGMENT}});
 }

@@ -33,7 +33,8 @@ class Application {
   void OnSceneChange();
   void OnImGui();
   static Application* instancePtr;
-  static void SetupResources();
+  void SetupResources();
+  void LoadShaders();
   Window m_window;
   CameraController m_cameraController;
   SceneManager m_sceneManager;
@@ -44,6 +45,7 @@ class Application {
   };
 
   Settings m_settings;
+  std::string m_screenshotFilename;
 
 
   bool m_renderToImGuiViewport;

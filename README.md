@@ -10,13 +10,19 @@ although I'm learning that C++ (and graphics programming for that matter) is rea
 - Orbit/FPS cameras
 - Skybox
 - Blinn-Phong lighting: Ambient, Diffuse, Specular, Emission maps
-- GUI to interact with scenes
+- MSAA
+- Stencil Outlining (eventually object selection)
+- Dockable ImGui interface
+- Screenshots
 
-## TODO (from soon to far)
+### MSAA
+![MSAA Comparison](screenshots/msaa_comparison.png)
+
+
+## TODO (soon to far)
 - Framebuffer stack for multiple post-processing effects
 - Uniform buffer objects (uniforms across shaders)
 - GPU instancing
-- Antialiasing (MSAA)
 - PBR
 - Commit to actually learning CMake and cross-platform compatibility (Ugh)
 - Rewrite in OpenGL 4.6 with data oriented approach (batched rendering, direct state access)
