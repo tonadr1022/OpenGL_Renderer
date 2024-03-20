@@ -28,7 +28,7 @@ class Shader {
   void SetBool(HashedString name, bool value)const;
   Shader(uint32_t id, std::unordered_map<uint32_t, uint32_t>& uniformLocations);
   ~Shader();
-
+  inline uint32_t Id() const {return m_id; }
  private:
   uint32_t m_id{0};
   std::unordered_map<uint32_t, uint32_t>& m_uniformLocations;

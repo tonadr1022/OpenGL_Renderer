@@ -49,30 +49,12 @@ void Application::SetupResources() {
                                           {GET_SHADER_PATH("blinnPhong.frag"), ShaderType::FRAGMENT}});
   ShaderManager::AddShader("skybox", {{GET_SHADER_PATH("skybox.vert"), ShaderType::VERTEX},
                                       {GET_SHADER_PATH("skybox.frag"), ShaderType::FRAGMENT}});
-
+  ShaderManager::AddShader("singleColor", {{GET_SHADER_PATH("singleColor.vert"), ShaderType::VERTEX},
+                                      {GET_SHADER_PATH("singleColor.frag"), ShaderType::FRAGMENT}});
 
   MeshManager::AddMesh("cube", Cube::Vertices, Cube::Indices);
   MeshManager::AddMesh("cube1024", Cube::Create(1024, 1024));
-  std::vector<TexturePair> textures = {{MatTextureType::Diffuse,
-                                        TextureManager::AddTexture("woodContainerDiffuse", GET_TEXTURE_PATH(
-                                            "container_diffuse.png"), Texture::SamplerType::TwoD)},
-                                       {MatTextureType::Specular,
-                                        TextureManager::AddTexture("woodContainerSpecular", GET_TEXTURE_PATH(
-                                            "container_specular.png"), Texture::SamplerType::TwoD)}};
 
-//                                    TextureManager::AddTexture("woodContainerEmission", GET_TEXTURE_PATH("container_emission.jpg"), Texture::Type::Emission)};
-  MaterialManager::AddMaterial("woodContainer", textures, "blinnPhong");
-
-  textures.clear();
-
-  textures.push_back({MatTextureType::Diffuse, TextureManager::AddTexture("spot_texture",
-                                                                            "resources/models/spot/spot_texture.png",
-                                                                            Texture::SamplerType::TwoD)});
-//  textures.push_back({MatTextureType::Specular,
-//                      TextureManager::AddTexture("woodContainerSpecular", GET_TEXTURE_PATH(
-//                          "container_specular.png"), Texture::SamplerType::TwoD)});
-  MaterialManager::AddMaterial("spotTextured", textures, "blinnPhong");
-  textures.clear();
   std::vector<std::string> sky1Strings = {
       GET_TEXTURE_PATH("skybox1/px.png"),
       GET_TEXTURE_PATH("skybox1/nx.png"),
@@ -81,6 +63,7 @@ void Application::SetupResources() {
       GET_TEXTURE_PATH("skybox1/pz.png"),
       GET_TEXTURE_PATH("skybox1/nz.png"),
   };
+
   std::vector<std::string> sky2Strings = {
       GET_TEXTURE_PATH("skybox2/right.jpg"),
       GET_TEXTURE_PATH("skybox2/left.jpg"),
@@ -89,10 +72,50 @@ void Application::SetupResources() {
       GET_TEXTURE_PATH("skybox2/front.jpg"),
       GET_TEXTURE_PATH("skybox2/back.jpg"),
   };
-  TextureManager::AddTexture("skybox", sky1Strings);
+  std::vector<std::string> sky3Strings = {
+      GET_TEXTURE_PATH("skybox_church/lposx.png"),
+      GET_TEXTURE_PATH("skybox_church/lnegx.png"),
+      GET_TEXTURE_PATH("skybox_church/lposy.png"),
+      GET_TEXTURE_PATH("skybox_church/lnegy.png"),
+      GET_TEXTURE_PATH("skybox_church/lposz.png"),
+      GET_TEXTURE_PATH("skybox_church/lnegz.png"),
+  };
+  std::vector<std::string> sky4Strings = {
+      GET_TEXTURE_PATH("skybox_winter/cposx.png"),
+      GET_TEXTURE_PATH("skybox_winter/cnegx.png"),
+      GET_TEXTURE_PATH("skybox_winter/cposy.png"),
+      GET_TEXTURE_PATH("skybox_winter/cnegy.png"),
+      GET_TEXTURE_PATH("skybox_winter/cposz.png"),
+      GET_TEXTURE_PATH("skybox_winter/cnegz.png"),
+  };
 
-//  textures.emplace_back(MatTextureType::Diffuse, TextureManager::GetTexture("cow"));
-//  MaterialManager::AddMaterial("cowMat", textures, "blinnPhong");
+  TextureManager::AddTexture("Sky 1", sky1Strings);
+  TextureManager::AddTexture("Sky 2", sky2Strings);
+  TextureManager::AddTexture("Church", sky3Strings);
+  TextureManager::AddTexture("Winter", sky4Strings);
+
+  TextureManager::AddTexture("oak",
+                             "resources/textures/oak_pbr/textures/oak_veneer_01_diff_1k.jpg",
+                             Texture::SamplerType::TwoD);
+  TextureManager::AddTexture("spot_texture", "resources/models/spot/spot_texture.png", Texture::SamplerType::TwoD);
+  TextureManager::AddTexture("woodContainerDiffuse",
+                             GET_TEXTURE_PATH("container_diffuse.png"),
+                             Texture::SamplerType::TwoD);
+  TextureManager::AddTexture("woodContainerSpecular",
+                             GET_TEXTURE_PATH("container_specular.png"),
+                             Texture::SamplerType::TwoD);
+  TextureManager::AddTexture("woodContainerEmission", GET_TEXTURE_PATH("container_emission.jpg"), Texture::SamplerType::TwoD);
+
+
+  std::vector<TexturePair> spotTextures = {
+      {MatTextureType::Diffuse, TextureManager::GetTexture("oak")}
+  };
+  MaterialManager::AddMaterial("spotTextured", spotTextures, "blinnPhong");
+
+
+  std::vector<TexturePair> woodContainerTextures = {{MatTextureType::Diffuse, TextureManager::GetTexture("woodContainerDiffuse")},
+                                        {MatTextureType::Specular, TextureManager::GetTexture("woodContainerDiffuse")}};
+  MaterialManager::AddMaterial("woodContainer", woodContainerTextures, "blinnPhong");
 }
 
 void Application::Run() {

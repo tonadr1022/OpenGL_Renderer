@@ -3,6 +3,7 @@
 //
 
 #include "Skybox.hpp"
+#include "src/core/Logger.hpp"
 
 namespace {
 constexpr const float Vertices[] = {
@@ -64,4 +65,5 @@ Skybox::Skybox() {
   m_vbo.Bind();
   m_vao.AttachBuffer(m_vbo.Id(), BufferType::ARRAY, sizeof(Vertices), STATIC, Vertices);
   m_vao.EnableAttribute<float>(0, 3, sizeof(float) * 3, nullptr);
+  GL_LOG_ERROR();
 }

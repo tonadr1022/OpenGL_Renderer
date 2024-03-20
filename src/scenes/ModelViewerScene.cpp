@@ -3,32 +3,49 @@
 //
 
 #include "ModelViewerScene.hpp"
-#include "src/renderer/group/Model.hpp"
 #include "src/renderer/resource/MaterialManager.hpp"
 #include "imgui/imgui.h"
+#include "src/core/Logger.hpp"
+#include "src/renderer/Application.hpp"
+#include "src/renderer/resource/TextureManager.hpp"
+#include "src/renderer/ModelLoader.hpp"
 
 ModelViewerScene::ModelViewerScene() : Scene("Model Viewer", {10, 10, 10}, CameraController::Mode::Orbit) {
-  auto backpack = std::make_unique<Model>("resources/models/backpack/backpack.obj");
+  m_skyboxNames = {"Sky 1", "Sky 2", "Church", "Winter"};
+  m_activeSkyboxName = m_skyboxNames[2];
+  Application::Instance().GetRenderer().SetSkyboxTexture(TextureManager::GetTexture(HashedString(m_activeSkyboxName.data())));
+  auto backpack = ModelLoader::LoadModel("resources/models/backpack/backpack.obj");
+//  auto backpack = std::make_unique<Model>("resources/models/backpack/backpack.obj");
   m_modelSelectMap.emplace("Backpack", backpack.get());
   m_groups.push_back(std::move(backpack));
 
-  auto teapot = std::make_unique<Model>("resources/models/teapot/teapot.obj");
+  auto teapot = ModelLoader::LoadModel("resources/models/teapot/teapot.obj");
   m_modelSelectMap.emplace("Teapot", teapot.get());
   teapot->transform.SetScale(glm::vec3(0.1));
-
   m_groups.push_back(std::move(teapot));
+
+  auto sponza = ModelLoader::LoadModel("/Users/tony/Desktop/sponza/sponza.obj");
+  m_modelSelectMap.emplace("Sponza", sponza.get());
+  sponza->transform.SetScale(glm::vec3(0.01));
+  m_groups.push_back(std::move(sponza));
+
+
+
 
 //  auto tree = std::make_unique<Model>("resources/models/Tree1/Tree1.obj", false);
 //  m_modelSelectMap.emplace("Tree", tree.get());
 //  tree->transform.Scale(glm::vec3(0.1));
 //  m_groups.push_back(std::move(tree));
+  GL_LOG_ERROR();
 
-  auto spot = std::make_unique<Model>("resources/models/spot/spot_quadrangulated.obj");
+  auto spot = ModelLoader::LoadModel("resources/models/spot/spot_quadrangulated.obj");
+  spot->selected = true;
   auto spotMat = MaterialManager::GetMaterial("spotTextured");
-//  auto spotMat = MaterialManager::GetMaterial("woodContainer");
   for (auto& obj : spot->GetObjects()) {
     obj->SetMaterial(spotMat);
   }
+  GL_LOG_ERROR();
+
   m_modelSelectMap.emplace("Spot", spot.get());
   m_groups.push_back(std::move(spot));
 
@@ -39,13 +56,11 @@ ModelViewerScene::ModelViewerScene() : Scene("Model Viewer", {10, 10, 10}, Camer
   for (auto& group : m_groups) {
     group->SetVisible(false);
   }
-  m_visibleModel = m_modelSelectMap.find("Teapot")->second;
+  m_visibleModel = m_modelSelectMap.find("Spot")->second;
   m_visibleModel->SetVisible(true);
-  m_activeModelName = "Teapot";
+  m_activeModelName = "Spot";
 
-  for (auto &obj : m_visibleModel->GetObjects()) {
-    obj->SetMaterial(spotMat);
-  }
+
 }
 
 void ModelViewerScene::Update(double dt) {
@@ -55,6 +70,16 @@ void ModelViewerScene::Update(double dt) {
 void ModelViewerScene::OnImGui() {
   Scene::OnImGui();
   ImGui::Begin("Model Viewer");
+
+  if (ImGui::BeginCombo("##Skybox", ("Skybox: " + m_activeSkyboxName).c_str())) {
+    for (auto& name : m_skyboxNames) {
+      if (ImGui::Selectable(name.data())) {
+        Application::Instance().GetRenderer().SetSkyboxTexture(TextureManager::GetTexture(HashedString(name.data())));
+        m_activeSkyboxName = name;
+      }
+    }
+    ImGui::EndCombo();
+  }
 
   if (ImGui::BeginCombo("##Models", ("Model: " + m_activeModelName).c_str())) {
     for (auto& [name, model] : m_modelSelectMap) {
@@ -89,10 +114,6 @@ void ModelViewerScene::OnImGui() {
     if (selectedObjectIndex >= 0 && selectedObjectIndex < m_visibleModel->GetObjects().size()) {
       auto& obj = m_visibleModel->GetObjects()[selectedObjectIndex];
       ImGui::Checkbox("Visible", &obj->shouldDraw);
-//      ImGui::SameLine();
-//      ImGui::Checkbox("Wireframe", &obj->wireframe);
-
-
       Material* material = obj->GetMaterial();
       ImGui::Text("Material");
 
@@ -112,7 +133,8 @@ void ModelViewerScene::OnImGui() {
           }
           material->diffuseColor =
               {glm::clamp(oldColor.x + change, 0.0f, 1.0f), glm::clamp(oldColor.y + change, 0.0f, 1.0f),
-               glm::clamp(oldColor.z + change, 0.0f, 1.0f)};        }
+               glm::clamp(oldColor.z + change, 0.0f, 1.0f)};
+        }
       } else {
         ImGui::DragFloat3("Diffuse##objsel", &material->diffuseColor.x, 0.01, 0, 1);
       }
@@ -149,11 +171,12 @@ void ModelViewerScene::OnImGui() {
           }
           material->ambientColor =
               {glm::clamp(oldColor.x + change, 0.0f, 1.0f), glm::clamp(oldColor.y + change, 0.0f, 1.0f),
-               glm::clamp(oldColor.z + change, 0.0f, 1.0f)};        }
+               glm::clamp(oldColor.z + change, 0.0f, 1.0f)};
+        }
       } else {
         ImGui::DragFloat3("Ambient##objsel", &material->ambientColor.x, 0.01, 0, 1);
       }
-      ImGuiTransformComponent(obj.get(), "");
+      ImGuiTransformComponent(obj.get(), "-1");
     }
   }
 

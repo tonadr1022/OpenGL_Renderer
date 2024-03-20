@@ -56,16 +56,15 @@ const glm::vec3& Transform::GetScale() {
 }
 
 void Transform::UpdateModelMatrix(const glm::mat4& parentModelMatrix, bool parentDirty) {
-//    m_isDirty = parentDirty;
-//    UpdateModelMatrix();
-//    if (parentDirty) {
-//      m_modelMatrix = parentModelMatrix * m_modelMatrix;
-//    }
   if (m_isDirty || parentDirty) {
     UpdateModelMatrix();
     if (parentDirty) {
       UpdateModelMatrix(true);
       m_modelMatrix = parentModelMatrix * m_modelMatrix;
+      m_isDirty = false;
     }
   }
+//  m_modelMatrix = parentModelMatrix * (glm::translate(glm::mat4{1.0f}, m_pos) * glm::mat4_cast(glm::quat(glm::radians(m_eulerRotDegrees)))
+//      * glm::scale(glm::mat4{1.0f}, m_scale));
+//  m_isDirty = false;
 }

@@ -39,10 +39,10 @@ void Texture::GenerateTextureFromBuffer(unsigned char* buffer, bool mipmap, uint
     default:format = GL_RGB;
       break;
   }
-
+  if ((GLenum)m_samplerType != GL_TEXTURE_2D) LOG_INFO("test here");
   glTexImage2D(GL_TEXTURE_2D, 0, format, (GLsizei) width, (GLsizei) height, 0, format, GL_UNSIGNED_BYTE, buffer);
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mipmap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -51,16 +51,22 @@ void Texture::GenerateTextureFromBuffer(unsigned char* buffer, bool mipmap, uint
 }
 
 void Texture::Bind() const {
-  glBindTexture(static_cast<GLint>(m_samplerType), m_id);
+  GL_LOG_ERROR();
+  glBindTexture((GLenum) m_samplerType, m_id);
+  GL_LOG_ERROR();
 }
-
 void Texture::Bind(int slot) const {
+//  std::cout << slot-GL_TEXTURE0 << '\n';
+  GL_LOG_ERROR();
   glActiveTexture(slot);
-  glBindTexture(static_cast<GLint>(m_samplerType), m_id);
+  glBindTexture(static_cast<GLenum>(m_samplerType), m_id);
+  GL_LOG_ERROR();
 }
 
 void Texture::Unbind() {
-  glBindTexture(static_cast<GLint>(m_samplerType), 0);
+  GL_LOG_ERROR();
+  glBindTexture(static_cast<GLenum>(m_samplerType), 0);
+  GL_LOG_ERROR();
 }
 
 void Texture::GenerateTextureFromFile(const std::string& texturePath, bool flip, bool mipmap) {
@@ -98,18 +104,18 @@ Texture::Texture(const std::vector<std::string>& texturePaths) :
   ASSERT(texturePaths.size() == 6, "Need 6 texture paths for cube map")
   glGenTextures(1, &m_id);
   Bind();
-
+  GL_LOG_ERROR();
   stbi_set_flip_vertically_on_load(false);
-
   unsigned char* data;
   int width, height, nrChannels;
   for (uint32_t i = 0; i < texturePaths.size(); i++) {
     data = stbi_load(texturePaths[i].c_str(), &width, &height, &nrChannels, 0);
-    if (data) {
-      glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-      stbi_image_free(data);
-    } else {
+    if (!data) {
       LOG_ERROR("Failed to load image: %s", texturePaths[i].c_str());
+      stbi_image_free(data);
+      continue;
+    } else {
+      glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
       stbi_image_free(data);
     }
   }

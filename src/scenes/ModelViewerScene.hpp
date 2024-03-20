@@ -6,7 +6,6 @@
 #define OPENGL_RENDERER_SRC_SCENES_MODELVIEWERSCENE_HPP_
 
 #include "src/renderer/group/Scene.hpp"
-#include "src/renderer/group/Model.hpp"
 
 class ModelViewerScene : public Scene {
  public:
@@ -14,9 +13,12 @@ class ModelViewerScene : public Scene {
   void Update(double dt) override;
   void OnImGui() override;
  private:
-  std::unordered_map<std::string, Model*> m_modelSelectMap;
-  Model* m_visibleModel;
+  std::unordered_map<std::string, Group*> m_modelSelectMap;
+  Group* m_visibleModel;
   std::string m_activeModelName;
+  std::string m_activeSkyboxName;
+  std::vector<std::string> m_skyboxNames;
+
   template<typename T>
   void ImGuiTransformComponent(T* object, const std::string& iStr);
 };

@@ -10,9 +10,9 @@
 #include "Object.hpp"
 
 class Group {
+  friend class ModelLoader;
  public:
   explicit Group(bool backFaceCull = true);
-  Transform transform;
   void AddObject(std::unique_ptr<Object> object);
   void RemoveObject(const Object* object);
 
@@ -22,7 +22,9 @@ class Group {
   inline void SetVisible(bool visible) { m_visible = visible; }
   void UpdateTransforms();
   [[nodiscard]] inline const std::vector<std::unique_ptr<Object>>& GetObjects() const { return m_objects; }
+  Transform transform;
   bool backFaceCull = true;
+  bool selected = false;
  protected:
   bool m_visible{true}, m_wireFrame{false};
   std::vector<std::unique_ptr<Object>> m_objects;

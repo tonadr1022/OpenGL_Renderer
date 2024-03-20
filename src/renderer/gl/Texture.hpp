@@ -11,7 +11,7 @@
 
 class Texture {
  public:
-  enum class SamplerType {
+  enum class SamplerType : GLenum {
     TwoD = GL_TEXTURE_2D,
     Array2D = GL_TEXTURE_2D_ARRAY,
     ThreeD = GL_TEXTURE_3D,

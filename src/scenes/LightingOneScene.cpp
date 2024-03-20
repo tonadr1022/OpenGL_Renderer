@@ -7,7 +7,6 @@
 #include "src/renderer/resource/MeshManager.hpp"
 #include "src/core/Logger.hpp"
 #include "imgui/imgui.h"
-#include "src/renderer/group/Model.hpp"
 
 LightingOneScene::LightingOneScene() : Scene("Lighting One", {1, 2, 4}) {
   Material* woodContainerMat = MaterialManager::GetMaterial("woodContainer");
@@ -16,21 +15,24 @@ LightingOneScene::LightingOneScene() : Scene("Lighting One", {1, 2, 4}) {
   auto plane = std::make_unique<Object>(MeshManager::GetMesh("cube1024"), woodContainerMat);
   plane->transform.Scale({1000, 1, 1000});
   plane->transform.UpdateModelMatrix();
-  auto g = std::make_unique<Group>();
-  g->AddObject(std::move(plane));
+  auto planeGroup = std::make_unique<Group>();
+  planeGroup->AddObject(std::move(plane));
+
+  auto cubeGroup = std::make_unique<Group>();
   for (int z = -200; z <= 20; z += 5) {
     for (int x = -20; x <= 20; x += 5) {
       auto cube = std::make_unique<Object>(cubeMesh, woodContainerMat);
       cube->transform.Translate({x, 3, z});
       m_cubes.push_back(cube.get());
-      g->AddObject(std::move(cube));
+      cubeGroup->AddObject(std::move(cube));
     }
   }
   for (auto& cube : m_cubes) {
     cube->transform.UpdateModelMatrix();
   }
-
-  AddGroup(std::move(g));
+  cubeGroup->selected = true;
+  AddGroup(std::move(cubeGroup));
+  AddGroup(std::move(planeGroup));
 
   glm::vec3 directionalDir = {0.2f, -0.5f, 0.5f};
   m_directionalLight = std::make_unique<DirectionalLight>(directionalDir);
