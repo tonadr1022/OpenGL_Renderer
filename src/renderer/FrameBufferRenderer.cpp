@@ -32,7 +32,7 @@ void FrameBufferRenderer::StartCapture() {
 }
 
 void FrameBufferRenderer::EndCapture() {
-  m_fbo.Unbind();
+  FrameBuffer::BindDefault();
   glClearColor(0.0f,1.0f,1.0f,1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 }

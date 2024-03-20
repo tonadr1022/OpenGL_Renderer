@@ -104,6 +104,8 @@ add_executable(opengl_renderer
         src/renderer/Skybox.hpp
         src/renderer/ModelManager.cpp
         src/renderer/ModelManager.hpp
+        src/renderer/FrameCapturer.hpp
+        src/renderer/FrameCapturer.cpp
 )
 
 
