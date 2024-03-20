@@ -103,8 +103,8 @@ add_executable(opengl_renderer
         src/renderer/Quad.hpp
         src/renderer/Skybox.cpp
         src/renderer/Skybox.hpp
-        src/renderer/ModelLoader.cpp
-        src/renderer/ModelLoader.hpp
+        src/renderer/ModelManager.cpp
+        src/renderer/ModelManager.hpp
 )
 
 

@@ -14,13 +14,14 @@ class SceneManager {
   SceneManager();
   void SetActiveScene(HashedString name);
 
-  void AddScene(std::unique_ptr<Scene> scene);
+  void AddScene(HashedString name, std::unique_ptr<Scene> scene);
 
   Scene* GetActiveScene();
   void ImGuiSceneSelect();
 
  private:
   Scene* m_activeScene = nullptr;
+  HashedString m_activeSceneName;
   std::unordered_map<HashedString, std::unique_ptr<Scene>> m_sceneMap;
 };
 

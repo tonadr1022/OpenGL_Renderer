@@ -20,7 +20,7 @@ void PlaygroundScene::Update(double dt) {
 //  }
 }
 
-PlaygroundScene::PlaygroundScene() : Scene("Playground") {
+PlaygroundScene::PlaygroundScene() {
 //  auto timeSetterFunction = [](HashedString id, Shader& shader) {
 //    shader.SetFloat(id, static_cast<float>(glfwGetTime()));
 //  };

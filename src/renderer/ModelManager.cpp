@@ -2,18 +2,27 @@
 // Created by Tony Adriansen on 3/19/24.
 //
 
-#include "ModelLoader.hpp"
+#include "ModelManager.hpp"
 #include "src/core/Logger.hpp"
 #include <stack>
 #include "src/renderer/resource/MeshManager.hpp"
 #include "src/renderer/resource/TextureManager.hpp"
 #include "src/renderer/resource/MaterialManager.hpp"
 
-std::unique_ptr<Group> ModelLoader::LoadModel(const std::string& modelPath, bool backfaceCull) {
+std::unique_ptr<Group> ModelManager::CopyLoadedModel(HashedString modelName) {
+  auto it = groups.find(modelName);
+  if (it == groups.end()) {
+    LOG_ERROR("Model not found");
+    return nullptr;
+  }
+  return std::make_unique<Group>(*it->second);
+}
+
+void ModelManager::LoadModel(HashedString modelName, const std::string& modelPath, bool backfaceCull) {
   auto model = std::make_unique<Group>();
-  ModelLoader::path = modelPath;
+  ModelManager::path = modelPath;
   uint32_t slashIdx = modelPath.find_last_of('/');
-  ModelLoader::directory = modelPath.substr(0, slashIdx);
+  ModelManager::directory = modelPath.substr(0, slashIdx);
   group = model.get();
   group->backFaceCull = backfaceCull;
 
@@ -22,17 +31,15 @@ std::unique_ptr<Group> ModelLoader::LoadModel(const std::string& modelPath, bool
       | aiProcess_CalcTangentSpace);
   if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
     LOG_ERROR("Assimp Error: %s", importer.GetErrorString());
-    return nullptr;
+    return;
   }
-
+  LOG_INFO("Mats: %i, meshes: %i, textures: %i ", scene->mNumMaterials, scene->mNumMeshes, scene->mNumTextures);
   ProcessNodes(scene->mRootNode, scene);
+  groups.emplace(modelName, std::move(model));
 
-  group = nullptr;
-
-  return model;
 }
 
-void ModelLoader::ProcessNodes(aiNode* rootNode, const aiScene* scene) {
+void ModelManager::ProcessNodes(aiNode* rootNode, const aiScene* scene) {
   std::stack<aiNode*> meshStack;
   meshStack.push(rootNode);
   aiNode* currNode;
@@ -53,7 +60,7 @@ void ModelLoader::ProcessNodes(aiNode* rootNode, const aiScene* scene) {
   }
 }
 
-void ModelLoader::ProcessMesh(aiMesh* aiMesh, const aiScene* scene, std::vector<bool>& processedMaterials) {
+void ModelManager::ProcessMesh(aiMesh* aiMesh, const aiScene* scene, std::vector<bool>& processedMaterials) {
   std::vector<Vertex> vertices;
   vertices.reserve(aiMesh->mNumVertices);
   std::vector<uint32_t> indices;
@@ -103,7 +110,7 @@ void ModelLoader::ProcessMesh(aiMesh* aiMesh, const aiScene* scene, std::vector<
   }
 }
 
-Material* ModelLoader::LoadMaterial(aiMaterial* aiMat, HashedString matName) {
+Material* ModelManager::LoadMaterial(aiMaterial* aiMat, HashedString matName) {
   std::vector<TexturePair> textures;
   auto diffuseMaps = LoadMaterialTextures(aiMat, aiTextureType_DIFFUSE, MatTextureType::Diffuse);
   textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
@@ -131,9 +138,9 @@ Material* ModelLoader::LoadMaterial(aiMaterial* aiMat, HashedString matName) {
   }
   return mat;
 }
-std::vector<TexturePair> ModelLoader::LoadMaterialTextures(aiMaterial* aiMaterial,
-                                                           aiTextureType aiType,
-                                                           MatTextureType matTextureType) {
+std::vector<TexturePair> ModelManager::LoadMaterialTextures(aiMaterial* aiMaterial,
+                                                            aiTextureType aiType,
+                                                            MatTextureType matTextureType) {
   std::vector<TexturePair> textures;
   for (uint32_t i = 0; i < aiMaterial->GetTextureCount(aiType); i++) {
     aiString textureFilename;

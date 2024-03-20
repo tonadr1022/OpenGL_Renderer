@@ -52,6 +52,8 @@ class Renderer {
     uint32_t drawCalls{0};
     uint32_t vertices{0};
     uint32_t indices{0};
+    uint32_t numShaderBinds{0};
+    uint32_t numMaterialSwitches{0};
   };
 
   inline RenderSettings& GetSettings() { return m_settings; }

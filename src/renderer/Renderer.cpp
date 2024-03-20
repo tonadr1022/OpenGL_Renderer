@@ -71,9 +71,11 @@ void Renderer::UpdateRenderState(const Object& object) {
     state.boundShaderName = mat->shaderName;
 
     state.boundShader->Bind();
+    stats.numShaderBinds++;
 
     if (mat != state.boundMaterial) {
       state.boundMaterial = mat;
+      stats.numMaterialSwitches++;
       SetBlinnPhongUniforms();
       GL_LOG_ERROR();
     }
@@ -90,6 +92,7 @@ void Renderer::UpdateRenderState(const Object& object) {
   }
   if (mat != state.boundMaterial) {
     state.boundMaterial = mat;
+    stats.numMaterialSwitches++;
     SetBlinnPhongUniforms();
   }
   GL_LOG_ERROR();
@@ -151,10 +154,10 @@ void Renderer::StartFrame(const Scene& scene) {
 }
 
 void Renderer::RenderGroup(const Group& group) {
-  if (!group.GetVisible()) return;
-  if (group.GetWireFrame() && !m_settings.wireframe) {
+  if (!group.visible) return;
+  if (group.wireframe && !m_settings.wireframe) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  } else if (!group.GetWireFrame() && m_settings.wireframe) {
+  } else if (!group.wireframe && m_settings.wireframe) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   }
 

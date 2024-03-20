@@ -21,12 +21,13 @@ class OrbitCamera : public Camera {
   void SetTargetPos(const glm::vec3& targetPos) override;
 
  private:
-void UpdatePosition();
-void UpdateMatrices();
+  void UpdatePosition();
+  void UpdateMatrices();
 
   glm::vec3 m_target;
   glm::vec3 m_up;
-
+  glm::vec3 m_right;
+  constexpr inline static glm::vec3 GLOBAL_UP = {0, 1, 0};
 
   float m_distance;
   float m_azimuthAngle, m_polarAngle;

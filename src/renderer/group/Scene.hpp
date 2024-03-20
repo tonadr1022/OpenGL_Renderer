@@ -14,8 +14,7 @@
 class Scene {
  public:
   Scene();
-  explicit Scene(HashedString name);
-  Scene(HashedString name, const glm::vec3& defaultCameraPos, CameraController::Mode defaultCamMode = CameraController::Mode::FPS);
+  Scene(const glm::vec3& defaultCameraPos, CameraController::Mode defaultCamMode = CameraController::Mode::FPS);
   virtual ~Scene() = default;
   virtual void Update(double dt);
   void ImGuiLights();
@@ -27,7 +26,7 @@ class Scene {
   [[nodiscard]] inline const std::vector<std::unique_ptr<PointLight>>* GetPointLights() const { return &m_pointLights; }
   [[nodiscard]] inline const std::vector<std::unique_ptr<SpotLight>>* GetSpotLights() const { return &m_spotLights; }
 
-  [[nodiscard]] inline HashedString GetName() const { return m_name; }
+//  [[nodiscard]] inline HashedString GetName() const { return m_name; }
 
   glm::vec3 defaultCameraPosition;
   CameraController::Mode defaultCameraMode;
@@ -35,7 +34,7 @@ class Scene {
   void AddGroup(std::unique_ptr<Group> group);
   void RemoveGroup(const Group* group);
 
-  HashedString m_name;
+//  HashedString m_name;
   std::vector<std::unique_ptr<SpotLight>> m_spotLights;
   std::vector<std::unique_ptr<PointLight>> m_pointLights;
   std::unique_ptr<DirectionalLight> m_directionalLight = nullptr;

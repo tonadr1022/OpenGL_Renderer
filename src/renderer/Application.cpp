@@ -13,6 +13,7 @@
 #include "src/renderer/shapes/Cube.hpp"
 #include "src/renderer/resource/TextureManager.hpp"
 #include "src/renderer/resource/MaterialManager.hpp"
+#include "src/renderer/ModelManager.hpp"
 
 #include "src/scenes/LightingOneScene.hpp"
 #include "src/scenes/PlaygroundScene.hpp"
@@ -51,6 +52,11 @@ void Application::SetupResources() {
                                       {GET_SHADER_PATH("skybox.frag"), ShaderType::FRAGMENT}});
   ShaderManager::AddShader("singleColor", {{GET_SHADER_PATH("singleColor.vert"), ShaderType::VERTEX},
                                       {GET_SHADER_PATH("singleColor.frag"), ShaderType::FRAGMENT}});
+
+  ModelManager::LoadModel("backpack", "resources/models/backpack/backpack.obj");
+  ModelManager::LoadModel("teapot", "resources/models/teapot/teapot.obj");
+  ModelManager::LoadModel("sponza", "/Users/tony/Desktop/sponza/sponza.obj");
+  ModelManager::LoadModel("spot", "resources/models/spot/spot_quadrangulated.obj");
 
   MeshManager::AddMesh("cube", Cube::Vertices, Cube::Indices);
   MeshManager::AddMesh("cube1024", Cube::Create(1024, 1024));
@@ -119,9 +125,10 @@ void Application::SetupResources() {
 }
 
 void Application::Run() {
-  m_sceneManager.AddScene(std::make_unique<PlaygroundScene>());
-  m_sceneManager.AddScene(std::make_unique<LightingOneScene>());
-  m_sceneManager.AddScene(std::make_unique<ModelViewerScene>());
+  m_sceneManager.AddScene("Playground", std::make_unique<PlaygroundScene>());
+  m_sceneManager.AddScene("Lighting One", std::make_unique<LightingOneScene>());
+  m_sceneManager.AddScene("Model Viewer", std::make_unique<ModelViewerScene>());
+
   m_sceneManager.SetActiveScene("Model Viewer");
   OnSceneChange();
 
@@ -168,6 +175,8 @@ void Application::OnImGui() {
     ImGui::Text("Draw Calls: %i", rendererStats.drawCalls);
     ImGui::Text("Vertices: %i", rendererStats.vertices);
     ImGui::Text("Indices: %i", rendererStats.indices);
+    ImGui::Text("Shader Binds: %i", rendererStats.numShaderBinds);
+    ImGui::Text("Material Swaps: %i", rendererStats.numMaterialSwitches);
   }
 
   if (ImGui::CollapsingHeader("Render Settings")) {
