@@ -10,6 +10,8 @@ out vec4 FragColor;
 in vec2 TexCoord;
 in vec3 FragPos;
 in vec3 Normal;
+in vec3 ViewReflectDir;
+in vec3 ViewRefractDir;
 
 struct Material {
     vec3 ambient;
@@ -24,6 +26,8 @@ struct MaterialMaps {
     sampler2D emissionMap;
     sampler2D normalMap;
 };
+
+uniform samplerCube skybox;
 
 struct LightBase {
     vec3 color;
@@ -186,7 +190,18 @@ void main() {
         if (color.a < 0.1) {
             discard;
         }
+
+        vec3 viewToFrag = normalize(FragPos - u_ViewPos);
+        vec4 environmentRefraction = texture(skybox, ViewRefractDir);
+        vec4 environmentReflection = vec4(texture(skybox, ViewReflectDir).rgb, 1.0);
+        vec4 mixedEnviron = mix(environmentReflection, environmentRefraction, 0.5);
+
+//        FragColor = mix(color, mixedEnviron, 0.6);
         FragColor = color;
+
+
+
+
     } else if (renderMode == 1) {
         FragColor = vec4(normalize(Normal)*0.5 + 0.5, 1.0);
     } else if (renderMode == 2) {

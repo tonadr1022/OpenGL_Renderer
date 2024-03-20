@@ -22,7 +22,6 @@ CameraController::CameraController(const Window& window)
 
 void CameraController::SetMode(CameraController::Mode mode) {
   m_mode = mode;
-  std::cout << "settingmode  " << (int) m_mode << "  " << (int) mode << '\n';
   switch (m_mode) {
     case Mode::FPS:m_activeCamera = m_fpsCamera.get();
       break;

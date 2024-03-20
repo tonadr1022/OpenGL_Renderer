@@ -96,12 +96,14 @@ add_executable(opengl_renderer
         src/scenes/LightingOneScene.hpp
         src/renderer/Light.cpp
         src/renderer/Light.hpp
-        src/renderer/group/Model.cpp
-        src/renderer/group/Model.hpp
         src/scenes/ModelViewerScene.cpp
         src/scenes/ModelViewerScene.hpp
         src/renderer/Quad.cpp
         src/renderer/Quad.hpp
+        src/renderer/Skybox.cpp
+        src/renderer/Skybox.hpp
+        src/renderer/ModelManager.cpp
+        src/renderer/ModelManager.hpp
 )
 
 

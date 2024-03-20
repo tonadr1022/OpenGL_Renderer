@@ -5,32 +5,43 @@
 #include "LightingOneScene.hpp"
 #include "src/renderer/resource/MaterialManager.hpp"
 #include "src/renderer/resource/MeshManager.hpp"
+#include "src/renderer/ModelManager.hpp"
 #include "src/core/Logger.hpp"
 #include "imgui/imgui.h"
-#include "src/renderer/group/Model.hpp"
 
-LightingOneScene::LightingOneScene() : Scene("Lighting One", {1, 2, 4}) {
+LightingOneScene::LightingOneScene() : Scene({1, 2, 4}) {
   Material* woodContainerMat = MaterialManager::GetMaterial("woodContainer");
   Mesh* cubeMesh = MeshManager::GetMesh("cube");
 
   auto plane = std::make_unique<Object>(MeshManager::GetMesh("cube1024"), woodContainerMat);
   plane->transform.Scale({1000, 1, 1000});
   plane->transform.UpdateModelMatrix();
-  auto g = std::make_unique<Group>();
-  g->AddObject(std::move(plane));
+  auto planeGroup = std::make_unique<Group>();
+  planeGroup->AddObject(std::move(plane));
+
+  auto cubeGroup = std::make_unique<Group>();
   for (int z = -200; z <= 20; z += 5) {
     for (int x = -20; x <= 20; x += 5) {
       auto cube = std::make_unique<Object>(cubeMesh, woodContainerMat);
       cube->transform.Translate({x, 3, z});
       m_cubes.push_back(cube.get());
-      g->AddObject(std::move(cube));
+      cubeGroup->AddObject(std::move(cube));
     }
   }
   for (auto& cube : m_cubes) {
     cube->transform.UpdateModelMatrix();
   }
+  cubeGroup->selected = true;
+  AddGroup(std::move(cubeGroup));
+  AddGroup(std::move(planeGroup));
 
-  AddGroup(std::move(g));
+  auto backpack = ModelManager::CopyLoadedModel("backpack");
+  // copy the contents of backpack 10 times
+  for (int i =0; i < 10; i++) {
+    auto bpI = std::make_unique<Group>(*backpack);
+    bpI->transform.Translate(glm::vec3(i*10,0,i*10));
+    m_groups.emplace_back(std::move(bpI));
+  }
 
   glm::vec3 directionalDir = {0.2f, -0.5f, 0.5f};
   m_directionalLight = std::make_unique<DirectionalLight>(directionalDir);

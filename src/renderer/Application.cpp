@@ -13,6 +13,7 @@
 #include "src/renderer/shapes/Cube.hpp"
 #include "src/renderer/resource/TextureManager.hpp"
 #include "src/renderer/resource/MaterialManager.hpp"
+#include "src/renderer/ModelManager.hpp"
 
 #include "src/scenes/LightingOneScene.hpp"
 #include "src/scenes/PlaygroundScene.hpp"
@@ -47,31 +48,87 @@ void Application::SetupResources() {
                                        {GET_SHADER_PATH("default.frag"), ShaderType::FRAGMENT}});
   ShaderManager::AddShader("blinnPhong", {{GET_SHADER_PATH("blinnPhong.vert"), ShaderType::VERTEX},
                                           {GET_SHADER_PATH("blinnPhong.frag"), ShaderType::FRAGMENT}});
+  ShaderManager::AddShader("skybox", {{GET_SHADER_PATH("skybox.vert"), ShaderType::VERTEX},
+                                      {GET_SHADER_PATH("skybox.frag"), ShaderType::FRAGMENT}});
+  ShaderManager::AddShader("singleColor", {{GET_SHADER_PATH("singleColor.vert"), ShaderType::VERTEX},
+                                      {GET_SHADER_PATH("singleColor.frag"), ShaderType::FRAGMENT}});
+
+  ModelManager::LoadModel("backpack", "resources/models/backpack/backpack.obj");
+  ModelManager::LoadModel("teapot", "resources/models/teapot/teapot.obj");
+  ModelManager::LoadModel("sponza", "/Users/tony/Desktop/sponza/sponza.obj");
+  ModelManager::LoadModel("spot", "resources/models/spot/spot_quadrangulated.obj");
 
   MeshManager::AddMesh("cube", Cube::Vertices, Cube::Indices);
   MeshManager::AddMesh("cube1024", Cube::Create(1024, 1024));
-  std::vector<Texture*> textures = {TextureManager::AddTexture("woodContainerDiffuse",
-                                                               GET_TEXTURE_PATH("container_diffuse.png"),
-                                                               Texture::Type::Diffuse),
-                                    TextureManager::AddTexture("woodContainerSpecular",
-                                                               GET_TEXTURE_PATH("container_specular.png"),
-                                                               Texture::Type::Specular)};
-//                                    TextureManager::AddTexture("woodContainerEmission", GET_TEXTURE_PATH("container_emission.jpg"), Texture::Type::Emission)};
-  MaterialManager::AddMaterial("woodContainer", textures, "blinnPhong");
 
-  textures.clear();
-//  TextureManager::AddTexture("cowbasic", GET_TEXTURE_PATH("cow.png"), Texture::Type::Diffuse);
+  std::vector<std::string> sky1Strings = {
+      GET_TEXTURE_PATH("skybox1/px.png"),
+      GET_TEXTURE_PATH("skybox1/nx.png"),
+      GET_TEXTURE_PATH("skybox1/py.png"),
+      GET_TEXTURE_PATH("skybox1/ny.png"),
+      GET_TEXTURE_PATH("skybox1/pz.png"),
+      GET_TEXTURE_PATH("skybox1/nz.png"),
+  };
 
-  textures.push_back(TextureManager::AddTexture("spotTextured",
-                                                "resources/models/spot/spot_texture.png",
-                                                Texture::Type::Diffuse));
-  MaterialManager::AddMaterial("spotTextured", textures, "blinnPhong");
+  std::vector<std::string> sky2Strings = {
+      GET_TEXTURE_PATH("skybox2/right.jpg"),
+      GET_TEXTURE_PATH("skybox2/left.jpg"),
+      GET_TEXTURE_PATH("skybox2/top.jpg"),
+      GET_TEXTURE_PATH("skybox2/bottom.jpg"),
+      GET_TEXTURE_PATH("skybox2/front.jpg"),
+      GET_TEXTURE_PATH("skybox2/back.jpg"),
+  };
+  std::vector<std::string> sky3Strings = {
+      GET_TEXTURE_PATH("skybox_church/lposx.png"),
+      GET_TEXTURE_PATH("skybox_church/lnegx.png"),
+      GET_TEXTURE_PATH("skybox_church/lposy.png"),
+      GET_TEXTURE_PATH("skybox_church/lnegy.png"),
+      GET_TEXTURE_PATH("skybox_church/lposz.png"),
+      GET_TEXTURE_PATH("skybox_church/lnegz.png"),
+  };
+  std::vector<std::string> sky4Strings = {
+      GET_TEXTURE_PATH("skybox_winter/cposx.png"),
+      GET_TEXTURE_PATH("skybox_winter/cnegx.png"),
+      GET_TEXTURE_PATH("skybox_winter/cposy.png"),
+      GET_TEXTURE_PATH("skybox_winter/cnegy.png"),
+      GET_TEXTURE_PATH("skybox_winter/cposz.png"),
+      GET_TEXTURE_PATH("skybox_winter/cnegz.png"),
+  };
+
+  TextureManager::AddTexture("Sky 1", sky1Strings);
+  TextureManager::AddTexture("Sky 2", sky2Strings);
+  TextureManager::AddTexture("Church", sky3Strings);
+  TextureManager::AddTexture("Winter", sky4Strings);
+
+  TextureManager::AddTexture("oak",
+                             "resources/textures/oak_pbr/textures/oak_veneer_01_diff_1k.jpg",
+                             Texture::SamplerType::TwoD);
+  TextureManager::AddTexture("spot_texture", "resources/models/spot/spot_texture.png", Texture::SamplerType::TwoD);
+  TextureManager::AddTexture("woodContainerDiffuse",
+                             GET_TEXTURE_PATH("container_diffuse.png"),
+                             Texture::SamplerType::TwoD);
+  TextureManager::AddTexture("woodContainerSpecular",
+                             GET_TEXTURE_PATH("container_specular.png"),
+                             Texture::SamplerType::TwoD);
+  TextureManager::AddTexture("woodContainerEmission", GET_TEXTURE_PATH("container_emission.jpg"), Texture::SamplerType::TwoD);
+
+
+  std::vector<TexturePair> spotTextures = {
+      {MatTextureType::Diffuse, TextureManager::GetTexture("oak")}
+  };
+  MaterialManager::AddMaterial("spotTextured", spotTextures, "blinnPhong");
+
+
+  std::vector<TexturePair> woodContainerTextures = {{MatTextureType::Diffuse, TextureManager::GetTexture("woodContainerDiffuse")},
+                                        {MatTextureType::Specular, TextureManager::GetTexture("woodContainerDiffuse")}};
+  MaterialManager::AddMaterial("woodContainer", woodContainerTextures, "blinnPhong");
 }
 
 void Application::Run() {
-  m_sceneManager.AddScene(std::make_unique<PlaygroundScene>());
-  m_sceneManager.AddScene(std::make_unique<LightingOneScene>());
-  m_sceneManager.AddScene(std::make_unique<ModelViewerScene>());
+  m_sceneManager.AddScene("Playground", std::make_unique<PlaygroundScene>());
+  m_sceneManager.AddScene("Lighting One", std::make_unique<LightingOneScene>());
+  m_sceneManager.AddScene("Model Viewer", std::make_unique<ModelViewerScene>());
+
   m_sceneManager.SetActiveScene("Model Viewer");
   OnSceneChange();
 
@@ -118,17 +175,19 @@ void Application::OnImGui() {
     ImGui::Text("Draw Calls: %i", rendererStats.drawCalls);
     ImGui::Text("Vertices: %i", rendererStats.vertices);
     ImGui::Text("Indices: %i", rendererStats.indices);
+    ImGui::Text("Shader Binds: %i", rendererStats.numShaderBinds);
+    ImGui::Text("Material Swaps: %i", rendererStats.numMaterialSwitches);
   }
 
   if (ImGui::CollapsingHeader("Render Settings")) {
-    constexpr std::array<const char*, 4> items = { "Default", "Normals", "Diffuse", "Depth Buffer" };
+    constexpr std::array<const char*, 4> items = {"Default", "Normals", "Diffuse", "Depth Buffer"};
     int selectedItem = static_cast<int>(m_renderer.debugMode);
     if (ImGui::BeginCombo("##RenderModeCombo", ("Mode: " + std::string(items[selectedItem])).c_str())) {
-      for (int i =0; i < items.size(); i++) {
+      for (int i = 0; i < items.size(); i++) {
         const bool isSelected = (selectedItem == i);
         if (ImGui::Selectable(items[i], isSelected)) {
           selectedItem = i;
-          m_renderer.debugMode = (Renderer::DebugMode)selectedItem;
+          m_renderer.debugMode = (Renderer::DebugMode) selectedItem;
           if (isSelected) ImGui::SetItemDefaultFocus();
         }
       }
@@ -153,7 +212,6 @@ void Application::OnImGui() {
     if (ImGui::Button("Recompile Shaders")) {
       m_renderer.RecompileShaders();
     }
-
 
   }
 
@@ -273,7 +331,7 @@ void Application::OnKeyEvent(int key, int action, int mods) {
     if (key == GLFW_KEY_BACKSPACE && mods == GLFW_MOD_SHIFT) {
       m_window.SetShouldClose(true);
     } else if (key == GLFW_KEY_M) {
-     m_renderer.RecompileShaders();
+      m_renderer.RecompileShaders();
     } else if (key == GLFW_KEY_N) {
       m_settings.showImGui = !m_settings.showImGui;
       if (!m_settings.showImGui) m_renderToImGuiViewport = false;

@@ -27,6 +27,7 @@ class Application {
   void OnMouseButtonEvent(int button, int action);
   void OnMouseScrollEvent(double yOffset);
   void OnKeyEvent(int key, int action, int mods);
+  inline Renderer& GetRenderer() { return m_renderer;}
 
  private:
   void OnSceneChange();

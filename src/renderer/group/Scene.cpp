@@ -22,12 +22,10 @@ void Scene::RemoveGroup(const Group* group) {
 
 void Scene::Update(double dt) {}
 
-Scene::Scene() : defaultCameraPosition({0, 0, 0}), m_name("Default") {}
+Scene::Scene() : defaultCameraPosition({0, 0, 0}) {}
 
-Scene::Scene(HashedString name) : defaultCameraPosition({0, 0, 0}), m_name(name) {}
-
-Scene::Scene(HashedString name, const glm::vec3& defaultCameraPos, CameraController::Mode defaultCamMode)
-    : defaultCameraPosition(defaultCameraPos),defaultCameraMode(defaultCamMode), m_name(name) {}
+Scene::Scene(const glm::vec3& defaultCameraPos, CameraController::Mode defaultCamMode)
+    : defaultCameraPosition(defaultCameraPos),defaultCameraMode(defaultCamMode) {}
 
 void Scene::ImGuiLights() {
   if (m_directionalLight != nullptr) {

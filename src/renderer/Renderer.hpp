@@ -7,7 +7,8 @@
 
 #include <cstdint>
 #include "src/renderer/group/Scene.hpp"
-#include "FrameBufferRenderer.hpp"
+#include "src/renderer/Skybox.hpp"
+#include "FrameCapturer.hpp"
 #include "Window.hpp"
 #include "Quad.hpp"
 
@@ -26,6 +27,7 @@ class Renderer {
     bool renderDirectionalLights{true};
     bool renderSpotlights{true};
     bool renderPointLights{true};
+    bool renderSkybox{true};
     bool useBlinn{true};
 
     bool diffuseMapEnabled{true};
@@ -42,6 +44,7 @@ class Renderer {
   void SetSpotLights(const std::vector<std::unique_ptr<SpotLight>>* spotLights);
   void SetPointLights(const std::vector<std::unique_ptr<PointLight>>* pointLights);
   void Reset();
+  void SetSkyboxTexture(Texture* texture);
 
   void RecompileShaders();
 
@@ -49,11 +52,13 @@ class Renderer {
     uint32_t drawCalls{0};
     uint32_t vertices{0};
     uint32_t indices{0};
+    uint32_t numShaderBinds{0};
+    uint32_t numMaterialSwitches{0};
   };
 
   inline RenderSettings& GetSettings() { return m_settings; }
   inline const PerFrameStats& GetStats() { return stats; }
-  inline const FrameBufferRenderer& GetFrameCapturer() { return m_frameCapturer; }
+  inline const FrameCapturer& GetFrameCapturer() { return m_frameCapturer; }
 
   Mode mode = Mode::BlinnPhong;
   DebugMode debugMode = DebugMode::None;
@@ -71,22 +76,30 @@ class Renderer {
   const std::vector<std::unique_ptr<SpotLight>>* m_spotLights = nullptr;
 
   Shader* m_screenShader = nullptr;
+  Shader* m_skyboxShader = nullptr;
+  Shader* m_singleColorShader = nullptr;
+
   Quad m_screenQuad;
+  Skybox m_skybox;
 
   Window& m_window;
   Camera* m_camera = nullptr;
+  Texture* m_skyboxTexture = nullptr;
   RenderState state;
-  FrameBufferRenderer m_frameCapturer;
+  FrameCapturer m_frameCapturer;
   PerFrameStats stats;
   RenderSettings m_settings;
 
+
   void UpdateRenderState(const Object& object);
   void ResetStats();
+  void IncStats(uint32_t numVertices, uint32_t numIndices);
   void StartFrame(const Scene& scene);
   void RenderGroup(const Group& group);
   void ApplyPostProcessingEffects();
   void SetLightingUniforms();
   void SetBlinnPhongUniforms();
+  void RenderSkybox(Camera* camera);
 
   void AssignShaders();
 

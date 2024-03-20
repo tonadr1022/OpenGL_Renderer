@@ -13,7 +13,6 @@ class Quad {
   Quad();
   ~Quad();
   void Draw();
-  inline const VertexArray& VAO() { return m_vao; }
  private:
   VertexArray m_vao;
   VertexBuffer m_vbo;

@@ -10,21 +10,30 @@
 #include "Object.hpp"
 
 class Group {
+  friend class ModelManager;
  public:
   explicit Group(bool backFaceCull = true);
-  Transform transform;
   void AddObject(std::unique_ptr<Object> object);
   void RemoveObject(const Object* object);
 
-  [[nodiscard]] inline bool GetVisible() const { return m_visible; }
-  [[nodiscard]] inline bool GetWireFrame() const { return m_wireFrame; }
-  inline void SetWireFrame(bool wireFrame) { m_wireFrame = wireFrame; }
-  inline void SetVisible(bool visible) { m_visible = visible; }
+  Group(const Group& other) {
+    this->backFaceCull = other.backFaceCull;
+    this->selected = other.selected;
+    for (const auto& object : other.m_objects) {
+      this->m_objects.push_back(std::make_unique<Object>(*object));
+    }
+    this->transform = other.transform;
+  }
+
+
   void UpdateTransforms();
   [[nodiscard]] inline const std::vector<std::unique_ptr<Object>>& GetObjects() const { return m_objects; }
+  Transform transform;
   bool backFaceCull = true;
+  bool selected = false;
+  bool visible = true;
+  bool wireframe = false;
  protected:
-  bool m_visible{true}, m_wireFrame{false};
   std::vector<std::unique_ptr<Object>> m_objects;
 };
 

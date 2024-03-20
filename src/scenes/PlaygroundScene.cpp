@@ -20,7 +20,7 @@ void PlaygroundScene::Update(double dt) {
 //  }
 }
 
-PlaygroundScene::PlaygroundScene() : Scene("Playground") {
+PlaygroundScene::PlaygroundScene() {
 //  auto timeSetterFunction = [](HashedString id, Shader& shader) {
 //    shader.SetFloat(id, static_cast<float>(glfwGetTime()));
 //  };
@@ -29,11 +29,6 @@ PlaygroundScene::PlaygroundScene() : Scene("Playground") {
 //      .SetterFunction = timeSetterFunction
 //  };
 
-  std::vector<Texture*> textures;
-
-  textures.push_back(TextureManager::GetTexture("cow"));
-  MaterialManager::AddMaterial("cowMat", textures, "blinnPhong");
-  textures.clear();
 
 //  textures.push_back(TextureManager::GetTexture("woodContainer"));
 //  MaterialManager::AddMaterial("floor", textures, "blinnPhong");

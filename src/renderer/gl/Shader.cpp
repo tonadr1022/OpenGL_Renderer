@@ -8,10 +8,8 @@
 #include <sstream>
 #include <string>
 #include <glm/gtc/type_ptr.hpp>
-#define CHECK 1
-Shader::~Shader() {
-  m_id = 0;
-}
+//#define CHECK 1
+Shader::~Shader() = default;
 
 void Shader::Bind() const {
 #ifdef CHECK

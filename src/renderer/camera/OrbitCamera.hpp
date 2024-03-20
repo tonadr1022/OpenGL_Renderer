@@ -15,18 +15,19 @@ class OrbitCamera : public Camera {
   void OnImGui() override;
   void Update(double dt) override;
   void ResetSettings();
-  virtual void SetPosition(const glm::vec3& newPos);
+  void SetPosition(const glm::vec3& newPos) override;
   void ProcessMouseMovement(double xOffset, double yOffset) override;
   void OnMouseScrollEvent(double yOffset) override;
   void SetTargetPos(const glm::vec3& targetPos) override;
 
  private:
-void UpdatePosition();
-void UpdateMatrices();
+  void UpdatePosition();
+  void UpdateMatrices();
 
   glm::vec3 m_target;
   glm::vec3 m_up;
-
+  glm::vec3 m_right;
+  constexpr inline static glm::vec3 GLOBAL_UP = {0, 1, 0};
 
   float m_distance;
   float m_azimuthAngle, m_polarAngle;

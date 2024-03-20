@@ -5,7 +5,7 @@
 #include "Quad.hpp"
 
 namespace {
-const float quadVertices[] = {
+constexpr const float quadVertices[] = {
     // positions   // texCoords
     -1.0f, 1.0f, 0.0f, 1.0f,
     -1.0f, -1.0f, 0.0f, 0.0f,
