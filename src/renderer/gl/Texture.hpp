@@ -13,6 +13,7 @@ class Texture {
  public:
   enum class SamplerType : GLenum {
     TwoD = GL_TEXTURE_2D,
+    TwoDMultiSample = GL_TEXTURE_2D_MULTISAMPLE,
     Array2D = GL_TEXTURE_2D_ARRAY,
     ThreeD = GL_TEXTURE_3D,
     Cube = GL_TEXTURE_CUBE_MAP
@@ -20,7 +21,7 @@ class Texture {
 
   Texture(const std::string& texturePath, SamplerType type, bool flip = true, bool mipmap = true);
   explicit Texture(const std::vector<std::string>& texturePaths);
-  Texture(uint32_t width, uint32_t height);
+  Texture(uint32_t width, uint32_t height, uint32_t numSamples = 1);
   ~Texture();
   void Bind() const;
   void Bind(int slot) const;
@@ -38,7 +39,7 @@ class Texture {
                                  bool mipmap,
                                  uint32_t numChannels,
                                  uint32_t width,
-                                 uint32_t height);
+                                 uint32_t height, uint32_t numSamples);
 };
 
 #endif //OPENGL_RENDERER_SRC_RENDERER_GL_TEXTURE_HPP_

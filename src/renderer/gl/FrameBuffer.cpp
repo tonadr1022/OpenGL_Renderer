@@ -21,6 +21,10 @@ void FrameBuffer::AttachColorBuffer(GLuint textureColorBuffer) {
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer, 0);
 }
 
+void FrameBuffer::AttachColorBuffer(GLenum attachment, GLenum textureTarget, GLuint textureId) {
+  glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, textureTarget, textureId, 0);
+}
+
 void FrameBuffer::AttachRenderBuffer(GLuint rbo) {
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 }

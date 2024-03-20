@@ -12,8 +12,12 @@ Texture::Texture(const std::string& texturePath, SamplerType type, bool flip, bo
   GenerateTextureFromFile(texturePath, flip, mipmap);
 }
 
-Texture::Texture(uint32_t width, uint32_t height) : m_samplerType(SamplerType::TwoD) {
-  GenerateTextureFromBuffer(nullptr, false, 3, width, height);
+Texture::Texture(uint32_t width, uint32_t height, uint32_t numSamples) {
+  if (numSamples == 1) { m_samplerType = SamplerType::TwoD; }
+  else if (numSamples > 1) { m_samplerType = SamplerType::TwoDMultiSample; }
+  else { LOG_ERROR("Invalid number of samples: %i", numSamples); }
+
+  GenerateTextureFromBuffer(nullptr, false, 3, width, height, numSamples);
 }
 
 Texture::~Texture() {
@@ -25,7 +29,7 @@ void Texture::Resize(uint32_t width, uint32_t height) {
 }
 
 void Texture::GenerateTextureFromBuffer(unsigned char* buffer, bool mipmap, uint32_t numChannels,
-                                        uint32_t width, uint32_t height) {
+                                        uint32_t width, uint32_t height, uint32_t numSamples) {
   glGenTextures(1, &m_id);
   Bind();
   GLenum format;
@@ -39,13 +43,32 @@ void Texture::GenerateTextureFromBuffer(unsigned char* buffer, bool mipmap, uint
     default:format = GL_RGB;
       break;
   }
-  if ((GLenum)m_samplerType != GL_TEXTURE_2D) LOG_INFO("test here");
-  glTexImage2D(GL_TEXTURE_2D, 0, format, (GLsizei) width, (GLsizei) height, 0, format, GL_UNSIGNED_BYTE, buffer);
+  switch (m_samplerType) {
+    case SamplerType::TwoD:
+      glTexImage2D(GL_TEXTURE_2D,
+                   0,
+                   format,
+                   (GLsizei) width,
+                   (GLsizei) height,
+                   0,
+                   format,
+                   GL_UNSIGNED_BYTE,
+                   buffer);
+      break;
+    case SamplerType::TwoDMultiSample:
+      glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE,
+                              (GLsizei)numSamples,
+                              GL_RGB,
+                              (GLsizei) width,
+                              (GLsizei) height,
+                              GL_TRUE);
+      break;
+  }
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri((GLenum) m_samplerType, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri((GLenum) m_samplerType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri((GLenum) m_samplerType, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri((GLenum) m_samplerType, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
   if (mipmap) glGenerateMipmap(GL_TEXTURE_2D);
 }
@@ -76,7 +99,7 @@ void Texture::GenerateTextureFromFile(const std::string& texturePath, bool flip,
   int numChannels, width, height;
   unsigned char* data = stbi_load(texturePath.c_str(), &width, &height, &numChannels, 0);
   if (data) {
-    GenerateTextureFromBuffer(data, mipmap, numChannels, width, height);
+    GenerateTextureFromBuffer(data, mipmap, numChannels, width, height, 1);
     stbi_image_free(data);
   } else {
     LOG_ERROR("Error loading Texture: %s", texturePath);

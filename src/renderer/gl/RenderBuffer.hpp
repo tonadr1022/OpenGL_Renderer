@@ -15,6 +15,7 @@ class RenderBuffer {
   void Unbind();
 
   void BufferStorage(uint32_t width, uint32_t height, GLint internalFormat);
+  void BufferStorageMultiSample(uint32_t width, uint32_t height, GLint internalFormat, uint32_t numSamples);
   [[nodiscard]] inline GLuint Id() const { return m_id; }
  private:
   GLuint m_id;

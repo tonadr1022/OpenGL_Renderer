@@ -16,11 +16,26 @@ FrameCapturer::FrameCapturer(uint32_t width, uint32_t height)
     : m_screenTexture(width, height) {
   m_screenTexture.Bind();
   m_screenTexture.SetFilterMode(GL_LINEAR, GL_LINEAR);
-  m_screenTexture.Unbind();
+//  m_screenTexture.Unbind();
   m_fbo.Bind();
   m_rbo.Bind();
   m_fbo.AttachColorBuffer(m_screenTexture.Id());
   m_rbo.BufferStorage(width, height, GL_DEPTH24_STENCIL8);
+  m_fbo.AttachRenderBuffer(m_rbo.Id());
+
+  if (!m_fbo.IsComplete()) LOG_ERROR("FBO incomplete");
+  FrameBuffer::BindDefault();
+//  m_rbo.Unbind();
+}
+
+FrameCapturer::FrameCapturer(uint32_t width, uint32_t height, uint32_t numSamples)
+    : m_screenTexture(width, height) {
+  m_screenTexture.Bind();
+  m_screenTexture.SetFilterMode(GL_LINEAR, GL_LINEAR);
+  m_fbo.Bind();
+  m_rbo.Bind();
+  m_fbo.AttachColorBuffer(GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D_MULTISAMPLE, m_screenTexture.Id());
+  m_rbo.BufferStorageMultiSample(width, height, GL_DEPTH24_STENCIL8, numSamples);
   m_fbo.AttachRenderBuffer(m_rbo.Id());
 
   if (!m_fbo.IsComplete()) LOG_ERROR("FBO incomplete");

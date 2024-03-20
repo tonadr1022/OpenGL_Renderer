@@ -82,8 +82,6 @@ add_executable(opengl_renderer
         src/renderer/camera/Camera.cpp
         src/renderer/camera/Camera.hpp
         src/Common.hpp
-        src/renderer/FrameBufferRenderer.cpp
-        src/renderer/FrameBufferRenderer.hpp
         src/renderer/gl/RenderBuffer.cpp
         src/renderer/gl/RenderBuffer.hpp
         src/scenes/SceneManager.cpp

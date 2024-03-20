@@ -27,3 +27,9 @@ void RenderBuffer::BufferStorage(uint32_t width, uint32_t height, GLint internal
   glRenderbufferStorage(GL_RENDERBUFFER, internalFormat, width, height);
 }
 
+void RenderBuffer::BufferStorageMultiSample(uint32_t width,
+                                             uint32_t height,
+                                             GLint internalFormat,
+                                             uint32_t numSamples) {
+  glRenderbufferStorageMultisample(GL_RENDERBUFFER, numSamples, internalFormat, width, height);
+}

@@ -14,6 +14,7 @@
 class FrameCapturer {
  public:
   FrameCapturer(uint32_t Width, uint32_t Height);
+  FrameCapturer(uint32_t width, uint32_t height, uint32_t numSamples);
   void UpdateViewport(uint32_t Width, uint32_t Height);
   [[nodiscard]] inline const Texture& GetTexture() const { return m_screenTexture; };
 

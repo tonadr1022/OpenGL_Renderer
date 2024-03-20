@@ -13,8 +13,9 @@ class FrameBuffer {
   ~FrameBuffer();
   void Bind() const;
   static void BindDefault();
-  bool IsComplete() const;
+  [[nodiscard]] bool IsComplete() const;
   void AttachColorBuffer(GLuint textureColorBuffer);
+  void AttachColorBuffer(GLenum attachment, GLenum textureTarget, GLuint textureId);
   void AttachRenderBuffer(GLuint rbo);
 
  private:
