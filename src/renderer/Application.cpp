@@ -30,7 +30,6 @@ Application::Application()
   SetupResources();
 
   m_renderToImGuiViewport = DEFAULT_RENDER_TO_IMGUI_VIEWPORT;
-  auto& renderSettings = m_renderer.GetSettings();
 
   Input::Initialize(m_window.GetContext());
 
@@ -45,7 +44,7 @@ void Application::SetupResources() {
 //  ModelManager::LoadModel("backpack", "resources/models/backpack/backpack.obj");
 //  ModelManager::LoadModel("teapot", "resources/models/teapot/teapot.obj");
 //  ModelManager::LoadModel("sponza", "/Users/tony/Desktop/sponza/sponza.obj");
-//  ModelManager::LoadModel("spot", "resources/models/spot/spot_quadrangulated.obj");
+  ModelManager::LoadModel("spot", "resources/models/spot/spot_quadrangulated.obj");
 
   MeshManager::AddMesh("cube", Cube::Vertices, Cube::Indices);
   MeshManager::AddMesh("cube1024", Cube::Create(1024, 1024));
@@ -118,10 +117,10 @@ void Application::Run() {
   m_renderer.SetSkyboxTexture(TextureManager::GetTexture(HashedString("Sky 2")));
 //  m_sceneManager.AddScene("Playground", std::make_unique<PlaygroundScene>());
   m_sceneManager.AddScene("Lighting One", std::make_unique<LightingOneScene>());
-//  m_sceneManager.AddScene("Model Viewer", std::make_unique<ModelViewerScene>());
+  m_sceneManager.AddScene("Model Viewer", std::make_unique<ModelViewerScene>());
 
-//  m_sceneManager.SetActiveScene("Model Viewer");
-  m_sceneManager.SetActiveScene("Lighting One");
+  m_sceneManager.SetActiveScene("Model Viewer");
+//  m_sceneManager.SetActiveScene("Lighting One");
   OnSceneChange();
 
   double currTime, lastTime = glfwGetTime(), deltaTime;

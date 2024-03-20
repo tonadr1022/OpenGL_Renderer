@@ -12,7 +12,8 @@ class Quad {
  public:
   Quad();
   ~Quad();
-  void Draw();
+  void Draw() const;
+  const VertexArray& VAO() const { return m_vao; }
  private:
   VertexArray m_vao;
   VertexBuffer m_vbo;

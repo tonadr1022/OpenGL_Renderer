@@ -237,6 +237,7 @@ void Renderer::RenderScene(const Scene& scene, Camera* camera) {
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_contrastFBOContainer->FBO().Id());
   glBlitFramebuffer(0, 0, (GLsizei) m_width, (GLsizei) m_height, 0, 0, (GLsizei) m_width,
                     (GLsizei) m_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
   if (ppUniforms.invert) {
     m_invertFBO->FBO().Bind();
   } else {
@@ -297,7 +298,7 @@ void Renderer::ResizeViewport(uint32_t width, uint32_t height) {
 }
 
 Renderer::Renderer(Window& window)
-    : m_window(window) {
+    : m_window(window), m_postProcessor(m_screenQuad) {
   auto frameBufferDims = window.GetFrameBufferDimensions();
   ResizeViewport(frameBufferDims.x, frameBufferDims.y);
 }

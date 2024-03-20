@@ -24,7 +24,7 @@ Quad::Quad() {
   m_vao.EnableAttribute<float>(0, 2, sizeof(float) * 4, nullptr);
   m_vao.EnableAttribute<float>(1, 2, sizeof(float) * 4, (void*) (sizeof(float) * 2));
 }
-void Quad::Draw() {
+void Quad::Draw() const {
   m_vao.Bind();
   glDrawArrays(GL_TRIANGLES, 0, 6);
 }

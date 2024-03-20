@@ -105,6 +105,10 @@ add_executable(opengl_renderer
         src/renderer/gl/FBOContainer.cpp
         src/renderer/gl/FBOContainer.hpp
         src/core/Utils.cpp
+        src/renderer/PostProcessor.cpp
+        src/renderer/PostProcessor.hpp
+        src/renderer/PostProcessingEffect.cpp
+        src/renderer/PostProcessingEffect.hpp
 )
 
 

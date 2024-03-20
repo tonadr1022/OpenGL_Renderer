@@ -11,6 +11,7 @@
 #include "Window.hpp"
 #include "Quad.hpp"
 #include "src/renderer/gl/FBOContainer.hpp"
+#include "PostProcessor.hpp"
 
 class Renderer {
  public:
@@ -109,6 +110,7 @@ class Renderer {
 
   PerFrameStats stats;
   RenderSettings m_settings;
+  PostProcessor m_postProcessor;
 
   uint32_t m_width{}, m_height{};
 
