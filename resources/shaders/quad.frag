@@ -7,5 +7,5 @@ in vec2 TexCoords;
 uniform sampler2D tex;
 
 void main() {
-    o_Color = texture(TexCoords, tex);
+    o_Color = texture(tex, TexCoords);
 }

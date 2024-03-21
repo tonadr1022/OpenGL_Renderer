@@ -64,6 +64,12 @@ void Shader::SetVec3(HashedString name, const glm::vec3& vec) const {
   #endif
   glUniform3fv(m_uniformLocations[name], 1, glm::value_ptr(vec));
 }
+void Shader::SetVec4(HashedString name, const glm::vec4& vec) const {
+  #ifdef CHECK
+  ASSERT(m_uniformLocations.contains(name), "Uniform name not found");
+  #endif
+  glUniform4fv(m_uniformLocations[name], 1, glm::value_ptr(vec));
+}
 
 void Shader::SetMat3(HashedString name, const glm::mat3& mat, bool transpose) const {
   #ifdef CHECK

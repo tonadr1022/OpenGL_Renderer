@@ -8,36 +8,40 @@
 #include "src/renderer/gl/FBOContainer.hpp"
 #include "src/renderer/gl/Shader.hpp"
 
-struct PPEffect {
-  bool enabled = true;
-  Shader* shader = nullptr;
-  std::function<void()> uniformFunction = nullptr;
-  std::unique_ptr<FBOContainer> fboContainer = nullptr;
-
-  PPEffect(HashedString name, Shader* shader, std::unique_ptr<FBOContainer> fboContainer, const std::function<void()>& uniformFunction)
-  : enabled(true), shader(shader), uniformFunction(uniformFunction), fboContainer(std::move(fboContainer)) {}
-
-  PPEffect(HashedString name, Shader* shader, std::unique_ptr<FBOContainer> fboContainer)
-      : enabled(true), shader(shader), fboContainer(std::move(fboContainer)) {}
+enum class PostProcessingEffectType {
+  Contrast = 0, Invert, Grayscale,ColorChannel, GaussianBlur, Count
 };
+static constexpr const char* PostProcessingEffectTypeToString(PostProcessingEffectType type) {
+  switch (type) {
+    case PostProcessingEffectType::Contrast: return "Contrast";
+    case PostProcessingEffectType::Invert: return "Invert";
+    case PostProcessingEffectType::Grayscale: return "Grayscale";
+    case PostProcessingEffectType::GaussianBlur: return "Gaussian Blue";
+    case PostProcessingEffectType::ColorChannel: return "Color Channel";
+  }
+}
 
-class PostProcessingEffect {
- public:
-  PostProcessingEffect(HashedString name,
-                       Shader* shader,
-                       std::unique_ptr<FBOContainer> FBOContainer,
-                       const std::function<void()>& uniformFunction);
-  PostProcessingEffect(HashedString name, Shader* shader, std::unique_ptr<FBOContainer> FBOContainer);
-  void SetFBOContainer(std::unique_ptr<FBOContainer> FBOContainer);
-  [[nodiscard]] inline FBOContainer* GetFBOContainer() const { return m_FBOContainer.get(); }
-  void SetUniforms();
-  [[nodiscard]] inline Shader* GetShader() const { return m_shader; }
-
- private:
+struct PostProcessingEffect {
+  PostProcessingEffectType type;
   bool enabled = true;
-  Shader* m_shader = nullptr;
-  std::function<void()> m_uniformFunction = nullptr;
-  std::unique_ptr<FBOContainer> m_FBOContainer = nullptr;
+  std::function<void()> bindAndUniformFunction = nullptr;
+  std::unique_ptr<FBOContainer> fboContainer = nullptr;
+  float resolutionScale;
+
+  PostProcessingEffect(PostProcessingEffectType type,
+                       std::unique_ptr<FBOContainer> fboContainer,
+                       const std::function<void()>& bindAndUniformFunction,
+                       float resolutionScale = 1)
+      : type(type),
+        enabled(true),
+        bindAndUniformFunction(bindAndUniformFunction),
+        fboContainer(std::move(fboContainer)),
+        resolutionScale(resolutionScale) {}
+
+  PostProcessingEffect(PostProcessingEffectType type,
+                       std::unique_ptr<FBOContainer> fboContainer,
+                       float resolutionScale = 1)
+      : type(type), enabled(true), fboContainer(std::move(fboContainer)), resolutionScale(resolutionScale) {}
 };
 
 #endif //OPENGL_RENDERER_SRC_RENDERER_POSTPROCESSINGEFFECT_HPP_

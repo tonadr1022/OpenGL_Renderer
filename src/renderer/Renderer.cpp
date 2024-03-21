@@ -242,13 +242,9 @@ void Renderer::RenderScene(const Scene& scene, Camera* camera) {
 
 void Renderer::RenderSkybox(Camera* camera) {
   glDepthFunc(GL_LEQUAL);
-//  glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP); // Keep stencil values unchanged
-//  glDisable(GL_STENCIL_TEST);
-//  glStencilFunc(GL_EQUAL, 1, 0xFF); // Only pass where stencil value is 1
 
   m_skyboxTexture->Bind(GL_TEXTURE0);
 
-//  t->Bind(GL_TEXTURE0);
   m_skyboxShader->Bind();
   glm::mat4 vp = camera->GetProjectionMatrix() * glm::mat4(glm::mat3(camera->GetViewMatrix()));
   m_skyboxShader->SetMat4("VP", vp);
@@ -260,15 +256,12 @@ void Renderer::RenderSkybox(Camera* camera) {
 
 }
 
-void Renderer::ApplyPostProcessingEffects() {
-
-}
-
 void Renderer::ResizeViewport(uint32_t width, uint32_t height) {
   glViewport(0, 0, (int) width, (int) height);
   m_width = width;
   m_height = height;
   AllocateFBOContainers(width, height);
+  m_postProcessor.Resize(width, height);
 }
 
 Renderer::Renderer(Window& window)
@@ -379,9 +372,15 @@ void Renderer::Screenshot() {
 }
 
 const Texture& Renderer::GetFinalImageTexture() {
-  ASSERT(!m_contrastFBOContainer->Textures().empty(), "Unexpected error, no textures attached to final framebuffer");
-  return *m_contrastFBOContainer->Textures()[0];
+  return *m_postProcessor.GetResultTextures().back();
 }
+
+void Renderer::OnImGui() {
+  if (ImGui::CollapsingHeader("Post Processing", ImGuiTreeNodeFlags_DefaultOpen)) {
+    m_postProcessor.OnImGui();
+  }
+}
+
 void Renderer::AllocateFBOContainers(uint32_t width, uint32_t height) {
   // MSAA Framebuffer
   int samples = 4;

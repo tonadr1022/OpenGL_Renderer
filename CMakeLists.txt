@@ -107,7 +107,6 @@ add_executable(opengl_renderer
         src/core/Utils.cpp
         src/renderer/PostProcessor.cpp
         src/renderer/PostProcessor.hpp
-        src/renderer/PostProcessingEffect.cpp
         src/renderer/PostProcessingEffect.hpp
 )
 

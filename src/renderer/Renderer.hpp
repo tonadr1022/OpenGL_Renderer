@@ -53,6 +53,7 @@ class Renderer {
   void SetSpotLights(const std::vector<std::unique_ptr<SpotLight>>* spotLights);
   void SetPointLights(const std::vector<std::unique_ptr<PointLight>>* pointLights);
   void Reset();
+  void OnImGui();
   void SetSkyboxTexture(Texture* texture);
 
   void RecompileShaders();
@@ -104,11 +105,7 @@ class Renderer {
   std::unique_ptr<FBOContainer> m_multiSampleFBOContainer = nullptr;
   std::unique_ptr<FBOContainer> m_singleSampleFBOContainer = nullptr;
   std::unique_ptr<FBOContainer> m_resolveSampleFBOContainer = nullptr;
-
-  std::unique_ptr<FBOContainer> m_contrastFBOContainer = nullptr;
-  std::unique_ptr<FBOContainer> m_invertFBO = nullptr;
   std::unique_ptr<FBOContainer> m_finalTextureFBO = nullptr;
-
 
   PerFrameStats stats;
   RenderSettings m_settings;
@@ -121,11 +118,9 @@ class Renderer {
   void IncStats(uint32_t numVertices, uint32_t numIndices);
   void StartFrame(const Scene& scene);
   void RenderGroup(const Group& group);
-  void ApplyPostProcessingEffects();
   void SetLightingUniforms();
   void SetBlinnPhongUniforms();
   void RenderSkybox(Camera* camera);
-
   void AllocateFBOContainers(uint32_t width, uint32_t height);
 
   void AssignShaders();

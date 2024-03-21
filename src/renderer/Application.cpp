@@ -199,10 +199,6 @@ void Application::OnImGui() {
     ImGui::Checkbox("Use Blinn", &rendererSettings.useBlinn);
     ImGui::Checkbox("Skybox", &rendererSettings.renderSkybox);
     ImGui::Checkbox("Render to ImGui Viewport", &m_renderToImGuiViewport);
-    auto& ppSettings = m_renderer.ppUniforms;
-    ImGui::Checkbox("Invert", &ppSettings.invert);
-    ImGui::Checkbox("Flip", &ppSettings.flip);
-    ImGui::DragFloat("Contrast", &m_renderer.ppUniforms.contrast, 0.01, -1, 1);
 
     if (ImGui::Button("Recompile Shaders")) {
       m_renderer.RecompileShaders();
@@ -220,6 +216,8 @@ void Application::OnImGui() {
     }
     ImGui::InputTextWithHint("##screenshotFilename", "Screenshot Filename", screenshotBuffer, sizeof(screenshotBuffer));
   }
+
+  m_renderer.OnImGui();
 
   if (ImGui::CollapsingHeader("Camera")) {
     m_cameraController.OnImGui();
