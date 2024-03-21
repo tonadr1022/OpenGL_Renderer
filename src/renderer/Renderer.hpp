@@ -103,6 +103,8 @@ class Renderer {
 
   std::unique_ptr<FBOContainer> m_multiSampleFBOContainer = nullptr;
   std::unique_ptr<FBOContainer> m_singleSampleFBOContainer = nullptr;
+  std::unique_ptr<FBOContainer> m_resolveSampleFBOContainer = nullptr;
+
   std::unique_ptr<FBOContainer> m_contrastFBOContainer = nullptr;
   std::unique_ptr<FBOContainer> m_invertFBO = nullptr;
   std::unique_ptr<FBOContainer> m_finalTextureFBO = nullptr;

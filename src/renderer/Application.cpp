@@ -361,8 +361,4 @@ void Application::LoadShaders() {
                                       {GET_SHADER_PATH("skybox.frag"), ShaderType::FRAGMENT}});
   ShaderManager::AddShader("singleColor", {{GET_SHADER_PATH("singleColor.vert"), ShaderType::VERTEX},
                                            {GET_SHADER_PATH("singleColor.frag"), ShaderType::FRAGMENT}});
-  ShaderManager::AddShader("contrast", {{GET_SHADER_PATH("contrast.vert"), ShaderType::VERTEX},
-                                        {GET_SHADER_PATH("contrast.frag"), ShaderType::FRAGMENT}});
-  ShaderManager::AddShader("invert", {{GET_SHADER_PATH("postprocessing/invert.vert"), ShaderType::VERTEX},
-                                      {GET_SHADER_PATH("postprocessing/invert.frag"), ShaderType::FRAGMENT}});
 }

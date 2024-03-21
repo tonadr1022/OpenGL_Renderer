@@ -234,36 +234,10 @@ void Renderer::RenderScene(const Scene& scene, Camera* camera) {
   glBindFramebuffer(GL_READ_FRAMEBUFFER,
                     m_settings.useMSAA ? m_multiSampleFBOContainer->FBO().Id()
                                        : m_singleSampleFBOContainer->FBO().Id());
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_contrastFBOContainer->FBO().Id());
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_resolveSampleFBOContainer->FBO().Id());
   glBlitFramebuffer(0, 0, (GLsizei) m_width, (GLsizei) m_height, 0, 0, (GLsizei) m_width,
                     (GLsizei) m_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-
-  if (ppUniforms.invert) {
-    m_invertFBO->FBO().Bind();
-  } else {
-    FrameBuffer::BindDefault();
-  }
-
-  GL_LOG_ERROR();
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT);
-  glDisable(GL_DEPTH_TEST);
-
-  m_contrastShader->Bind();
-  m_contrastShader->SetFloat("u_Contrast", ppUniforms.contrast);
-  m_contrastFBOContainer->Textures()[0]->Bind();
-  m_screenQuad.Draw();
-
-  GL_LOG_ERROR();
-  if (ppUniforms.invert) {
-    FrameBuffer::BindDefault();
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    m_invertShader->Bind();
-    m_invertFBO->Textures()[0]->Bind();
-    m_screenQuad.Draw();
-    GL_LOG_ERROR();
-  }
+  m_postProcessor.Render(m_resolveSampleFBOContainer->Textures()[0].get());
 }
 
 void Renderer::RenderSkybox(Camera* camera) {
@@ -301,6 +275,7 @@ Renderer::Renderer(Window& window)
     : m_window(window), m_postProcessor(m_screenQuad) {
   auto frameBufferDims = window.GetFrameBufferDimensions();
   ResizeViewport(frameBufferDims.x, frameBufferDims.y);
+  m_postProcessor.Init(frameBufferDims.x, frameBufferDims.y);
 }
 
 void Renderer::SetPointLights(const std::vector<std::unique_ptr<PointLight>>* pointLights) {
@@ -434,26 +409,14 @@ void Renderer::AllocateFBOContainers(uint32_t width, uint32_t height) {
   singleSampleRBO->BufferStorage(width, height);
   m_singleSampleFBOContainer->AttachRenderBuffer(std::move(singleSampleRBO));
 
-  m_invertFBO = std::make_unique<FBOContainer>();
-  m_invertFBO->FBO().Bind();
-  auto invertTexture = std::make_unique<Texture>(width, height);
-  m_invertFBO->AttachColorBuffer(GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, std::move(invertTexture));
 
-  m_contrastFBOContainer = std::make_unique<FBOContainer>();
-  m_contrastFBOContainer->FBO().Bind();
-  auto tex1 = std::make_unique<Texture>(width, height);
-  m_contrastFBOContainer->AttachColorBuffer(GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, std::move(tex1));
-
-//  if (!m_contrastFBOContainer->FBO().IsComplete()) {
-//    LOG_ERROR("contrast fbo incomplete");
-//  }
-//  if (!m_singleSampleFBOContainer->FBO().IsComplete()) {
-//    LOG_ERROR("single sample fbo incomplete");
-//  }
-//  if (!m_multiSampleFBOContainer->FBO().IsComplete()) {
-//    LOG_ERROR("multi sample fbo incomplete");
-//  }
-//  if (!m_invertFBO->FBO().IsComplete()) {
-//    LOG_ERROR("invert fbo incomplete");
-//  }
+  // Resolve FBO
+  m_resolveSampleFBOContainer = std::make_unique<FBOContainer>();
+  m_resolveSampleFBOContainer->FBO().Bind();
+  auto resolveSampleTexture = std::make_unique<Texture>(width, height);
+  m_resolveSampleFBOContainer->AttachColorBuffer(GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, std::move(resolveSampleTexture));
+  auto resolveSampleRBO = std::make_unique<RenderBuffer>(GL_DEPTH24_STENCIL8);
+  resolveSampleRBO->Bind();
+  resolveSampleRBO->BufferStorage(width, height);
+  m_resolveSampleFBOContainer->AttachRenderBuffer(std::move(resolveSampleRBO));
 }

@@ -8,6 +8,19 @@
 #include "src/renderer/gl/FBOContainer.hpp"
 #include "src/renderer/gl/Shader.hpp"
 
+struct PPEffect {
+  bool enabled = true;
+  Shader* shader = nullptr;
+  std::function<void()> uniformFunction = nullptr;
+  std::unique_ptr<FBOContainer> fboContainer = nullptr;
+
+  PPEffect(HashedString name, Shader* shader, std::unique_ptr<FBOContainer> fboContainer, const std::function<void()>& uniformFunction)
+  : enabled(true), shader(shader), uniformFunction(uniformFunction), fboContainer(std::move(fboContainer)) {}
+
+  PPEffect(HashedString name, Shader* shader, std::unique_ptr<FBOContainer> fboContainer)
+      : enabled(true), shader(shader), fboContainer(std::move(fboContainer)) {}
+};
+
 class PostProcessingEffect {
  public:
   PostProcessingEffect(HashedString name,

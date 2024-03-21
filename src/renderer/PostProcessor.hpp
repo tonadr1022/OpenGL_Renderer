@@ -14,21 +14,21 @@ class PostProcessor {
   explicit PostProcessor(const Quad& quad);
   void Init(uint32_t width, uint32_t height);
   void Resize(uint32_t width, uint32_t height);
-  void Render();
+  void Render(Texture* texture);
 
   struct Uniforms {
-    float contrast = 1.0f;
+    float contrast = 0.0f;
   };
 
   Uniforms uniforms;
 
-  [[nodiscard]] inline FBOContainer* GetFBOContainer(uint32_t index) const { return m_effects[index]->GetFBOContainer(); }
-
+  void AssignShaders();
  private:
   const Quad& m_quad;
-  std::vector<std::unique_ptr<PostProcessingEffect>> m_effects;
+  std::vector<std::unique_ptr<PPEffect>> m_effects;
   Shader* contrastShader = nullptr;
   Shader* invertShader = nullptr;
+  void LoadShaders();
 
   std::unique_ptr<FBOContainer> makeFBOContainer(uint32_t width, uint32_t height);
 };
