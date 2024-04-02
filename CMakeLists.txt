@@ -13,7 +13,7 @@ include_directories("dep")
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif ()
-
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Add source to this project's executable.
 add_executable(opengl_renderer
         src/main.cpp

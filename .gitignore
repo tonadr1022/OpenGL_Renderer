@@ -12,7 +12,14 @@ cmake-build-release
 cmake-build-release-wsl
 cmake-build-release-mingw
 cmake-build-release-visual-studio
+build-debug
+build-release
 .vs
 x64-Debug
 x64-Release
 CMakeSettings.json
+.cache
+
+compile_commands.json 
+testbuild
+

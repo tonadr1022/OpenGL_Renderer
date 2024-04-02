@@ -5,7 +5,6 @@
 #ifndef OPENGL_RENDERER_SRC_CORE_UTILS_HPP_
 #define OPENGL_RENDERER_SRC_CORE_UTILS_HPP_
 
-
 #include <fstream>
 #include <sstream>
 #include <chrono>
