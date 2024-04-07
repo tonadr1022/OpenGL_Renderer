@@ -1,8 +1,29 @@
 # OpenGL Renderer
 
-This is a basic 3D renderer written in C++ and OpenGL. Its main purpose has been for me to learn more rendering techniques while abstracting them into
+This is a basic 3D renderer written in C++ and OpenGL. Its main purpose has been for me to learn more rendering
+techniques while abstracting them into
 an API that allows for scene creation without making OpenGL calls. Along the way, it has improved my C++ skills,
 although I'm learning that C++ (and graphics programming for that matter) is really a lifelong journey.
+
+## Building
+
+On MacOS and Linux:
+
+```shell
+sh build_run_debug.sh
+# or 
+sh build_run_release.sh
+```
+
+On Windows (Using Visual Studio 2022 as CMake generator):
+
+```
+win_build_run_debug.bat
+or
+win_build_run_release.bat
+```
+
+Or Open the project in an IDE and build from there if these scripts don't work (Still learning CMake)
 
 ## Features
 
@@ -16,10 +37,11 @@ although I'm learning that C++ (and graphics programming for that matter) is rea
 - Screenshots
 
 ### MSAA
+
 ![MSAA Comparison](screenshots/msaa_comparison.png)
 
-
 ## TODO (soon to far)
+
 - Framebuffer stack for multiple post-processing effects
 - Uniform buffer objects (uniforms across shaders)
 - GPU instancing
@@ -29,6 +51,7 @@ although I'm learning that C++ (and graphics programming for that matter) is rea
 - Learn Vulkan
 
 ## Dependencies
+
 - [GLFW](https://github.com/glfw/glfw): window creation and OpenGL context management
 - [GLAD](https://glad.dav1d.de/): OpenGL function loader
 - [stb_image](https://github.com/nothings/stb): Image loading
@@ -36,6 +59,7 @@ although I'm learning that C++ (and graphics programming for that matter) is rea
 - [ImGui](https://github.com/ocornut/imgui): GUI
 
 ## References
+
 - [LearnOpenGL](https://learnopengl.com/Introduction): Much learning and some textures
 - [GEngine](https://github.com/JuanDiegoMontoya/Gengine/tree/37739ecfcb608f6b282b36ed8a962fac968b1487):
   Inspiration for input handling with GLFW, and the HashedString

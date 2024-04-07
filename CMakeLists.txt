@@ -163,9 +163,6 @@ add_custom_command(
         $<TARGET_FILE_DIR:opengl_renderer>/resources
 )
 
-file(CREATE_LINK
-        "${CMAKE_BINARY_DIR}/compile_commands.json"
-        "${CMAKE_SOURCE_DIR}/compile_commands.json")
 
 add_compile_definitions(SHADER_PATH="resources/shaders/")
 add_compile_definitions(TEXTURE_PATH="resources/textures/")
