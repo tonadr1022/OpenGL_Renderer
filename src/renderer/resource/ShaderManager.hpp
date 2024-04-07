@@ -6,6 +6,8 @@
 #define OPENGL_RENDERER_SRC_RENDERER_RESOURCE_SHADERMANAGER_HPP_
 
 #include <cstdint>
+#include <optional>
+#include <memory>
 
 #include "src/renderer/gl/Shader.hpp"
 #include "src/core/HashedString.hpp"

@@ -6,6 +6,7 @@
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
 #include <imgui/imgui.h>
+#include <iostream>
 
 void ImGuiMenu::StartFrame(bool imguiFullScreen) {
   ImGui_ImplOpenGL3_NewFrame();
@@ -75,7 +76,7 @@ void ImGuiMenu::StartFrame(bool imguiFullScreen) {
     if (ImGui::BeginMenuBar()) {
       if (ImGui::BeginMenu("Options")) {
         if (ImGui::MenuItem("Close", nullptr, false, p_open))
-          exit(0);
+          std::cout << "Close not working since exit() not found on VS\n";
         ImGui::EndMenu();
       }
       ImGui::EndMenuBar();

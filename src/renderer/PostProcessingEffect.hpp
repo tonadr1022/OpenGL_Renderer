@@ -9,8 +9,9 @@
 #include "src/renderer/gl/Shader.hpp"
 
 enum class PostProcessingEffectType {
-  Contrast = 0, Invert, Grayscale,ColorChannel, GaussianBlur, Count
+  Contrast = 0, Invert, Grayscale, ColorChannel, GaussianBlur, Count
 };
+
 static constexpr const char* PostProcessingEffectTypeToString(PostProcessingEffectType type) {
   switch (type) {
     case PostProcessingEffectType::Contrast: return "Contrast";
@@ -18,6 +19,7 @@ static constexpr const char* PostProcessingEffectTypeToString(PostProcessingEffe
     case PostProcessingEffectType::Grayscale: return "Grayscale";
     case PostProcessingEffectType::GaussianBlur: return "Gaussian Blue";
     case PostProcessingEffectType::ColorChannel: return "Color Channel";
+    default: return "None";
   }
 }
 

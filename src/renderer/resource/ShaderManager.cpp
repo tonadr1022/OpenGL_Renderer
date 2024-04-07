@@ -101,14 +101,14 @@ void ShaderManager::InitializeUniforms(ShaderData& shaderData) {
     GLint uniformSize;
     GLenum uniformType = GL_NONE;
 
-    GLint maxNameLength = 0;
-    glGetProgramiv(shaderData.id, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxNameLength);
+//    GLint maxNameLength = 0;
+//    glGetProgramiv(shaderData.id, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxNameLength);
 
-    GLchar uniformName[maxNameLength + 10];
+    GLchar uniformName[60];
     GLsizei uniformNameLength;
 
     for (GLint i = 0; i < uniformCount; i++) {
-      glGetActiveUniform(shaderData.id, i, maxNameLength, &uniformNameLength,
+      glGetActiveUniform(shaderData.id, i, 60, &uniformNameLength,
                          &uniformSize, &uniformType, uniformName);
       shaderData.uniformIds.emplace(HashedString(uniformName), glGetUniformLocation(shaderData.id, uniformName));
     }

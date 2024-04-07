@@ -87,14 +87,18 @@ void Renderer::UpdateRenderState(const Object &object) {
   Material *mat = object.GetMaterial();
   GL_LOG_ERROR();
   if (state.boundShaderName != mat->shaderName) {
+  GL_LOG_ERROR();
     state.boundShader = ShaderManager::GetShader(mat->shaderName);
     state.boundShaderName = mat->shaderName;
+  GL_LOG_ERROR();
 
     state.boundShader->Bind();
     stats.numShaderBinds++;
 
+  GL_LOG_ERROR();
     if (mat != state.boundMaterial) {
       state.boundMaterial = mat;
+  GL_LOG_ERROR();
       stats.numMaterialSwitches++;
       SetBlinnPhongUniforms();
       GL_LOG_ERROR();
@@ -104,15 +108,22 @@ void Renderer::UpdateRenderState(const Object &object) {
     m_skyboxTexture->Bind(GL_TEXTURE4);
     GL_LOG_ERROR();
     state.boundShader->SetInt("renderMode", static_cast<int>(debugMode));
+    GL_LOG_ERROR();
     state.boundShader->SetInt("skybox", 4);
+    GL_LOG_ERROR();
     state.boundShader->SetBool("useBlinn", m_settings.useBlinn);
+    GL_LOG_ERROR();
     state.boundShader->SetVec3("u_ViewPos", m_camera->GetPosition());
+    GL_LOG_ERROR();
     state.boundShader->SetMat4("u_VP", m_camera->GetVPMatrix());
+    GL_LOG_ERROR();
     SetLightingUniforms();
+    GL_LOG_ERROR();
   }
   if (mat != state.boundMaterial) {
     state.boundMaterial = mat;
     stats.numMaterialSwitches++;
+    GL_LOG_ERROR();
     SetBlinnPhongUniforms();
   }
   GL_LOG_ERROR();
@@ -160,7 +171,9 @@ void Renderer::SetBlinnPhongUniforms() {
                               state.boundMaterial->shininess);
 }
 
-void Renderer::ResetStats() { memset(&stats, 0, sizeof(PerFrameStats)); }
+void Renderer::ResetStats() {
+  stats = {};
+}
 
 void Renderer::StartFrame(const Scene &scene) {
   // reset state
@@ -319,7 +332,9 @@ void Renderer::SetSpotLights(
 }
 
 void Renderer::SetLightingUniforms() {
+  GL_LOG_ERROR();
   if (m_settings.renderDirectionalLights && m_directionalLight != nullptr) {
+
     state.boundShader->SetBool("directionalLightEnabled", true);
     state.boundShader->SetVec3(directionalLightStrings[0],
                                m_directionalLight->color);
@@ -331,13 +346,16 @@ void Renderer::SetLightingUniforms() {
                                 m_directionalLight->specularIntensity);
     state.boundShader->SetVec3(directionalLightStrings[4],
                                m_directionalLight->direction);
+    GL_LOG_ERROR();
   } else {
+    GL_LOG_ERROR();
     state.boundShader->SetBool("directionalLightEnabled", false);
   }
   if (m_settings.renderPointLights && m_pointLights != nullptr) {
     state.boundShader->SetBool("pointLightEnabled", true);
     int i = 0;
     for (auto &light : *m_pointLights) {
+      GL_LOG_ERROR();
       state.boundShader->SetVec3(pointLightStrings[NUM_POINT_PARAMS * i],
                                  light->color);
       state.boundShader->SetFloat(pointLightStrings[NUM_POINT_PARAMS * i + 1],
@@ -381,8 +399,10 @@ void Renderer::SetLightingUniforms() {
                                   glm::cos(glm::radians(light->angle)));
       i++;
     }
+    GL_LOG_ERROR();
     state.boundShader->SetInt("numSpotLights", i);
   } else {
+    GL_LOG_ERROR();
     state.boundShader->SetBool("spotLightEnabled", false);
   }
 }

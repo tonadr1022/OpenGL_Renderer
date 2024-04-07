@@ -6,6 +6,7 @@ if (POLICY CMP0141)
     set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif ()
 
+
 project("opengl_renderer")
 
 include_directories("dep")
@@ -111,10 +112,10 @@ add_executable(opengl_renderer
 )
 
 
-if (CMAKE_BUILD_TYPE MATCHES Debug)
-    add_compile_definitions(DEBUG_MODE)
-    set(CMAKE_CXX_FLAGS "-g")
-endif ()
+#if (CMAKE_BUILD_TYPE MATCHES Debug)
+#    add_compile_definitions(DEBUG_MODE)
+#    set(CMAKE_CXX_FLAGS "-g")
+#endif ()
 
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/screenshots)
 
@@ -129,29 +130,27 @@ if (APPLE)
     set(CMAKE_CXX_FLAGS -Wdeprecated-declarations)
 endif ()
 
-add_definitions(-Wall -v)
-
+# add_definitions(-Wall -v)
 
 add_subdirectory(dep/glfw)
 add_subdirectory(dep/glm)
 
 include(FetchContent)
-
-FetchContent_Declare(
-        assimp
-        GIT_REPOSITORY https://github.com/assimp/assimp.git
-)
-
+set(FETCHCONTENT_BASE_DIR ${PROJECT_SOURCE_DIR}/dep CACHE PATH "" FORCE)
+FetchContent_Declare(assimp GIT_REPOSITORY https://github.com/assimp/assimp.git)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+# set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "Build Assimp tools" FORCE)
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_INJECT_DEBUG_POSTFIX OFF CACHE BOOL "" FORCE)
+set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(assimp)
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build Assimp as static library" FORCE)
-set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "Build Assimp tools" FORCE)
-set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "Build Assimp tests" FORCE)
-set(ASSIMP_INSTALL OFF CACHE BOOL "Install Assimp" FORCE)
+
+target_include_directories(opengl_renderer PRIVATE dep/assimp-src/include)
 
 
 find_package(OpenGL REQUIRED)
 
-target_link_libraries(opengl_renderer ${OPENGL_LIBRARIES} glfw glm assimp::assimp)
+target_link_libraries(opengl_renderer ${OPENGL_LIBRARIES} glfw glm assimp)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
     set_property(TARGET opengl_renderer PROPERTY CXX_STANDARD 20)

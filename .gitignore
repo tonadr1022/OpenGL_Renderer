@@ -4,21 +4,13 @@ CMakePresets.json
 .vscode
 build
 out
-cmake-build-debug
-cmake-build-debug-wsl
-cmake-build-debug-mingw
-cmake-build-debug-visual-studio
-cmake-build-release
-cmake-build-release-wsl
-cmake-build-release-mingw
-cmake-build-release-visual-studio
+cmake-build*
 build-debug
 build-release
 .vs
-x64-Debug
-x64-Release
 CMakeSettings.json
 .cache
+dep/assimp*
 
 compile_commands.json 
 testbuild

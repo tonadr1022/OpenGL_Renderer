@@ -9,6 +9,7 @@
 #include <mutex>
 #include <iostream>
 #include "src/Common.hpp"
+#include <cstring>
 
 enum LogPriority {
   TracePriority, DebugPriority, InfoPriority, WarnPriority, ErrorPriority, CriticalPriority

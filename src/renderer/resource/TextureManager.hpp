@@ -6,7 +6,7 @@
 #define OPENGL_RENDERER_SRC_RENDERER_RESOURCE_TEXTUREMANAGER_HPP_
 
 #include "src/renderer/gl/Texture.hpp"
-
+#include <memory>
 
 class TextureManager {
  public:
