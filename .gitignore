@@ -5,8 +5,7 @@ CMakePresets.json
 build
 out
 cmake-build*
-build-debug
-build-release
+build*
 .vs
 CMakeSettings.json
 .cache
