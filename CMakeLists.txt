@@ -132,7 +132,6 @@ include(FetchContent)
 set(FETCHCONTENT_BASE_DIR
     ${PROJECT_SOURCE_DIR}/dep
     CACHE PATH "" FORCE)
-FetchContent_Declare(assimp GIT_REPOSITORY https://github.com/assimp/assimp.git)
 
 find_package(glfw3 3.3)
 if(glfw3_FOUND)
@@ -149,7 +148,7 @@ else()
   target_include_directories(opengl_renderer PRIVATE dep/glfw-src/include)
 endif()
 
-find_package(assimp REQUIRED)
+find_package(assimp)
 if(assimp_FOUND)
   message("Assimp found")
   link_directories(${ASSIMP_LIBRARY_DIRS})
