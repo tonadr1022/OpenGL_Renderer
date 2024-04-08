@@ -135,11 +135,11 @@ set(FETCHCONTENT_BASE_DIR
 
 find_package(glfw3 3.3)
 if(glfw3_FOUND)
-  message("GLFW found")
+  message("GLFW found on system")
   link_directories(${GLFW_LIBRARY_DIRS})
   target_include_directories(opengl_renderer PRIVATE ${GLFW_INCLUDE_DIRS})
 else()
-  message("GLFW not found")
+  message("GLFW not found on system, fetching instead")
   FetchContent_Declare(
     GLFW
     GIT_REPOSITORY https://github.com/glfw/glfw.git
@@ -150,17 +150,16 @@ endif()
 
 find_package(assimp)
 if(assimp_FOUND)
-  message("Assimp found")
+  message("Assimp found on system")
   link_directories(${ASSIMP_LIBRARY_DIRS})
   target_include_directories(opengl_renderer PRIVATE ${ASSIMP_INCLUDE_DIRS})
 else()
-  message("Assimp not found")
+  message("Assimp not found on system, fetching instead")
   FetchContent_Declare(assimp
                        GIT_REPOSITORY https://github.com/assimp/assimp.git)
   set(BUILD_SHARED_LIBS
       OFF
       CACHE BOOL "" FORCE)
-  # set(ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "Build Assimp tools" FORCE)
   set(ASSIMP_BUILD_TESTS
       OFF
       CACHE BOOL "" FORCE)
@@ -176,7 +175,8 @@ endif()
 
 find_package(OpenGL REQUIRED)
 
-target_link_libraries(opengl_renderer ${OPENGL_LIBRARIES} glfw glm assimp)
+target_link_libraries(opengl_renderer ${OPENGL_LIBRARIES} glfw glm
+                      assimp::assimp)
 
 if(CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET opengl_renderer PROPERTY CXX_STANDARD 20)
