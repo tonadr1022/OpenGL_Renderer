@@ -3,19 +3,19 @@
 //
 
 #include "Renderer.hpp"
+
+#include <chrono>
+
 #include "imgui/imgui.h"
+#include "src/Common.hpp"
 #include "src/core/Logger.hpp"
+#include "src/core/Utils.hpp"
+#include "src/renderer/gl/FrameBuffer.hpp"
 #include "src/renderer/resource/MaterialManager.hpp"
 #include "src/renderer/resource/ShaderManager.hpp"
 #include "src/renderer/resource/TextureManager.hpp"
 
-#include "src/Common.hpp"
-#include "src/core/Utils.hpp"
-#include "src/renderer/gl/FrameBuffer.hpp"
-
-#include <chrono>
-
-namespace { // detail
+namespace {  // detail
 #define NUM_SPOT_PARAMS 9
 #define NUM_POINT_PARAMS 6
 #define NUM_DIRECTIONAL_PARAMS 5
@@ -81,24 +81,24 @@ std::array<HashedString, NUM_DIRECTIONAL_PARAMS> directionalLightStrings = {
 std::vector<HashedString> pointLightStrings = GeneratePointLightStrings(50);
 std::vector<HashedString> spotLightStrings = GenerateSpotLightStrings(50);
 
-} // namespace
+}  // namespace
 
 void Renderer::UpdateRenderState(const Object &object) {
   Material *mat = object.GetMaterial();
   GL_LOG_ERROR();
   if (state.boundShaderName != mat->shaderName) {
-  GL_LOG_ERROR();
+    GL_LOG_ERROR();
     state.boundShader = ShaderManager::GetShader(mat->shaderName);
     state.boundShaderName = mat->shaderName;
-  GL_LOG_ERROR();
+    GL_LOG_ERROR();
 
     state.boundShader->Bind();
     stats.numShaderBinds++;
 
-  GL_LOG_ERROR();
+    GL_LOG_ERROR();
     if (mat != state.boundMaterial) {
       state.boundMaterial = mat;
-  GL_LOG_ERROR();
+      GL_LOG_ERROR();
       stats.numMaterialSwitches++;
       SetBlinnPhongUniforms();
       GL_LOG_ERROR();
@@ -135,31 +135,31 @@ void Renderer::SetBlinnPhongUniforms() {
   uint32_t numDiffuseMaps = 0, numSpecularMaps = 0, numEmissionMaps = 0;
   for (auto &&texturePair : state.boundMaterial->textures) {
     switch (texturePair.first) {
-    case MatTextureType::Diffuse:
-      texturePair.second->Bind(GL_TEXTURE0);
-      state.boundShader->SetInt("materialMaps.diffuseMap", 0);
-      numDiffuseMaps++;
-      break;
-    case MatTextureType::Specular:
-      texturePair.second->Bind(GL_TEXTURE1);
-      state.boundShader->SetInt("materialMaps.specularMap", 1);
-      numSpecularMaps++;
-      break;
-    case MatTextureType::Emission:
-      texturePair.second->Bind(GL_TEXTURE2);
-      state.boundShader->SetInt("materialMaps.emissionMap", 2);
-      numEmissionMaps++;
-      break;
-    default:
-      break;
+      case MatTextureType::Diffuse:
+        texturePair.second->Bind(GL_TEXTURE0);
+        state.boundShader->SetInt("materialMaps.diffuseMap", 0);
+        numDiffuseMaps++;
+        break;
+      case MatTextureType::Specular:
+        texturePair.second->Bind(GL_TEXTURE1);
+        state.boundShader->SetInt("materialMaps.specularMap", 1);
+        numSpecularMaps++;
+        break;
+      case MatTextureType::Emission:
+        texturePair.second->Bind(GL_TEXTURE2);
+        state.boundShader->SetInt("materialMaps.emissionMap", 2);
+        numEmissionMaps++;
+        break;
+      default:
+        break;
     }
   }
-  state.boundShader->SetBool("hasDiffuseMap", m_settings.diffuseMapEnabled &&
-                                                  numDiffuseMaps > 0);
-  state.boundShader->SetBool("hasSpecularMap", m_settings.specularMapEnabled &&
-                                                   numSpecularMaps > 0);
-  state.boundShader->SetBool("hasEmissionMap", m_settings.emissionMapEnabled &&
-                                                   numEmissionMaps > 0);
+  state.boundShader->SetBool(
+      "hasDiffuseMap", m_settings.diffuseMapEnabled && numDiffuseMaps > 0);
+  state.boundShader->SetBool(
+      "hasSpecularMap", m_settings.specularMapEnabled && numSpecularMaps > 0);
+  state.boundShader->SetBool(
+      "hasEmissionMap", m_settings.emissionMapEnabled && numEmissionMaps > 0);
 
   state.boundShader->SetVec3("material.ambient",
                              state.boundMaterial->ambientColor);
@@ -171,9 +171,7 @@ void Renderer::SetBlinnPhongUniforms() {
                               state.boundMaterial->shininess);
 }
 
-void Renderer::ResetStats() {
-  stats = {};
-}
+void Renderer::ResetStats() { stats = {}; }
 
 void Renderer::StartFrame(const Scene &scene) {
   // reset state
@@ -196,8 +194,7 @@ void Renderer::StartFrame(const Scene &scene) {
 }
 
 void Renderer::RenderGroup(const Group &group) {
-  if (!group.visible)
-    return;
+  if (!group.visible) return;
   if (group.wireframe && !m_settings.wireframe) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   } else if (!group.wireframe && m_settings.wireframe) {
@@ -209,8 +206,7 @@ void Renderer::RenderGroup(const Group &group) {
   }
 
   for (auto &&object : group.GetObjects()) {
-    if (!object->shouldDraw)
-      continue;
+    if (!object->shouldDraw) continue;
     auto mesh = object->GetMesh();
     UpdateRenderState(*object);
     mesh->GetVAO().Bind();
@@ -231,8 +227,7 @@ void Renderer::RenderGroup(const Group &group) {
     glStencilMask(0x00);
     m_singleColorShader->SetMat4("u_VP", m_camera->GetVPMatrix());
     for (auto &&object : group.GetObjects()) {
-      if (!object->shouldDraw)
-        continue;
+      if (!object->shouldDraw) continue;
       auto mesh = object->GetMesh();
       mesh->GetVAO().Bind();
       state.boundShader->SetMat4("u_Model", object->transform.GetModelMatrix());
@@ -259,7 +254,8 @@ void Renderer::Init() {
   // action to take when any stencil test passes or fails, replace when pass
   // stencil test and depth test (or only stencil if no depth test)
   glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-  glStencilFunc(GL_NOTEQUAL, 1, 0xFF); // all fragments should pass stencil test
+  glStencilFunc(GL_NOTEQUAL, 1,
+                0xFF);  // all fragments should pass stencil test
 }
 
 void Renderer::Reset() {}
@@ -271,8 +267,7 @@ void Renderer::RenderScene(const Scene &scene, Camera *camera) {
   for (auto &group : scene.GetGroups()) {
     RenderGroup(*group);
   }
-  if (m_settings.renderSkybox)
-    RenderSkybox(camera);
+  if (m_settings.renderSkybox) RenderSkybox(camera);
 
   // blit from multi-sampled result to the intermediate FBO
   glBindFramebuffer(GL_READ_FRAMEBUFFER,
@@ -334,7 +329,6 @@ void Renderer::SetSpotLights(
 void Renderer::SetLightingUniforms() {
   GL_LOG_ERROR();
   if (m_settings.renderDirectionalLights && m_directionalLight != nullptr) {
-
     state.boundShader->SetBool("directionalLightEnabled", true);
     state.boundShader->SetVec3(directionalLightStrings[0],
                                m_directionalLight->color);

@@ -18,4 +18,7 @@ cmake -DCMAKE_BUILD_TYPE=Debug ..
 # Build using parallel jobs
 cmake --build . -- -j$NUM_CORES
 
-./opengl_renderer
+cd ..
+ln -s ./build-debug/compile_commands.json ./compile_commands.json
+
+./build-debug/opengl_renderer
