@@ -7,11 +7,7 @@
 
 #include "src/Common.hpp"
 
-
-enum BufferType : int {
-  ARRAY = GL_ARRAY_BUFFER,
-  ELEMENT = GL_ELEMENT_ARRAY_BUFFER
-};
+enum BufferType : int { ARRAY = GL_ARRAY_BUFFER, ELEMENT = GL_ELEMENT_ARRAY_BUFFER };
 
 enum DrawMode : int {
   STATIC = GL_STATIC_DRAW,
@@ -19,5 +15,4 @@ enum DrawMode : int {
   STREAM = GL_STREAM_DRAW,
 };
 
-
-#endif //OPENGL_RENDERER_SRC_RENDERER_GL_TYPES_HPP_
+#endif  // OPENGL_RENDERER_SRC_RENDERER_GL_TYPES_HPP_

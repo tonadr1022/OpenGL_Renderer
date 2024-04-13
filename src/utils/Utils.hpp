@@ -5,16 +5,13 @@
 #ifndef OPENGL_RENDERER_SRC_CORE_UTILS_HPP_
 #define OPENGL_RENDERER_SRC_CORE_UTILS_HPP_
 
-#include <fstream>
-#include <sstream>
-#include <chrono>
-#include "src/utils/Logger.hpp"
+#include <string>
 
 namespace Utils {
 extern std::string LoadFromFile(const std::string& path);
 
 extern std::string GetDateTimeString();
 
-}
+}  // namespace Utils
 
-#endif //OPENGL_RENDERER_SRC_CORE_UTILS_HPP_
+#endif  // OPENGL_RENDERER_SRC_CORE_UTILS_HPP_

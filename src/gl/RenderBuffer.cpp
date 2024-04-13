@@ -6,8 +6,7 @@
 
 #include "src/utils/Logger.hpp"
 
-RenderBuffer::RenderBuffer(GLint internalFormat)
-    : m_internalFormat(internalFormat) {
+RenderBuffer::RenderBuffer(GLint internalFormat) : m_internalFormat(internalFormat) {
   glGenRenderbuffers(1, &m_id);
 }
 
@@ -26,6 +25,5 @@ void RenderBuffer::BufferStorage(uint32_t width, uint32_t height) const {
 
 void RenderBuffer::BufferStorageMultiSample(uint32_t width, uint32_t height,
                                             uint32_t numSamples) const {
-  glRenderbufferStorageMultisample(GL_RENDERBUFFER, numSamples,
-                                   m_internalFormat, width, height);
+  glRenderbufferStorageMultisample(GL_RENDERBUFFER, numSamples, m_internalFormat, width, height);
 }

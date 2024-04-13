@@ -27,9 +27,8 @@ void OrbitCamera::ProcessMouseMovement(double xOffset, double yOffset) {
   if (Input::IsKeyDown(GLFW_KEY_RIGHT_SHIFT)) {
     //      glm::vec3 moveOffset = m
     // Move target based on camera orientation and mouse offset
-    glm::vec3 move_offset =
-        m_right * static_cast<float>(-xOffset) * m_sensitivity +
-        m_up * static_cast<float>(yOffset) * m_sensitivity;
+    glm::vec3 move_offset = m_right * static_cast<float>(-xOffset) * m_sensitivity +
+                            m_up * static_cast<float>(yOffset) * m_sensitivity;
 
     m_target += move_offset * speed;
   } else {
@@ -44,8 +43,7 @@ void OrbitCamera::ProcessMouseMovement(double xOffset, double yOffset) {
 
 void OrbitCamera::OnImGui() {
   ImGui::Text("Position: %.2f, %.2f, %.2f", m_pos.x, m_pos.y, m_pos.z);
-  ImGui::Text("Target Position: %.2f, %.2f, %.2f", m_target.x, m_target.y,
-              m_target.z);
+  ImGui::Text("Target Position: %.2f, %.2f, %.2f", m_target.x, m_target.y, m_target.z);
   ImGui::Text("Front: %.2f, %.2f, %.2f", m_front.x, m_front.y, m_front.z);
   ImGui::Text("Distance To Target: %.2f", m_distance);
   ImGui::Text("Polar Angle: %.2f", m_polarAngle);
@@ -105,8 +103,8 @@ void OrbitCamera::SetTargetPos(const glm::vec3& targetPos) {
 
 void OrbitCamera::UpdateMatrices() {
   m_viewMatrix = glm::lookAt(m_pos, m_target, GlobalUp);
-  m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspectRatio,
-                                        m_nearPlane, m_farPlane);
+  m_projectionMatrix =
+      glm::perspective(glm::radians(m_fov), m_aspectRatio, m_nearPlane, m_farPlane);
   m_VPMatrix = m_projectionMatrix * m_viewMatrix;
 }
 

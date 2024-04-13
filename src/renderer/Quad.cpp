@@ -5,7 +5,8 @@
 #include "Quad.hpp"
 
 namespace {
-constexpr const float quadVertices[] = {
+// clang-format off
+constexpr const float QuadVertices[] = {
     // positions   // texCoords
     -1.0f, 1.0f, 0.0f, 1.0f,
     -1.0f, -1.0f, 0.0f, 0.0f,
@@ -15,14 +16,15 @@ constexpr const float quadVertices[] = {
     1.0f, -1.0f, 1.0f, 0.0f,
     1.0f, 1.0f, 1.0f, 1.0f
 };
+//clang-format on
 }
 
 Quad::Quad() {
   m_vbo.Bind();
   m_vao.Bind();
-  m_vao.AttachBuffer(m_vbo.Id(), BufferType::ARRAY, sizeof(quadVertices), STATIC, quadVertices);
+  m_vao.AttachBuffer(m_vbo.Id(), BufferType::ARRAY, sizeof(QuadVertices), STATIC, QuadVertices);
   m_vao.EnableAttribute<float>(0, 2, sizeof(float) * 4, nullptr);
-  m_vao.EnableAttribute<float>(1, 2, sizeof(float) * 4, (void*) (sizeof(float) * 2));
+  m_vao.EnableAttribute<float>(1, 2, sizeof(float) * 4, reinterpret_cast<void*>((sizeof(float) * 2)));
 }
 void Quad::Draw() const {
   m_vao.Bind();

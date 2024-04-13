@@ -10,13 +10,11 @@
 #include "src/utils/Logger.hpp"
 #include "src/utils/Utils.hpp"
 
-std::unordered_map<HashedString, std::unique_ptr<Shader>>
-    ShaderManager::m_shaders;
-std::unordered_map<uint32_t, ShaderManager::ShaderData>
-    ShaderManager::m_shader_data;
+std::unordered_map<HashedString, std::unique_ptr<Shader>> ShaderManager::m_shaders;
+std::unordered_map<uint32_t, ShaderManager::ShaderData> ShaderManager::m_shader_data;
 
-Shader* ShaderManager::AddShader(
-    HashedString name, const std::vector<ShaderCreateInfo>& createInfos) {
+Shader* ShaderManager::AddShader(HashedString name,
+                                 const std::vector<ShaderCreateInfo>& createInfos) {
   if (m_shaders.contains(name)) {
     LOG_ERROR("Duplicate shader name: %s", name.data());
     return nullptr;
@@ -27,8 +25,7 @@ Shader* ShaderManager::AddShader(
   auto it = m_shader_data.emplace(name, std::move(data.value()));
   // need to access from it since data got moved
   m_shaders.emplace(name,
-                    std::make_unique<Shader>(it.first->second.id,
-                                             it.first->second.uniformIds));
+                    std::make_unique<Shader>(it.first->second.id, it.first->second.uniformIds));
   return m_shaders.at(name).get();
 }
 
@@ -39,8 +36,7 @@ Shader* ShaderManager::RecompileShader(HashedString name) {
   }
   auto old_it = m_shader_data.find(name);
 
-  std::optional<ShaderData> data =
-      CompileProgram(name, old_it->second.moduleCreateInfos);
+  std::optional<ShaderData> data = CompileProgram(name, old_it->second.moduleCreateInfos);
   if (!data.has_value()) {
     LOG_ERROR("Recompilation Failed for shader: %s", name.data());
     return nullptr;
@@ -51,8 +47,7 @@ Shader* ShaderManager::RecompileShader(HashedString name) {
   glDeleteProgram(old_it->second.id);
   m_shader_data.erase(old_it);
   auto it = m_shader_data.emplace(name, std::move(data.value()));
-  m_shaders[name] = std::make_unique<Shader>(it.first->second.id,
-                                             it.first->second.uniformIds);
+  m_shaders[name] = std::make_unique<Shader>(it.first->second.id, it.first->second.uniformIds);
   return m_shaders.at(name).get();
 }
 
@@ -65,8 +60,7 @@ Shader* ShaderManager::GetShader(HashedString name) {
   return it->second.get();
 }
 
-bool ShaderManager::CheckModuleCompilationSuccess(GLuint id,
-                                                  std::string_view shaderPath,
+bool ShaderManager::CheckModuleCompilationSuccess(GLuint id, std::string_view shaderPath,
                                                   ShaderType type) {
   int success;
   glGetShaderiv(id, GL_COMPILE_STATUS, &success);
@@ -76,8 +70,8 @@ bool ShaderManager::CheckModuleCompilationSuccess(GLuint id,
     LOG_ERROR("File: %s", shaderPath);
 
     LOG_ERROR("Error Compiling Shader: %s, %s",
-              type == ShaderType::VERTEX     ? "Vertex"
-              : type == ShaderType::FRAGMENT ? "Fragment"
+              type == ShaderType::Vertex     ? "Vertex"
+              : type == ShaderType::Fragment ? "Fragment"
                                              : "Geometry",
               buffer);
     return false;
@@ -124,11 +118,10 @@ void ShaderManager::InitializeUniforms(ShaderData& shaderData) {
     GLsizei uniform_name_length;
 
     for (GLint i = 0; i < uniform_count; i++) {
-      glGetActiveUniform(shaderData.id, i, 60, &uniform_name_length,
-                         &uniform_size, &uniform_type, uniform_name);
-      shaderData.uniformIds.emplace(
-          HashedString(uniform_name),
-          glGetUniformLocation(shaderData.id, uniform_name));
+      glGetActiveUniform(shaderData.id, i, 60, &uniform_name_length, &uniform_size, &uniform_type,
+                         uniform_name);
+      shaderData.uniformIds.emplace(HashedString(uniform_name),
+                                    glGetUniformLocation(shaderData.id, uniform_name));
     }
   }
 }

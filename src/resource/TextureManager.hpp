@@ -6,6 +6,7 @@
 #define OPENGL_RENDERER_SRC_RENDERER_RESOURCE_TEXTUREMANAGER_HPP_
 
 #include "src/gl/Texture.hpp"
+#include "src/utils/HashedString.hpp"
 
 class TextureManager {
  public:

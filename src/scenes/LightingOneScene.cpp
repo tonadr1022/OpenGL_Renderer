@@ -11,8 +11,7 @@ LightingOneScene::LightingOneScene() : Scene({1, 2, 4}) {
   Material* wood_container_mat = MaterialManager::GetMaterial("woodContainer");
   Mesh* cube_mesh = MeshManager::GetMesh("cube");
 
-  auto plane = std::make_unique<Object>(MeshManager::GetMesh("cube1024"),
-                                        wood_container_mat);
+  auto plane = std::make_unique<Object>(MeshManager::GetMesh("cube1024"), wood_container_mat);
   plane->transform.Scale({1000, 1, 1000});
   plane->transform.UpdateModelMatrix();
   auto plane_group = std::make_unique<Group>();

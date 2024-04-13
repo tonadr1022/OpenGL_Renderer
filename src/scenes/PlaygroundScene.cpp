@@ -6,8 +6,6 @@
 
 #include "src/resource/MaterialManager.hpp"
 #include "src/resource/MeshManager.hpp"
-#include "src/resource/TextureManager.hpp"
-#include "src/utils/Logger.hpp"
 
 void PlaygroundScene::Update(double /*dt*/) {
   //  for (auto& cube : m_cubes) {
@@ -34,9 +32,8 @@ PlaygroundScene::PlaygroundScene() {
   //  MaterialManager::AddMaterial("floor", textures, "blinnPhong");
 
   auto g = std::make_unique<Group>();
-  auto plane =
-      std::make_unique<Object>(MeshManager::GetMesh("cube"),
-                               MaterialManager::GetMaterial("woodContainer"));
+  auto plane = std::make_unique<Object>(MeshManager::GetMesh("cube"),
+                                        MaterialManager::GetMaterial("woodContainer"));
   g->AddObject(std::move(plane));
   AddGroup(std::move(g));
 }

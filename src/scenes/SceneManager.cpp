@@ -3,13 +3,15 @@
 //
 
 #include "SceneManager.hpp"
-#include "src/utils/Logger.hpp"
+
 #include <imgui/imgui.h>
+
+#include "src/utils/Logger.hpp"
 
 SceneManager::SceneManager() = default;
 
 void SceneManager::AddScene(HashedString name, std::unique_ptr<Scene> scene) {
-   m_sceneMap.emplace(name, std::move(scene));
+  m_sceneMap.emplace(name, std::move(scene));
 }
 
 void SceneManager::SetActiveScene(HashedString name) {
@@ -26,12 +28,13 @@ Scene* SceneManager::GetActiveScene() {
 
 void SceneManager::ImGuiSceneSelect() {
   if (!m_activeScene || !m_activeSceneName) return;
-  if (ImGui::BeginCombo("##SceneSelectCombo", ("Scene: " + std::string(m_activeSceneName)).c_str())) {
+  if (ImGui::BeginCombo("##SceneSelectCombo",
+                        ("Scene: " + std::string(m_activeSceneName)).c_str())) {
     for (auto& [name, scene] : m_sceneMap) {
-      const bool isSelected = scene.get() == m_activeScene;
-      if (ImGui::Selectable(name.data(), isSelected)) {
+      const bool is_selected = scene.get() == m_activeScene;
+      if (ImGui::Selectable(name.data(), is_selected)) {
         m_activeScene = scene.get();
-        if (isSelected) ImGui::SetItemDefaultFocus();
+        if (is_selected) ImGui::SetItemDefaultFocus();
       }
     }
     ImGui::EndCombo();

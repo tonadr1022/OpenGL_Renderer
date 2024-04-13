@@ -27,21 +27,13 @@ bool Input::IsKeyPressed(Key key) { return m_key_states[key] == Pressed; }
 
 bool Input::IsKeyReleased(Key key) { return m_key_states[key] == Released; }
 
-bool Input::IsMouseDown(MouseButton key) {
-  return m_mouse_button_states[key] == Down;
-}
+bool Input::IsMouseDown(MouseButton key) { return m_mouse_button_states[key] == Down; }
 
-bool Input::IsMouseUp(MouseButton key) {
-  return m_mouse_button_states[key] == Up;
-}
+bool Input::IsMouseUp(MouseButton key) { return m_mouse_button_states[key] == Up; }
 
-bool Input::IsMousePressed(MouseButton key) {
-  return m_mouse_button_states[key] == Pressed;
-}
+bool Input::IsMousePressed(MouseButton key) { return m_mouse_button_states[key] == Pressed; }
 
-bool Input::IsMouseReleased(MouseButton key) {
-  return m_mouse_button_states[key] == Released;
-}
+bool Input::IsMouseReleased(MouseButton key) { return m_mouse_button_states[key] == Released; }
 
 void Input::init_glfw_input_callbacks(GLFWwindow* window) {
   m_window = window;
@@ -59,12 +51,9 @@ void Input::SetCursorVisible(bool state) {
   glfwSetInputMode(m_window, GLFW_CURSOR, mode);
 }
 
-bool Input::GetCursorVisible() {
-  return glfwGetInputMode(m_window, GLFW_CURSOR) != 0;
-}
+bool Input::GetCursorVisible() { return glfwGetInputMode(m_window, GLFW_CURSOR) != 0; }
 
-void Input::keypress_cb(GLFWwindow* window, int key, int scancode, int action,
-                        int mods) {
+void Input::keypress_cb(GLFWwindow* window, int key, int scancode, int action, int mods) {
   ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
   //  ImGuiIO& io = ImGui::GetIO();
   //  if (action == GLFW_PRESS) {
@@ -104,14 +93,12 @@ void Input::mouse_pos_cb(GLFWwindow* window, double xpos, double ypos) {
   Application::Instance().OnMousePosMove(xpos, ypos);
 }
 
-void Input::mouse_scroll_cb(GLFWwindow* window, double xoffset,
-                            double yoffset) {
+void Input::mouse_scroll_cb(GLFWwindow* window, double xoffset, double yoffset) {
   ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
   Application::Instance().OnMouseScrollEvent(yoffset);
 }
 
-void Input::mouse_button_cb(GLFWwindow* window, int button, int action,
-                            int mods) {
+void Input::mouse_button_cb(GLFWwindow* window, int button, int action, int mods) {
   ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
   if (action == GLFW_PRESS) {
     m_mouse_button_states[button] = Pressed;
@@ -132,8 +119,7 @@ void Input::CenterCursor() {
   int width;
   int height;
   glfwGetWindowSize(m_window, &width, &height);
-  glfwSetCursorPos(m_window, static_cast<float>(width) / 2.0f,
-                   static_cast<float>(height) / 2.0f);
+  glfwSetCursorPos(m_window, static_cast<float>(width) / 2.0f, static_cast<float>(height) / 2.0f);
 }
 
 const glm::vec2& Input::GetMousePosOffset() { return m_mouse_screen_offset; }

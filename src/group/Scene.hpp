@@ -14,25 +14,22 @@
 class Scene {
  public:
   Scene();
-  Scene(const glm::vec3& defaultCameraPos,
-        CameraController::Mode defaultCamMode = CameraController::Mode::FPS);
+  explicit Scene(const glm::vec3& defaultCameraPos,
+                 CameraController::Mode defaultCamMode = CameraController::Mode::FPS);
   virtual ~Scene() = default;
   virtual void Update(double dt);
   void ImGuiLights();
   virtual void OnImGui();
   virtual void PreRender();
 
-  [[nodiscard]] inline const std::vector<std::unique_ptr<Group>>& GetGroups()
-      const {
+  [[nodiscard]] inline const std::vector<std::unique_ptr<Group>>& GetGroups() const {
     return m_groups;
   }
   [[nodiscard]] const DirectionalLight* GetDirectionalLight() const;
-  [[nodiscard]] inline const std::vector<std::unique_ptr<PointLight>>*
-  GetPointLights() const {
+  [[nodiscard]] inline const std::vector<std::unique_ptr<PointLight>>* GetPointLights() const {
     return &m_pointLights;
   }
-  [[nodiscard]] inline const std::vector<std::unique_ptr<SpotLight>>*
-  GetSpotLights() const {
+  [[nodiscard]] inline const std::vector<std::unique_ptr<SpotLight>>* GetSpotLights() const {
     return &m_spotLights;
   }
 

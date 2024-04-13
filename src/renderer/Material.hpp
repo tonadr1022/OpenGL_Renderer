@@ -47,26 +47,23 @@ struct Material {
   float strength = 1;
 
   Material(const std::vector<TexturePair>& textures,
-           const std::vector<PerMaterialUniformData>& materialUniforms,
-           HashedString shaderName, Type type)
+           const std::vector<PerMaterialUniformData>& materialUniforms, HashedString shaderName,
+           Type type)
       : textures(textures),
         materialUniforms(materialUniforms),
         shaderName(shaderName),
         type(type) {}
 
-  Material(const std::vector<TexturePair>& textures, HashedString shaderName,
-           Type type)
+  Material(const std::vector<TexturePair>& textures, HashedString shaderName, Type type)
       : textures(textures), shaderName(shaderName), type(type) {}
 
   Material(const glm::vec3& color, HashedString shaderName, Type type)
       : shaderName(shaderName), type(type) {}
 
-  Material(HashedString shaderName, Type type)
-      : shaderName(shaderName), type(type) {}
+  Material(HashedString shaderName, Type type) : shaderName(shaderName), type(type) {}
 
   Material(const std::vector<TexturePair>& textures,
-           const std::vector<PerMaterialUniformData>& materialUniforms,
-           HashedString shaderName)
+           const std::vector<PerMaterialUniformData>& materialUniforms, HashedString shaderName)
       : textures(textures),
         materialUniforms(materialUniforms),
         shaderName(shaderName),
@@ -78,8 +75,7 @@ struct Material {
   Material(const glm::vec3& color, HashedString shaderName)
       : shaderName(shaderName), type(Type::BlinnPhong) {}
 
-  explicit Material(HashedString shaderName)
-      : shaderName(shaderName), type(Type::BlinnPhong) {}
+  explicit Material(HashedString shaderName) : shaderName(shaderName), type(Type::BlinnPhong) {}
 };
 
 #endif  // OPENGL_RENDERER_SRC_RENDERER_MATERIAL_HPP_

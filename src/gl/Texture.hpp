@@ -5,9 +5,9 @@
 #ifndef OPENGL_RENDERER_SRC_RENDERER_GL_TEXTURE_HPP_
 #define OPENGL_RENDERER_SRC_RENDERER_GL_TEXTURE_HPP_
 
-#include "src/Common.hpp"
 #include <string>
-#include "src/utils/HashedString.hpp"
+
+#include "src/Common.hpp"
 
 class Texture {
  public:
@@ -33,15 +33,13 @@ class Texture {
   void SetFilterMode(GLint minFilter, GLint magFilter);
 
   void Screenshot(uint32_t width, uint32_t height, std::string_view filename) const;
+
  private:
   GLuint m_id{0};
   SamplerType m_samplerType;
   void GenerateTextureFromFile(const std::string& texturePath, bool flip, bool mipmap);
-  void GenerateTextureFromBuffer(unsigned char* buffer,
-                                 bool mipmap,
-                                 uint32_t numChannels,
-                                 uint32_t width,
-                                 uint32_t height, uint32_t numSamples);
+  void GenerateTextureFromBuffer(unsigned char* buffer, bool mipmap, uint32_t numChannels,
+                                 uint32_t width, uint32_t height, uint32_t numSamples);
 };
 
-#endif //OPENGL_RENDERER_SRC_RENDERER_GL_TEXTURE_HPP_
+#endif  // OPENGL_RENDERER_SRC_RENDERER_GL_TEXTURE_HPP_

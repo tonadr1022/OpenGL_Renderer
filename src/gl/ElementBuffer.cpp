@@ -4,9 +4,7 @@
 
 #include "ElementBuffer.hpp"
 
-void ElementBuffer::Bind() const {
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id);
-}
+void ElementBuffer::Bind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id); }
 
 void ElementBuffer::Unbind() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); }
 

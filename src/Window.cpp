@@ -4,16 +4,13 @@
 
 #include "Window.hpp"
 
-#include <imgui/imgui.h>
-#include <imgui/backends/imgui_impl_opengl3.h>
 #include <imgui/backends/imgui_impl_glfw.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
+#include <imgui/imgui.h>
 
-#include "src/imgui/ImguiStyles.h"
-
-#include "src/utils/Logger.hpp"
-#include "src/renderer/Renderer.hpp"
-#include "src/utils/Input.hpp"
 #include "Application.hpp"
+#include "src/imgui/ImGuiMenu.hpp"
+#include "src/utils/Logger.hpp"
 
 #define NUM_SAMPLES 4
 
@@ -31,7 +28,9 @@ Window::~Window() {
 }
 
 void Window::Init_Glfw() {
-  glfwSetErrorCallback([](int error, const char *description) { LOG_ERROR("GLFW Error %i: %s", error, description); });
+  glfwSetErrorCallback([](int error, const char *description) {
+    LOG_ERROR("GLFW Error %i: %s", error, description);
+  });
   if (!glfwInit()) {
     LOG_ERROR("Failed to initialize GLFW");
     std::exit(EXIT_FAILURE);
@@ -59,13 +58,14 @@ void Window::Init_Glfw() {
   glfwMakeContextCurrent(m_window);
   //  glfwSetWindowPos(m_window, 100, 100);
 
-  if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
+  if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
     LOG_ERROR("Failed to initialize Glad");
     std::exit(EXIT_FAILURE);
   }
 
   // glfw may not have created a window at desired size
-  int w, h;
+  int w;
+  int h;
   glfwGetFramebufferSize(m_window, &w, &h);
   m_framebufferWidth = w;
   m_framebufferHeight = h;
@@ -74,10 +74,9 @@ void Window::Init_Glfw() {
   m_windowWidth = w;
   m_windowHeight = h;
 
-  glfwSetFramebufferSizeCallback(m_window,
-                                 [](GLFWwindow *window, int width, int height) {
-                                   Application::Instance().OnViewportResize(width, height);
-                                 });
+  glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow * /*window*/, int width, int height) {
+    Application::Instance().OnViewportResize(width, height);
+  });
 }
 
 void Window::Init_ImGui() {
@@ -88,7 +87,7 @@ void Window::Init_ImGui() {
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
   //  io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
-  Style();
+  ImGuiMenu::Style();
   ImGuiStyle &style = ImGui::GetStyle();
   if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
     style.WindowRounding = 0.0f;
@@ -99,33 +98,21 @@ void Window::Init_ImGui() {
   ImGui_ImplOpenGL3_Init(m_glsl_version);
 }
 
-void Window::SetVsync(bool state) {
-  glfwSwapInterval(state);
-}
+void Window::SetVsync(bool state) { glfwSwapInterval(state); }
 
-bool Window::ShouldClose() {
-  return glfwWindowShouldClose(m_window);
-}
+bool Window::ShouldClose() { return glfwWindowShouldClose(m_window); }
 
-void Window::Close() {
-  glfwSetWindowShouldClose(m_window, true);
-}
+void Window::Close() { glfwSetWindowShouldClose(m_window, true); }
 
 float Window::GetAspectRatio() const {
   return static_cast<float>(m_framebufferWidth) / static_cast<float>(m_framebufferHeight);
 }
 
-void Window::SwapBuffers() {
-  glfwSwapBuffers(m_window);
-}
+void Window::SwapBuffers() { glfwSwapBuffers(m_window); }
 
-glm::ivec2 Window::GetWindowDimensions() const {
-  return {m_windowWidth, m_windowHeight};
-}
+glm::ivec2 Window::GetWindowDimensions() const { return {m_windowWidth, m_windowHeight}; }
 
 glm::ivec2 Window::GetFrameBufferDimensions() const {
   return {m_framebufferWidth, m_framebufferHeight};
 }
-void Window::SetShouldClose(bool shouldClose) {
-  glfwSetWindowShouldClose(m_window, shouldClose);
-}
+void Window::SetShouldClose(bool shouldClose) { glfwSetWindowShouldClose(m_window, shouldClose); }

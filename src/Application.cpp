@@ -24,8 +24,7 @@ Application *Application::m_instance_ptr = nullptr;
 
 #define DEFAULT_RENDER_TO_IMGUI_VIEWPORT false
 
-Application::Application()
-    : m_cameraController(m_window), m_renderer(m_window) {
+Application::Application() : m_cameraController(m_window), m_renderer(m_window) {
   m_instance_ptr = this;
   Window::SetVsync(false);
   SetupResources();
@@ -47,8 +46,7 @@ void Application::SetupResources() {
   //  ModelManager::LoadModel("teapot", "resources/models/teapot/teapot.obj");
   //  ModelManager::LoadModel("sponza",
   //  "/Users/tony/Desktop/sponza/sponza.obj");
-  ModelManager::LoadModel("spot",
-                          "resources/models/spot/spot_quadrangulated.obj");
+  ModelManager::LoadModel("spot", "resources/models/spot/spot_quadrangulated.obj");
 
   MeshManager::AddMesh("cube", Cube::Vertices, Cube::Indices);
   MeshManager::AddMesh("cube1024", Cube::Create(1024, 1024));
@@ -60,28 +58,19 @@ void Application::SetupResources() {
   };
 
   std::vector<std::string> sky2_strings = {
-      GET_TEXTURE_PATH("skybox2/right.jpg"),
-      GET_TEXTURE_PATH("skybox2/left.jpg"),
-      GET_TEXTURE_PATH("skybox2/top.jpg"),
-      GET_TEXTURE_PATH("skybox2/bottom.jpg"),
-      GET_TEXTURE_PATH("skybox2/front.jpg"),
-      GET_TEXTURE_PATH("skybox2/back.jpg"),
+      GET_TEXTURE_PATH("skybox2/right.jpg"), GET_TEXTURE_PATH("skybox2/left.jpg"),
+      GET_TEXTURE_PATH("skybox2/top.jpg"),   GET_TEXTURE_PATH("skybox2/bottom.jpg"),
+      GET_TEXTURE_PATH("skybox2/front.jpg"), GET_TEXTURE_PATH("skybox2/back.jpg"),
   };
   std::vector<std::string> sky3_strings = {
-      GET_TEXTURE_PATH("skybox_church/lposx.png"),
-      GET_TEXTURE_PATH("skybox_church/lnegx.png"),
-      GET_TEXTURE_PATH("skybox_church/lposy.png"),
-      GET_TEXTURE_PATH("skybox_church/lnegy.png"),
-      GET_TEXTURE_PATH("skybox_church/lposz.png"),
-      GET_TEXTURE_PATH("skybox_church/lnegz.png"),
+      GET_TEXTURE_PATH("skybox_church/lposx.png"), GET_TEXTURE_PATH("skybox_church/lnegx.png"),
+      GET_TEXTURE_PATH("skybox_church/lposy.png"), GET_TEXTURE_PATH("skybox_church/lnegy.png"),
+      GET_TEXTURE_PATH("skybox_church/lposz.png"), GET_TEXTURE_PATH("skybox_church/lnegz.png"),
   };
   std::vector<std::string> sky4_strings = {
-      GET_TEXTURE_PATH("skybox_winter/cposx.png"),
-      GET_TEXTURE_PATH("skybox_winter/cnegx.png"),
-      GET_TEXTURE_PATH("skybox_winter/cposy.png"),
-      GET_TEXTURE_PATH("skybox_winter/cnegy.png"),
-      GET_TEXTURE_PATH("skybox_winter/cposz.png"),
-      GET_TEXTURE_PATH("skybox_winter/cnegz.png"),
+      GET_TEXTURE_PATH("skybox_winter/cposx.png"), GET_TEXTURE_PATH("skybox_winter/cnegx.png"),
+      GET_TEXTURE_PATH("skybox_winter/cposy.png"), GET_TEXTURE_PATH("skybox_winter/cnegy.png"),
+      GET_TEXTURE_PATH("skybox_winter/cposz.png"), GET_TEXTURE_PATH("skybox_winter/cnegz.png"),
   };
 
   TextureManager::AddTexture("Sky 1", sky1_strings);
@@ -89,20 +78,15 @@ void Application::SetupResources() {
   TextureManager::AddTexture("Church", sky3_strings);
   TextureManager::AddTexture("Winter", sky4_strings);
 
-  TextureManager::AddTexture(
-      "oak", "resources/textures/oak_pbr/textures/oak_veneer_01_diff_1k.jpg",
-      Texture::SamplerType::TwoD);
-  TextureManager::AddTexture("spot_texture",
-                             "resources/models/spot/spot_texture.png",
+  TextureManager::AddTexture("oak", "resources/textures/oak_pbr/textures/oak_veneer_01_diff_1k.jpg",
                              Texture::SamplerType::TwoD);
-  TextureManager::AddTexture("woodContainerDiffuse",
-                             GET_TEXTURE_PATH("container_diffuse.png"),
+  TextureManager::AddTexture("spot_texture", "resources/models/spot/spot_texture.png",
                              Texture::SamplerType::TwoD);
-  TextureManager::AddTexture("woodContainerSpecular",
-                             GET_TEXTURE_PATH("container_specular.png"),
+  TextureManager::AddTexture("woodContainerDiffuse", GET_TEXTURE_PATH("container_diffuse.png"),
                              Texture::SamplerType::TwoD);
-  TextureManager::AddTexture("woodContainerEmission",
-                             GET_TEXTURE_PATH("container_emission.jpg"),
+  TextureManager::AddTexture("woodContainerSpecular", GET_TEXTURE_PATH("container_specular.png"),
+                             Texture::SamplerType::TwoD);
+  TextureManager::AddTexture("woodContainerEmission", GET_TEXTURE_PATH("container_emission.jpg"),
                              Texture::SamplerType::TwoD);
 
   std::vector<TexturePair> spot_textures = {
@@ -110,17 +94,13 @@ void Application::SetupResources() {
   MaterialManager::AddMaterial("spotTextured", spot_textures, "blinnPhong");
 
   std::vector<TexturePair> wood_container_textures = {
-      {MatTextureType::Diffuse,
-       TextureManager::GetTexture("woodContainerDiffuse")},
-      {MatTextureType::Specular,
-       TextureManager::GetTexture("woodContainerDiffuse")}};
-  MaterialManager::AddMaterial("woodContainer", wood_container_textures,
-                               "blinnPhong");
+      {MatTextureType::Diffuse, TextureManager::GetTexture("woodContainerDiffuse")},
+      {MatTextureType::Specular, TextureManager::GetTexture("woodContainerDiffuse")}};
+  MaterialManager::AddMaterial("woodContainer", wood_container_textures, "blinnPhong");
 }
 
 void Application::Run() {
-  m_renderer.SetSkyboxTexture(
-      TextureManager::GetTexture(HashedString("Sky 2")));
+  m_renderer.SetSkyboxTexture(TextureManager::GetTexture(HashedString("Sky 2")));
   //  m_sceneManager.AddScene("Playground",
   //  std::make_unique<PlaygroundScene>());
   m_sceneManager.AddScene("Lighting One", std::make_unique<LightingOneScene>());
@@ -149,8 +129,7 @@ void Application::Run() {
 
     // render
     if (m_settings.showImGui) ImGuiMenu::StartFrame(m_renderToImGuiViewport);
-    m_renderer.RenderScene(*m_sceneManager.GetActiveScene(),
-                           m_cameraController.GetActiveCamera());
+    m_renderer.RenderScene(*m_sceneManager.GetActiveScene(), m_cameraController.GetActiveCamera());
     if (m_settings.showImGui) OnImGui();
 
     if (m_settings.showImGui) ImGuiMenu::EndFrame();
@@ -169,8 +148,8 @@ void Application::OnImGui() {
 
   m_sceneManager.ImGuiSceneSelect();
   if (ImGui::CollapsingHeader("Metrics", ImGuiTreeNodeFlags_DefaultOpen)) {
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-                1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate,
+                ImGui::GetIO().Framerate);
     ImGui::Text("Draw Calls: %i", renderer_stats.drawCalls);
     ImGui::Text("Vertices: %i", renderer_stats.vertices);
     ImGui::Text("Indices: %i", renderer_stats.indices);
@@ -178,20 +157,16 @@ void Application::OnImGui() {
     ImGui::Text("Material Swaps: %i", renderer_stats.numMaterialSwitches);
   }
 
-  if (ImGui::CollapsingHeader("Render Settings",
-                              ImGuiTreeNodeFlags_DefaultOpen)) {
-    constexpr std::array<const char *, 4> Items = {"Default", "Normals",
-                                                   "Diffuse", "Depth Buffer"};
+  if (ImGui::CollapsingHeader("Render Settings", ImGuiTreeNodeFlags_DefaultOpen)) {
+    constexpr std::array<const char *, 4> Items = {"Default", "Normals", "Diffuse", "Depth Buffer"};
     int selected_item = static_cast<int>(m_renderer.debugMode);
-    if (ImGui::BeginCombo(
-            "##RenderModeCombo",
-            ("Mode: " + std::string(Items[selected_item])).c_str())) {
+    if (ImGui::BeginCombo("##RenderModeCombo",
+                          ("Mode: " + std::string(Items[selected_item])).c_str())) {
       for (int i = 0; i < Items.size(); i++) {
         const bool is_selected = (selected_item == i);
         if (ImGui::Selectable(Items[i], is_selected)) {
           selected_item = i;
-          m_renderer.debugMode =
-              static_cast<Renderer::DebugMode>(selected_item);
+          m_renderer.debugMode = static_cast<Renderer::DebugMode>(selected_item);
           if (is_selected) ImGui::SetItemDefaultFocus();
         }
       }
@@ -228,8 +203,8 @@ void Application::OnImGui() {
         m_renderer.Screenshot(m_screenshotFilename);
       }
     }
-    ImGui::InputTextWithHint("##screenshotFilename", "Screenshot Filename",
-                             screenshot_buffer, sizeof(screenshot_buffer));
+    ImGui::InputTextWithHint("##screenshotFilename", "Screenshot Filename", screenshot_buffer,
+                             sizeof(screenshot_buffer));
   }
 
   m_renderer.OnImGui();
@@ -262,21 +237,18 @@ void Application::OnImGui() {
   if (m_renderToImGuiViewport) {
     bool viewport_open = true;
     ImGui::Begin("Viewport", &viewport_open, viewport_flags);
-    imgui_viewport_focused =
-        ImGui::IsWindowHovered() || ImGui::IsWindowFocused();
+    imgui_viewport_focused = ImGui::IsWindowHovered() || ImGui::IsWindowFocused();
     // ImGui flips UV coords, need to swap
-    ImGui::Image(
-        (void *)static_cast<intptr_t>(m_renderer.GetFinalImageTexture().Id()),
-        GetContentRegionAvail(), ImVec2(0, 1), ImVec2(1, 0));
+    ImGui::Image((void *)static_cast<intptr_t>(m_renderer.GetFinalImageTexture().Id()),
+                 GetContentRegionAvail(), ImVec2(0, 1), ImVec2(1, 0));
 
     // handle window resize
     static ImVec2 prev_dimensions{0, 0};
     ImVec2 curr_dimensions = ImGui::GetWindowSize();
-    if (prev_dimensions.x != curr_dimensions.x ||
-        prev_dimensions.y != curr_dimensions.y) {
+    if (prev_dimensions.x != curr_dimensions.x || prev_dimensions.y != curr_dimensions.y) {
       // update cameras
-      float aspect_ratio = static_cast<float>(curr_dimensions.x) /
-                           static_cast<float>(curr_dimensions.y);
+      float aspect_ratio =
+          static_cast<float>(curr_dimensions.x) / static_cast<float>(curr_dimensions.y);
       m_cameraController.SetAspectRatio(aspect_ratio);
     }
     prev_dimensions = curr_dimensions;
@@ -343,8 +315,7 @@ void Application::OnMouseScrollEvent(double yOffset) {
 void Application::OnSceneChange() {
   Scene *active_scene = m_sceneManager.GetActiveScene();
   m_cameraController.SetMode(active_scene->defaultCameraMode);
-  m_cameraController.GetActiveCamera()->SetPosition(
-      active_scene->defaultCameraPosition);
+  m_cameraController.GetActiveCamera()->SetPosition(active_scene->defaultCameraPosition);
   m_renderer.SetDirectionalLight(active_scene->GetDirectionalLight());
   m_renderer.SetPointLights(active_scene->GetPointLights());
   m_renderer.SetSpotLights(active_scene->GetSpotLights());
@@ -372,18 +343,14 @@ void Application::OnKeyEvent(int key, int action, int mods) {
 }
 
 void Application::LoadShaders() {
-  ShaderManager::AddShader(
-      "default", {{GET_SHADER_PATH("default.vert"), ShaderType::VERTEX},
-                  {GET_SHADER_PATH("default.frag"), ShaderType::FRAGMENT}});
-  ShaderManager::AddShader(
-      "blinnPhong",
-      {{GET_SHADER_PATH("blinnPhong.vert"), ShaderType::VERTEX},
-       {GET_SHADER_PATH("blinnPhong.frag"), ShaderType::FRAGMENT}});
-  ShaderManager::AddShader(
-      "skybox", {{GET_SHADER_PATH("skybox.vert"), ShaderType::VERTEX},
-                 {GET_SHADER_PATH("skybox.frag"), ShaderType::FRAGMENT}});
-  ShaderManager::AddShader(
-      "singleColor",
-      {{GET_SHADER_PATH("singleColor.vert"), ShaderType::VERTEX},
-       {GET_SHADER_PATH("singleColor.frag"), ShaderType::FRAGMENT}});
+  ShaderManager::AddShader("default", {{GET_SHADER_PATH("default.vert"), ShaderType::Vertex},
+                                       {GET_SHADER_PATH("default.frag"), ShaderType::Fragment}});
+  ShaderManager::AddShader("blinnPhong",
+                           {{GET_SHADER_PATH("blinnPhong.vert"), ShaderType::Vertex},
+                            {GET_SHADER_PATH("blinnPhong.frag"), ShaderType::Fragment}});
+  ShaderManager::AddShader("skybox", {{GET_SHADER_PATH("skybox.vert"), ShaderType::Vertex},
+                                      {GET_SHADER_PATH("skybox.frag"), ShaderType::Fragment}});
+  ShaderManager::AddShader("singleColor",
+                           {{GET_SHADER_PATH("singleColor.vert"), ShaderType::Vertex},
+                            {GET_SHADER_PATH("singleColor.frag"), ShaderType::Fragment}});
 }

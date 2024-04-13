@@ -20,8 +20,7 @@ class Shader {
   void SetIVec3(HashedString name, const glm::ivec3& vec) const;
   void SetVec3(HashedString name, const glm::vec3& vec) const;
   void SetVec4(HashedString name, const glm::vec4& vec) const;
-  void SetMat3(HashedString name, const glm::mat3& mat,
-               bool transpose = false) const;
+  void SetMat3(HashedString name, const glm::mat3& mat, bool transpose = false) const;
   void SetBool(HashedString name, bool value) const;
   Shader(uint32_t id, std::unordered_map<uint32_t, uint32_t>& uniformLocations);
   ~Shader();

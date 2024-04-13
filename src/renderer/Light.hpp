@@ -5,15 +5,14 @@
 #ifndef OPENGL_RENDERER_SRC_RENDERER_LIGHT_HPP_
 #define OPENGL_RENDERER_SRC_RENDERER_LIGHT_HPP_
 
-#include "glm/glm.hpp"
-#include <string>
+#include <glm/glm.hpp>
 
 #define DEFAULT_SPECULAR_STRENGTH 1.0;
-#define DEFAULT_AMBIENT_STRENGTH  0.2;
-#define DEFAULT_DIFFUSE_STRENGTH  0.5;
+#define DEFAULT_AMBIENT_STRENGTH 0.2;
+#define DEFAULT_DIFFUSE_STRENGTH 0.5;
 
 struct LightBase {
-  glm::vec3 color = {1.0f,1.0f,1.0f};
+  glm::vec3 color = {1.0f, 1.0f, 1.0f};
   float ambientIntensity = 0.2f;
   float diffuseIntensity = 0.5f;
   float specularIntensity = 1.0f;
@@ -24,8 +23,8 @@ struct LightBase {
 
 struct PointLight : public LightBase {
   glm::vec3 position;
-//  float linear = 0.09;
-//  float quadratic = 0.032;
+  //  float linear = 0.09;
+  //  float quadratic = 0.032;
   float radius = 10;
 
   // Default constructor
@@ -37,8 +36,8 @@ struct SpotLight : public LightBase {
   glm::vec3 position;
   glm::vec3 direction;
   float radius = 10;
-//  float linear = 0.09;
-//  float quadratic = 0.032;
+  //  float linear = 0.09;
+  //  float quadratic = 0.032;
   float penumbra = 5.0f;
   float angle = 17.5f;
 
@@ -53,4 +52,4 @@ struct DirectionalLight : public LightBase {
   explicit DirectionalLight(const glm::vec3& direction);
 };
 
-#endif //OPENGL_RENDERER_SRC_RENDERER_LIGHT_HPP_
+#endif  // OPENGL_RENDERER_SRC_RENDERER_LIGHT_HPP_

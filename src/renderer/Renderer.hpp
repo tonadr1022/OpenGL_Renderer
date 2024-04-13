@@ -48,8 +48,7 @@ class Renderer {
   void ResizeViewport(uint32_t width, uint32_t height);
   void SetDirectionalLight(const DirectionalLight* directionalLight);
   void SetSpotLights(const std::vector<std::unique_ptr<SpotLight>>* spotLights);
-  void SetPointLights(
-      const std::vector<std::unique_ptr<PointLight>>* pointLights);
+  void SetPointLights(const std::vector<std::unique_ptr<PointLight>>* pointLights);
   void Reset();
   void OnImGui();
   void SetSkyboxTexture(Texture* texture);
@@ -65,7 +64,7 @@ class Renderer {
   };
 
   inline RenderSettings& GetSettings() { return m_settings; }
-  inline const PerFrameStats& GetStats() { return stats; }
+  inline const PerFrameStats& GetStats() { return m_stats; }
 
   Mode mode = Mode::BlinnPhong;
   DebugMode debugMode = DebugMode::None;
@@ -97,14 +96,14 @@ class Renderer {
   Camera* m_camera = nullptr;
   Texture* m_skyboxTexture = nullptr;
 
-  RenderState state;
+  RenderState m_state;
 
   std::unique_ptr<FBOContainer> m_multiSampleFBOContainer = nullptr;
   std::unique_ptr<FBOContainer> m_singleSampleFBOContainer = nullptr;
   std::unique_ptr<FBOContainer> m_resolveSampleFBOContainer = nullptr;
   std::unique_ptr<FBOContainer> m_finalTextureFBO = nullptr;
 
-  PerFrameStats stats;
+  PerFrameStats m_stats;
   RenderSettings m_settings;
   PostProcessor m_postProcessor;
 
@@ -116,7 +115,7 @@ class Renderer {
   void StartFrame(const Scene& scene);
   void RenderGroup(const Group& group);
   void SetLightingUniforms();
-  void SetBlinnPhongUniforms();
+  void SetBlinnPhongUniforms() const;
   void RenderSkybox(Camera* camera);
   void AllocateFBOContainers(uint32_t width, uint32_t height);
 

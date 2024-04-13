@@ -15,15 +15,9 @@ class Camera {
   virtual void SetPosition(const glm::vec3& newPos);
   virtual void SetTargetPos(const glm::vec3& targetPos) = 0;
   [[nodiscard]] inline const glm::vec3& GetPosition() const { return m_pos; };
-  [[nodiscard]] inline const glm::mat4& GetProjectionMatrix() const {
-    return m_projectionMatrix;
-  }
-  [[nodiscard]] inline const glm::mat4& GetViewMatrix() const {
-    return m_viewMatrix;
-  }
-  [[nodiscard]] inline const glm::mat4& GetVPMatrix() const {
-    return m_VPMatrix;
-  }
+  [[nodiscard]] inline const glm::mat4& GetProjectionMatrix() const { return m_projectionMatrix; }
+  [[nodiscard]] inline const glm::mat4& GetViewMatrix() const { return m_viewMatrix; }
+  [[nodiscard]] inline const glm::mat4& GetVPMatrix() const { return m_VPMatrix; }
   [[nodiscard]] inline const glm::vec3& GetFront() const { return m_front; }
 
   void SetAspectRatio(float aspectRatio);

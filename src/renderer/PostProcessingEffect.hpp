@@ -5,9 +5,9 @@
 #ifndef OPENGL_RENDERER_SRC_RENDERER_POSTPROCESSINGEFFECT_HPP_
 #define OPENGL_RENDERER_SRC_RENDERER_POSTPROCESSINGEFFECT_HPP_
 
-#include "src/gl/FBOContainer.hpp"
-#include "src/gl/Shader.hpp"
+#include <functional>
 
+#include "src/gl/FBOContainer.hpp"
 enum class PostProcessingEffectType {
   Contrast = 0,
   Invert,
@@ -17,8 +17,7 @@ enum class PostProcessingEffectType {
   Count
 };
 
-static constexpr const char* PostProcessingEffectTypeToString(
-    PostProcessingEffectType type) {
+static constexpr const char* PostProcessingEffectTypeToString(PostProcessingEffectType type) {
   switch (type) {
     case PostProcessingEffectType::Contrast:
       return "Contrast";
@@ -42,23 +41,17 @@ struct PostProcessingEffect {
   std::unique_ptr<FBOContainer> fboContainer = nullptr;
   float resolutionScale;
 
-  PostProcessingEffect(PostProcessingEffectType type,
-                       std::unique_ptr<FBOContainer> fboContainer,
+  PostProcessingEffect(PostProcessingEffectType type, std::unique_ptr<FBOContainer> fboContainer,
                        const std::function<void()>& bindAndUniformFunction,
                        float resolutionScale = 1)
       : type(type),
-        enabled(true),
         bindAndUniformFunction(bindAndUniformFunction),
         fboContainer(std::move(fboContainer)),
         resolutionScale(resolutionScale) {}
 
-  PostProcessingEffect(PostProcessingEffectType type,
-                       std::unique_ptr<FBOContainer> fboContainer,
+  PostProcessingEffect(PostProcessingEffectType type, std::unique_ptr<FBOContainer> fboContainer,
                        float resolutionScale = 1)
-      : type(type),
-        enabled(true),
-        fboContainer(std::move(fboContainer)),
-        resolutionScale(resolutionScale) {}
+      : type(type), fboContainer(std::move(fboContainer)), resolutionScale(resolutionScale) {}
 };
 
 #endif  // OPENGL_RENDERER_SRC_RENDERER_POSTPROCESSINGEFFECT_HPP_

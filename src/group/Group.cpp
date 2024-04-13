@@ -3,10 +3,8 @@
 //
 
 #include "Group.hpp"
-#include "src/utils/Logger.hpp"
-void Group::AddObject(std::unique_ptr<Object> object) {
-  m_objects.push_back(std::move(object));
-}
+
+void Group::AddObject(std::unique_ptr<Object> object) { m_objects.push_back(std::move(object)); }
 
 Group::Group(bool backFaceCull) : backFaceCull(backFaceCull) {}
 
@@ -22,26 +20,26 @@ void Group::RemoveObject(const Object* object) {
 }
 
 void Group::UpdateTransforms() {
-//  if (transform.IsDirty()) {
-//    transform.UpdateModelMatrix();
-//    auto& modelMatrix = transform.GetModelMatrix();
-//    for (auto& obj : m_objects) {
-//      obj->transform.UpdateModelMatrix(modelMatrix, true);
-//    }
-//  } else {
-//    auto& modelMatrix = transform.GetModelMatrix();
-//    for (auto& obj : m_objects) {
-//      if (obj->transform.IsDirty()) {
-//        obj->transform.UpdateModelMatrix(modelMatrix, false);
-//      }
-//    }
-//  }
+  //  if (transform.IsDirty()) {
+  //    transform.UpdateModelMatrix();
+  //    auto& modelMatrix = transform.GetModelMatrix();
+  //    for (auto& obj : m_objects) {
+  //      obj->transform.UpdateModelMatrix(modelMatrix, true);
+  //    }
+  //  } else {
+  //    auto& modelMatrix = transform.GetModelMatrix();
+  //    for (auto& obj : m_objects) {
+  //      if (obj->transform.IsDirty()) {
+  //        obj->transform.UpdateModelMatrix(modelMatrix, false);
+  //      }
+  //    }
+  //  }
 
-  bool parentDirty = transform.IsDirty();
+  bool parent_dirtyy = transform.IsDirty();
   transform.UpdateModelMatrix();
-  auto& modelMatrix = transform.GetModelMatrix();
+  const auto& model_matrix = transform.GetModelMatrix();
 
   for (auto& obj : m_objects) {
-    obj->transform.UpdateModelMatrix(modelMatrix, parentDirty || obj->transform.IsDirty());
+    obj->transform.UpdateModelMatrix(model_matrix, parent_dirtyy || obj->transform.IsDirty());
   }
 }

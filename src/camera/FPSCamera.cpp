@@ -12,8 +12,8 @@ using ImGui::SliderAngle;
 
 void FPSCamera::UpdateMatrices() {
   m_viewMatrix = glm::lookAt(m_pos, m_pos + m_front, UP);
-  m_projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspectRatio,
-                                        m_nearPlane, m_farPlane);
+  m_projectionMatrix =
+      glm::perspective(glm::radians(m_fov), m_aspectRatio, m_nearPlane, m_farPlane);
   m_VPMatrix = m_projectionMatrix * m_viewMatrix;
 }
 void FPSCamera::Update(double dt) {
@@ -60,8 +60,8 @@ FPSCamera::FPSCamera(float aspectRatio)
 
 void FPSCamera::ProcessMouseMovement(double xOffset, double yOffset) {
   m_yaw += static_cast<float>(xOffset) * m_mouseSensitivity;
-  m_pitch -= static_cast<float>(yOffset) *
-             m_mouseSensitivity;  // need to flip yOffset (screen space)
+  m_pitch -=
+      static_cast<float>(yOffset) * m_mouseSensitivity;  // need to flip yOffset (screen space)
   m_pitch = glm::clamp(m_pitch, -89.0f, 89.0f);
   glm::vec3 eulers;
   eulers.x = glm::cos(glm::radians(m_yaw)) * glm::cos(glm::radians(m_pitch));
@@ -82,10 +82,9 @@ void FPSCamera::OnImGui() {
     m_fov = glm::degrees(fov_rad);
     UpdateMatrices();
   }
-  ImGui::SliderFloat("Movement Speed", &m_movementSpeed, MinMoveSpeed,
-                     MaxMoveSpeed);
-  ImGui::SliderFloat("Mouse Sensitivity", &m_mouseSensitivity,
-                     MinMouseSensitivity, MaxMouseSensitivity);
+  ImGui::SliderFloat("Movement Speed", &m_movementSpeed, MinMoveSpeed, MaxMoveSpeed);
+  ImGui::SliderFloat("Mouse Sensitivity", &m_mouseSensitivity, MinMouseSensitivity,
+                     MaxMouseSensitivity);
   if (ImGui::Button("Reset Settings")) {
     m_movementSpeed = DefaultMovementSpeed;
     m_mouseSensitivity = DefaultMouseSensitivity;

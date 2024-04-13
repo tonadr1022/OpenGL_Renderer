@@ -2,10 +2,13 @@
 // Created by Tony Adriansen on 3/20/24.
 //
 
-#include <fstream>
-#include <sstream>
 #include "Utils.hpp"
+
+#include <fstream>
 #include <iomanip>
+#include <sstream>
+
+#include "src/utils/Logger.hpp"
 
 namespace Utils {
 
@@ -17,7 +20,6 @@ std::string LoadFromFile(const std::string& path) {
   file.open(path);
   if (!file.is_open()) {
     LOG_ERROR("File could not be opened: %s", path);
-// TODO: handle better
     return "";
   }
 
@@ -35,4 +37,4 @@ std::string GetDateTimeString() {
   ss << std::put_time(std::localtime(&now_time_t), "%Y-%m-%d_%H-%M-%S");
   return ss.str();
 }
-}
+}  // namespace Utils

@@ -6,7 +6,7 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-#include "src/utils/Logger.hpp"
+#include "src/Common.hpp"
 
 // #define CHECK 1
 Shader::~Shader() = default;
@@ -38,8 +38,7 @@ void Shader::SetMat4(HashedString name, const glm::mat4& mat) const {
 #ifdef CHECK
   ASSERT(m_uniformLocations.contains(name), "Uniform name not found");
 #endif
-  glUniformMatrix4fv(m_uniformLocations[name], 1, GL_FALSE,
-                     glm::value_ptr(mat));
+  glUniformMatrix4fv(m_uniformLocations[name], 1, GL_FALSE, glm::value_ptr(mat));
 }
 
 void Shader::SetIVec2(HashedString name, const glm::ivec2& vec) const {
@@ -69,13 +68,12 @@ void Shader::SetVec4(HashedString name, const glm::vec4& vec) const {
   glUniform4fv(m_uniformLocations[name], 1, glm::value_ptr(vec));
 }
 
-void Shader::SetMat3(HashedString name, const glm::mat3& mat,
-                     bool transpose) const {
+void Shader::SetMat3(HashedString name, const glm::mat3& mat, bool transpose) const {
 #ifdef CHECK
   ASSERT(m_uniformLocations.contains(name), "Uniform name not found");
 #endif
-  glUniformMatrix3fv(m_uniformLocations[name], 1,
-                     static_cast<GLboolean>(transpose), glm::value_ptr(mat));
+  glUniformMatrix3fv(m_uniformLocations[name], 1, static_cast<GLboolean>(transpose),
+                     glm::value_ptr(mat));
 }
 
 void Shader::SetBool(HashedString name, bool value) const {
@@ -85,6 +83,5 @@ void Shader::SetBool(HashedString name, bool value) const {
   glUniform1i(m_uniformLocations[name], static_cast<GLint>(value));
 }
 
-Shader::Shader(uint32_t id,
-               std::unordered_map<uint32_t, uint32_t>& uniformLocations)
+Shader::Shader(uint32_t id, std::unordered_map<uint32_t, uint32_t>& uniformLocations)
     : m_id(id), m_uniformLocations(uniformLocations) {}

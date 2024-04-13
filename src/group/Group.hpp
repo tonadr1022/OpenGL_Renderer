@@ -28,8 +28,7 @@ class Group {
   }
 
   void UpdateTransforms();
-  [[nodiscard]] inline const std::vector<std::unique_ptr<Object>>& GetObjects()
-      const {
+  [[nodiscard]] inline const std::vector<std::unique_ptr<Object>>& GetObjects() const {
     return m_objects;
   }
   Transform transform;

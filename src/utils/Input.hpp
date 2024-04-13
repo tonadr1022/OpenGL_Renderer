@@ -1,8 +1,9 @@
 #pragma once
 
 #define GL_SILENCE_DEPRECATION 1
-#include "glm/glm.hpp"
-#include "src/Common.hpp"
+
+#include <glm/glm.hpp>
+#include <src/Common.hpp>
 
 constexpr int ButtonCount = GLFW_KEY_LAST;
 constexpr int MouseButtonStates = GLFW_MOUSE_BUTTON_LAST;
@@ -50,15 +51,11 @@ class Input {
   static inline glm::vec2 m_mouse_scroll_offset;
   static inline bool m_mouse_moved;
 
-  static void keypress_cb(GLFWwindow* window, int key, int scancode, int action,
-                          int mods);
+  static void keypress_cb(GLFWwindow* window, int key, int scancode, int action, int mods);
   static void mouse_pos_cb(GLFWwindow* window, double xpos, double ypos);
-  static void mouse_scroll_cb(GLFWwindow* window, double xoffset,
-                              double yoffset);
-  static void mouse_button_cb(GLFWwindow* window, int button, int action,
-                              int mods);
+  static void mouse_scroll_cb(GLFWwindow* window, double xoffset, double yoffset);
+  static void mouse_button_cb(GLFWwindow* window, int button, int action, int mods);
 
   static inline KeyState m_key_states[ButtonCount] = {static_cast<KeyState>(0)};
-  static inline KeyState m_mouse_button_states[MouseButtonStates] = {
-      static_cast<KeyState>(0)};
+  static inline KeyState m_mouse_button_states[MouseButtonStates] = {static_cast<KeyState>(0)};
 };

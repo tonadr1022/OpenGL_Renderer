@@ -34,15 +34,14 @@ class PostProcessor {
   Uniforms uniforms;
 
  private:
-  std::bitset<static_cast<size_t>(PostProcessingEffectType::Count)>
-      m_effectEnabledBits;
+  std::bitset<static_cast<size_t>(PostProcessingEffectType::Count)> m_effectEnabledBits;
   void EnabledCheckbox(int i);
   const Quad& m_quad;
   std::vector<PostProcessingEffect> m_effects;
   std::vector<Texture*> m_resultTextures;
   static void LoadShaders();
-  static std::unique_ptr<FBOContainer> makeFBOContainer(
-      uint32_t width, uint32_t height, float resolutionScale = 1);
+  static std::unique_ptr<FBOContainer> makeFBOContainer(uint32_t width, uint32_t height,
+                                                        float resolutionScale = 1);
 
   static constexpr const char* ColorChannelToString(int i) {
     switch (i) {

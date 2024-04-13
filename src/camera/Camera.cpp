@@ -5,10 +5,7 @@
 #include "Camera.hpp"
 
 Camera::Camera(float aspectRatio)
-    : m_pos({10, 10, 10}),
-      m_aspectRatio(aspectRatio),
-      m_nearPlane(0.1),
-      m_farPlane(1000) {}
+    : m_pos({10, 10, 10}), m_aspectRatio(aspectRatio), m_nearPlane(0.1), m_farPlane(1000) {}
 
 void Camera::SetAspectRatio(float aspectRatio) {
   m_aspectRatio = aspectRatio;

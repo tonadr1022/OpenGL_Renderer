@@ -13,7 +13,7 @@ class Quad {
   Quad();
   ~Quad();
   void Draw() const;
-  const VertexArray& VAO() const { return m_vao; }
+  [[nodiscard]] const VertexArray& VAO() const { return m_vao; }
 
  private:
   VertexArray m_vao;

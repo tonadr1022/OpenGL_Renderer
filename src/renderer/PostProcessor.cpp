@@ -28,22 +28,21 @@ void PostProcessor::Init(uint32_t width, uint32_t height) {
     shader->SetVec4("u_ColorChannels", uniforms.colorChannels);
   };
 
-  m_effects.emplace_back(PostProcessingEffectType::Contrast,
-                         makeFBOContainer(width, height), contrast_func);
-  m_effects.emplace_back(PostProcessingEffectType::Invert,
-                         makeFBOContainer(width, height), invert_func);
-  m_effects.emplace_back(PostProcessingEffectType::Grayscale,
-                         makeFBOContainer(width, height), grayscale_func);
-  m_effects.emplace_back(PostProcessingEffectType::ColorChannel,
-                         makeFBOContainer(width, height), color_channel_funcnc);
+  m_effects.emplace_back(PostProcessingEffectType::Contrast, makeFBOContainer(width, height),
+                         contrast_func);
+  m_effects.emplace_back(PostProcessingEffectType::Invert, makeFBOContainer(width, height),
+                         invert_func);
+  m_effects.emplace_back(PostProcessingEffectType::Grayscale, makeFBOContainer(width, height),
+                         grayscale_func);
+  m_effects.emplace_back(PostProcessingEffectType::ColorChannel, makeFBOContainer(width, height),
+                         color_channel_funcnc);
   m_resultTextures.reserve(m_effects.size() + 1);
   m_effectEnabledBits.reset();
 }
 
 void PostProcessor::Resize(uint32_t width, uint32_t height) {
   for (auto& effect : m_effects) {
-    effect.fboContainer =
-        makeFBOContainer(width, height, effect.resolutionScale);
+    effect.fboContainer = makeFBOContainer(width, height, effect.resolutionScale);
   }
 }
 
@@ -62,8 +61,7 @@ void PostProcessor::Render(Texture* texture) {
     glClear(GL_COLOR_BUFFER_BIT);
     // bind the shader for the effect and set its uniforms. Bind the current
     // texture (result of previous draw) and draw
-    if (effect.bindAndUniformFunction != nullptr)
-      effect.bindAndUniformFunction();
+    if (effect.bindAndUniformFunction != nullptr) effect.bindAndUniformFunction();
     m_resultTextures.back()->Bind();
     m_quad.Draw();
     // get the output of the render for input to the next effect or screen
@@ -90,38 +88,31 @@ void PostProcessor::DisableEffect(PostProcessingEffectType type) {
   }
 }
 
-std::unique_ptr<FBOContainer> PostProcessor::makeFBOContainer(
-    uint32_t width, uint32_t height, float resolutionScale) {
+std::unique_ptr<FBOContainer> PostProcessor::makeFBOContainer(uint32_t width, uint32_t height,
+                                                              float resolutionScale) {
   auto fbo_container = std::make_unique<FBOContainer>();
   fbo_container->FBO().Bind();
-  auto tex =
-      make_unique<Texture>(width * resolutionScale, height * resolutionScale);
-  fbo_container->AttachColorBuffer(GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                                   std::move(tex));
+  auto tex = make_unique<Texture>(width * resolutionScale, height * resolutionScale);
+  fbo_container->AttachColorBuffer(GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, std::move(tex));
   return fbo_container;
 }
 
 void PostProcessor::LoadShaders() {
-  ShaderManager::AddShader("contrast",
-                           {{GET_SHADER_PATH("quad.vert"), ShaderType::VERTEX},
-                            {GET_SHADER_PATH("postprocessing/contrast.frag"),
-                             ShaderType::FRAGMENT}});
   ShaderManager::AddShader(
-      "invert",
-      {{GET_SHADER_PATH("quad.vert"), ShaderType::VERTEX},
-       {GET_SHADER_PATH("postprocessing/invert.frag"), ShaderType::FRAGMENT}});
+      "contrast", {{GET_SHADER_PATH("quad.vert"), ShaderType::Vertex},
+                   {GET_SHADER_PATH("postprocessing/contrast.frag"), ShaderType::Fragment}});
+  ShaderManager::AddShader("invert",
+                           {{GET_SHADER_PATH("quad.vert"), ShaderType::Vertex},
+                            {GET_SHADER_PATH("postprocessing/invert.frag"), ShaderType::Fragment}});
+  ShaderManager::AddShader("colorChannel", {{GET_SHADER_PATH("quad.vert"), ShaderType::Vertex},
+                                            {GET_SHADER_PATH("postprocessing/colorChannel.frag"),
+                                             ShaderType::Fragment}});
   ShaderManager::AddShader(
-      "colorChannel", {{GET_SHADER_PATH("quad.vert"), ShaderType::VERTEX},
-                       {GET_SHADER_PATH("postprocessing/colorChannel.frag"),
-                        ShaderType::FRAGMENT}});
-  ShaderManager::AddShader("grayscale",
-                           {{GET_SHADER_PATH("quad.vert"), ShaderType::VERTEX},
-                            {GET_SHADER_PATH("postprocessing/grayscale.frag"),
-                             ShaderType::FRAGMENT}});
+      "grayscale", {{GET_SHADER_PATH("quad.vert"), ShaderType::Vertex},
+                    {GET_SHADER_PATH("postprocessing/grayscale.frag"), ShaderType::Fragment}});
 
-  ShaderManager::AddShader(
-      "quad", {{GET_SHADER_PATH("quad.vert"), ShaderType::VERTEX},
-               {GET_SHADER_PATH("quad.frag"), ShaderType::FRAGMENT}});
+  ShaderManager::AddShader("quad", {{GET_SHADER_PATH("quad.vert"), ShaderType::Vertex},
+                                    {GET_SHADER_PATH("quad.frag"), ShaderType::Fragment}});
 }
 
 void PostProcessor::OnImGui() {

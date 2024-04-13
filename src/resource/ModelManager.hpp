@@ -24,16 +24,14 @@ class ModelManager {
   static void ProcessMesh(aiMesh* mesh, const aiScene* scene,
                           std::vector<bool>& processedMaterials);
   static Material* LoadMaterial(aiMaterial* aiMat, HashedString matName);
-  static std::vector<TexturePair> LoadMaterialTextures(
-      aiMaterial* aiMaterial, aiTextureType aiType,
-      MatTextureType matTextureType);
+  static std::vector<TexturePair> LoadMaterialTextures(aiMaterial* aiMaterial, aiTextureType aiType,
+                                                       MatTextureType matTextureType);
 
   static inline std::string m_path;
   static inline std::string m_directory;
   static inline std::string m_name;
   static inline Group* m_group;
-  static inline std::unordered_map<HashedString, std::unique_ptr<Group>>
-      m_groups;
+  static inline std::unordered_map<HashedString, std::unique_ptr<Group>> m_groups;
 };
 
 #endif  // OPENGL_RENDERER_SRC_RENDERER_MODELMANAGER_HPP_
