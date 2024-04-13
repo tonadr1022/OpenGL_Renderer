@@ -4,6 +4,8 @@
 
 #include "MeshManager.hpp"
 
+#include <memory>
+
 #include "src/utils/Logger.hpp"
 
 std::unordered_map<HashedString, std::unique_ptr<Mesh>> MeshManager::m_meshes;

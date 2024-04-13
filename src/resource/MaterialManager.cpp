@@ -4,6 +4,7 @@
 
 #include "MaterialManager.hpp"
 
+#include <memory>
 #include <unordered_map>
 
 std::unordered_map<HashedString, std::unique_ptr<Material>> MaterialManager::m_materials;

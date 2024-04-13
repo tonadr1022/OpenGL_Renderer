@@ -5,6 +5,7 @@
 #ifndef OPENGL_RENDERER_SRC_CORE_LOGGER_HPP_
 #define OPENGL_RENDERER_SRC_CORE_LOGGER_HPP_
 
+#include <cstring>
 #include <iostream>
 #include <mutex>
 

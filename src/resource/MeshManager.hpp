@@ -5,6 +5,7 @@
 #ifndef OPENGL_RENDERER_SRC_RENDERER_RESOURCE_MESHMANAGER_HPP_
 #define OPENGL_RENDERER_SRC_RENDERER_RESOURCE_MESHMANAGER_HPP_
 
+#include <memory>
 #include <unordered_map>
 
 #include "src/renderer/Mesh.hpp"

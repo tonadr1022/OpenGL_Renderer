@@ -5,7 +5,10 @@
 #ifndef OPENGL_RENDERER_SRC_RENDERER_RESOURCE_MATERIALMANAGER_HPP_
 #define OPENGL_RENDERER_SRC_RENDERER_RESOURCE_MATERIALMANAGER_HPP_
 
+#include <memory>
+
 #include "src/renderer/Material.hpp"
+
 class MaterialManager {
  public:
   template <typename... Args>

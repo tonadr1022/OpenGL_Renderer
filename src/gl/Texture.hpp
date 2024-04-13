@@ -6,6 +6,7 @@
 #define OPENGL_RENDERER_SRC_RENDERER_GL_TEXTURE_HPP_
 
 #include <string>
+#include <vector>
 
 #include "src/Common.hpp"
 

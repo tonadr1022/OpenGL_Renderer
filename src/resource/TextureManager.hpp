@@ -5,6 +5,8 @@
 #ifndef OPENGL_RENDERER_SRC_RENDERER_RESOURCE_TEXTUREMANAGER_HPP_
 #define OPENGL_RENDERER_SRC_RENDERER_RESOURCE_TEXTUREMANAGER_HPP_
 
+#include <memory>
+
 #include "src/gl/Texture.hpp"
 #include "src/utils/HashedString.hpp"
 
