@@ -18,7 +18,7 @@
 #      to functions where the return value should not be ignored.
 #      We need to support C++14, which does not supported the annotation.
 #
-#  -modernize-return-braced-init-list: We think removing typenames and using
+# -modernize-return-braced-init-list: We think removing typenames and using
 #      only braced-init can hurt readability.
 #
 #  -modernize-avoid-c-arrays: We only use C arrays when they seem to be the
@@ -62,6 +62,28 @@
 #    code, but we should do that over time, maybe per-directory, instead of
 #    blocking the adoption of Clang 17 until it is all fixed.
 #
+#  -google-readability-braces-around-statements,
+#  -google-readability-namespace-comments,
+#  -google-runtime-references,
+#  -misc-non-private-member-variables-in-classes,
+#  -misc-const-correctness,
+#  -misc-include-cleaner,
+#  -modernize-return-braced-init-list,
+#  -modernize-use-trailing-return-type,
+#  -modernize-concat-nested-namespaces,
+#  -modernize-use-nodiscard,
+#  -modernize-avoid-c-arrays,
+#  -performance-move-const-arg,
+#  -performance-avoid-endl,
+#  -readability-braces-around-statements,
+#  -readability-identifier-length,
+#  -readability-magic-numbers,
+#  -readability-named-parameter,
+#  -readability-redundant-declaration,
+#  -readability-function-cognitive-complexity,
+#  -bugprone-narrowing-conversions,
+#  -bugprone-easily-swappable-parameters,
+#  -bugprone-implicit-widening-of-multiplication-result,
 Checks: >
   -*,
   abseil-*,
@@ -76,25 +98,15 @@ Checks: >
   -google-readability-namespace-comments,
   -google-runtime-references,
   -misc-non-private-member-variables-in-classes,
-  -misc-const-correctness,
-  -misc-include-cleaner,
-  -modernize-return-braced-init-list,
   -modernize-use-trailing-return-type,
   -modernize-concat-nested-namespaces,
-  -modernize-use-nodiscard,
   -modernize-avoid-c-arrays,
-  -performance-move-const-arg,
-  -performance-avoid-endl,
   -readability-braces-around-statements,
   -readability-identifier-length,
   -readability-magic-numbers,
-  -readability-named-parameter,
   -readability-redundant-declaration,
-  -readability-function-cognitive-complexity,
-  -bugprone-narrowing-conversions,
-  -bugprone-easily-swappable-parameters,
   -bugprone-implicit-widening-of-multiplication-result,
-  -bugprone-unchecked-optional-access
+  -readability-uppercase-literal-suffix
 
 # Turn all the warnings from the checks above into errors.
 WarningsAsErrors: "*"
@@ -106,34 +118,34 @@ CheckOptions:
   - { key: readability-identifier-naming.ClassCase, value: CamelCase }
   - { key: readability-identifier-naming.StructCase, value: CamelCase }
   - {
-      key: readability-identifier-naming.TemplateParameterCase,
-      value: CamelCase,
-    }
+    key: readability-identifier-naming.TemplateParameterCase,
+    value: CamelCase,
+  }
   - { key: readability-identifier-naming.FunctionCase, value: aNy_CasE }
   - { key: readability-identifier-naming.VariableCase, value: lower_case }
   - { key: readability-identifier-naming.ClassMemberCase, value: lower_case }
-  - { key: readability-identifier-naming.ClassMemberSuffix, value: _ }
-  - { key: readability-identifier-naming.PrivateMemberSuffix, value: _ }
-  - { key: readability-identifier-naming.ProtectedMemberSuffix, value: _ }
+  - { key: readability-identifier-naming.ClassMemberPrefix, value: m_ }
+  - { key: readability-identifier-naming.PrivateMemberPrefix, value: m_ }
+  - { key: readability-identifier-naming.ProtectedMemberPrefix, value: m_ }
   - { key: readability-identifier-naming.EnumConstantCase, value: CamelCase }
-  - { key: readability-identifier-naming.EnumConstantPrefix, value: k }
+  #  - { key: readability-identifier-naming.EnumConstantPrefix, value: k }
   - {
-      key: readability-identifier-naming.ConstexprVariableCase,
-      value: CamelCase,
-    }
-  - { key: readability-identifier-naming.ConstexprVariablePrefix, value: k }
+    key: readability-identifier-naming.ConstexprVariableCase,
+    value: CamelCase,
+  }
+  #  - { key: readability-identifier-naming.ConstexprVariablePrefix, value: k }
   - { key: readability-identifier-naming.GlobalConstantCase, value: CamelCase }
-  - { key: readability-identifier-naming.GlobalConstantPrefix, value: k }
+  #  - { key: readability-identifier-naming.GlobalConstantPrefix, value: k }
   - { key: readability-identifier-naming.MemberConstantCase, value: CamelCase }
-  - { key: readability-identifier-naming.MemberConstantPrefix, value: k }
+  #  - { key: readability-identifier-naming.MemberConstantPrefix, value: k }
   - { key: readability-identifier-naming.StaticConstantCase, value: CamelCase }
-  - { key: readability-identifier-naming.StaticConstantPrefix, value: k }
+  #  - { key: readability-identifier-naming.StaticConstantPrefix, value: k }
   - {
-      key: readability-implicit-bool-conversion.AllowIntegerConditions,
-      value: 1,
-    }
+    key: readability-implicit-bool-conversion.AllowIntegerConditions,
+    value: 1,
+  }
   - {
-      key: readability-implicit-bool-conversion.AllowPointerConditions,
-      value: 1,
-    }
+    key: readability-implicit-bool-conversion.AllowPointerConditions,
+    value: 1,
+  }
   - { key: readability-function-cognitive-complexity.IgnoreMacros, value: 1 }

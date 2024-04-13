@@ -15,7 +15,8 @@
 #include "src/renderer/resource/ShaderManager.hpp"
 #include "src/renderer/resource/TextureManager.hpp"
 
-namespace {  // detail
+namespace {
+// detail
 #define NUM_SPOT_PARAMS 9
 #define NUM_POINT_PARAMS 6
 #define NUM_DIRECTIONAL_PARAMS 5
@@ -25,25 +26,25 @@ std::vector<HashedString> GenerateSpotLightStrings(int num) {
   ret.reserve(num * NUM_SPOT_PARAMS);
   for (int i = 0; i < num; i++) {
     ret.emplace_back(
-        ("spotlights[" + std::to_string(i) + "].base.color").c_str());
+      ("spotlights[" + std::to_string(i) + "].base.color").c_str());
     ret.emplace_back(
-        ("spotlights[" + std::to_string(i) + "].base.ambientIntensity")
-            .c_str());
+      ("spotlights[" + std::to_string(i) + "].base.ambientIntensity")
+      .c_str());
     ret.emplace_back(
-        ("spotlights[" + std::to_string(i) + "].base.diffuseIntensity")
-            .c_str());
+      ("spotlights[" + std::to_string(i) + "].base.diffuseIntensity")
+      .c_str());
     ret.emplace_back(
-        ("spotlights[" + std::to_string(i) + "].base.specularIntensity")
-            .c_str());
+      ("spotlights[" + std::to_string(i) + "].base.specularIntensity")
+      .c_str());
     ret.emplace_back(
-        ("spotlights[" + std::to_string(i) + "].position").c_str());
+      ("spotlights[" + std::to_string(i) + "].position").c_str());
     ret.emplace_back(
-        ("spotlights[" + std::to_string(i) + "].direction").c_str());
+      ("spotlights[" + std::to_string(i) + "].direction").c_str());
     ret.emplace_back(("spotlights[" + std::to_string(i) + "].radius").c_str());
     ret.emplace_back(
-        ("spotlights[" + std::to_string(i) + "].innerCutoff").c_str());
+      ("spotlights[" + std::to_string(i) + "].innerCutoff").c_str());
     ret.emplace_back(
-        ("spotlights[" + std::to_string(i) + "].outerCutoff").c_str());
+      ("spotlights[" + std::to_string(i) + "].outerCutoff").c_str());
   }
   return ret;
 }
@@ -53,35 +54,34 @@ std::vector<HashedString> GeneratePointLightStrings(int num) {
   ret.reserve(num * NUM_POINT_PARAMS);
   for (int i = 0; i < num; i++) {
     ret.emplace_back(
-        ("pointLights[" + std::to_string(i) + "].base.color").c_str());
+      ("pointLights[" + std::to_string(i) + "].base.color").c_str());
     ret.emplace_back(
-        ("pointLights[" + std::to_string(i) + "].base.ambientIntensity")
-            .c_str());
+      ("pointLights[" + std::to_string(i) + "].base.ambientIntensity")
+      .c_str());
     ret.emplace_back(
-        ("pointLights[" + std::to_string(i) + "].base.diffuseIntensity")
-            .c_str());
+      ("pointLights[" + std::to_string(i) + "].base.diffuseIntensity")
+      .c_str());
     ret.emplace_back(
-        ("pointLights[" + std::to_string(i) + "].base.specularIntensity")
-            .c_str());
+      ("pointLights[" + std::to_string(i) + "].base.specularIntensity")
+      .c_str());
     ret.emplace_back(
-        ("pointLights[" + std::to_string(i) + "].position").c_str());
+      ("pointLights[" + std::to_string(i) + "].position").c_str());
     ret.emplace_back(("pointLights[" + std::to_string(i) + "].radius").c_str());
   }
   return ret;
 }
 
 std::array<HashedString, NUM_DIRECTIONAL_PARAMS> directionalLightStrings = {
-    HashedString("directionalLight.base.color"),
-    HashedString("directionalLight.base.ambientIntensity"),
-    HashedString("directionalLight.base.diffuseIntensity"),
-    HashedString("directionalLight.base.specularIntensity"),
-    HashedString("directionalLight.direction"),
+  HashedString("directionalLight.base.color"),
+  HashedString("directionalLight.base.ambientIntensity"),
+  HashedString("directionalLight.base.diffuseIntensity"),
+  HashedString("directionalLight.base.specularIntensity"),
+  HashedString("directionalLight.direction"),
 };
 
 std::vector<HashedString> pointLightStrings = GeneratePointLightStrings(50);
 std::vector<HashedString> spotLightStrings = GenerateSpotLightStrings(50);
-
-}  // namespace
+} // namespace
 
 void Renderer::UpdateRenderState(const Object &object) {
   Material *mat = object.GetMaterial();
@@ -155,11 +155,14 @@ void Renderer::SetBlinnPhongUniforms() {
     }
   }
   state.boundShader->SetBool(
-      "hasDiffuseMap", m_settings.diffuseMapEnabled && numDiffuseMaps > 0);
+    "hasDiffuseMap",
+    m_settings.diffuseMapEnabled && numDiffuseMaps > 0);
   state.boundShader->SetBool(
-      "hasSpecularMap", m_settings.specularMapEnabled && numSpecularMaps > 0);
+    "hasSpecularMap",
+    m_settings.specularMapEnabled && numSpecularMaps > 0);
   state.boundShader->SetBool(
-      "hasEmissionMap", m_settings.emissionMapEnabled && numEmissionMaps > 0);
+    "hasEmissionMap",
+    m_settings.emissionMapEnabled && numEmissionMaps > 0);
 
   state.boundShader->SetVec3("material.ambient",
                              state.boundMaterial->ambientColor);
@@ -211,7 +214,9 @@ void Renderer::RenderGroup(const Group &group) {
     UpdateRenderState(*object);
     mesh->GetVAO().Bind();
     state.boundShader->SetMat4("u_Model", object->transform.GetModelMatrix());
-    glDrawElements(GL_TRIANGLES, (GLsizei)mesh->NumIndices(), GL_UNSIGNED_INT,
+    glDrawElements(GL_TRIANGLES,
+                   (GLsizei) mesh->NumIndices(),
+                   GL_UNSIGNED_INT,
                    nullptr);
     IncStats(mesh->NumVertices(), mesh->NumIndices());
   }
@@ -231,7 +236,9 @@ void Renderer::RenderGroup(const Group &group) {
       auto mesh = object->GetMesh();
       mesh->GetVAO().Bind();
       state.boundShader->SetMat4("u_Model", object->transform.GetModelMatrix());
-      glDrawElements(GL_TRIANGLES, (GLsizei)mesh->NumIndices(), GL_UNSIGNED_INT,
+      glDrawElements(GL_TRIANGLES,
+                     (GLsizei) mesh->NumIndices(),
+                     GL_UNSIGNED_INT,
                      nullptr);
       IncStats(mesh->NumVertices(), mesh->NumIndices());
     }
@@ -254,11 +261,13 @@ void Renderer::Init() {
   // action to take when any stencil test passes or fails, replace when pass
   // stencil test and depth test (or only stencil if no depth test)
   glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-  glStencilFunc(GL_NOTEQUAL, 1,
-                0xFF);  // all fragments should pass stencil test
+  glStencilFunc(GL_NOTEQUAL,
+                1,
+                0xFF); // all fragments should pass stencil test
 }
 
-void Renderer::Reset() {}
+void Renderer::Reset() {
+}
 
 void Renderer::RenderScene(const Scene &scene, Camera *camera) {
   GL_LOG_ERROR();
@@ -272,12 +281,19 @@ void Renderer::RenderScene(const Scene &scene, Camera *camera) {
   // blit from multi-sampled result to the intermediate FBO
   glBindFramebuffer(GL_READ_FRAMEBUFFER,
                     m_settings.useMSAA
-                        ? m_multiSampleFBOContainer->FBO().Id()
-                        : m_singleSampleFBOContainer->FBO().Id());
+                      ? m_multiSampleFBOContainer->FBO().Id()
+                      : m_singleSampleFBOContainer->FBO().Id());
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER,
                     m_resolveSampleFBOContainer->FBO().Id());
-  glBlitFramebuffer(0, 0, (GLsizei)m_width, (GLsizei)m_height, 0, 0,
-                    (GLsizei)m_width, (GLsizei)m_height, GL_COLOR_BUFFER_BIT,
+  glBlitFramebuffer(0,
+                    0,
+                    (GLsizei) m_width,
+                    (GLsizei) m_height,
+                    0,
+                    0,
+                    (GLsizei) m_width,
+                    (GLsizei) m_height,
+                    GL_COLOR_BUFFER_BIT,
                     GL_NEAREST);
   m_postProcessor.Render(m_resolveSampleFBOContainer->Textures()[0].get());
 }
@@ -289,7 +305,7 @@ void Renderer::RenderSkybox(Camera *camera) {
 
   m_skyboxShader->Bind();
   glm::mat4 vp = camera->GetProjectionMatrix() *
-                 glm::mat4(glm::mat3(camera->GetViewMatrix()));
+      glm::mat4(glm::mat3(camera->GetViewMatrix()));
   m_skyboxShader->SetMat4("VP", vp);
   m_skybox.Draw();
   //  m_skyboxShader->Unbind();
@@ -299,7 +315,7 @@ void Renderer::RenderSkybox(Camera *camera) {
 }
 
 void Renderer::ResizeViewport(uint32_t width, uint32_t height) {
-  glViewport(0, 0, (int)width, (int)height);
+  glViewport(0, 0, (int) width, (int) height);
   m_width = width;
   m_height = height;
   AllocateFBOContainers(width, height);
@@ -307,14 +323,14 @@ void Renderer::ResizeViewport(uint32_t width, uint32_t height) {
 }
 
 Renderer::Renderer(Window &window)
-    : m_window(window), m_postProcessor(m_screenQuad) {
+  : m_window(window), m_postProcessor(m_screenQuad) {
   auto frameBufferDims = window.GetFrameBufferDimensions();
   ResizeViewport(frameBufferDims.x, frameBufferDims.y);
   m_postProcessor.Init(frameBufferDims.x, frameBufferDims.y);
 }
 
 void Renderer::SetPointLights(
-    const std::vector<std::unique_ptr<PointLight>> *pointLights) {
+  const std::vector<std::unique_ptr<PointLight> > *pointLights) {
   m_pointLights = pointLights;
 }
 
@@ -322,7 +338,7 @@ void Renderer::SetDirectionalLight(const DirectionalLight *directionalLight) {
   m_directionalLight = directionalLight;
 }
 void Renderer::SetSpotLights(
-    const std::vector<std::unique_ptr<SpotLight>> *spotLights) {
+  const std::vector<std::unique_ptr<SpotLight> > *spotLights) {
   m_spotLights = spotLights;
 }
 
@@ -387,8 +403,8 @@ void Renderer::SetLightingUniforms() {
       state.boundShader->SetFloat(spotLightStrings[NUM_SPOT_PARAMS * i + 6],
                                   light->radius);
       state.boundShader->SetFloat(
-          spotLightStrings[NUM_SPOT_PARAMS * i + 7],
-          glm::cos(glm::radians(light->angle - light->penumbra)));
+        spotLightStrings[NUM_SPOT_PARAMS * i + 7],
+        glm::cos(glm::radians(light->angle - light->penumbra)));
       state.boundShader->SetFloat(spotLightStrings[NUM_SPOT_PARAMS * i + 8],
                                   glm::cos(glm::radians(light->angle)));
       i++;
@@ -473,7 +489,9 @@ void Renderer::AllocateFBOContainers(uint32_t width, uint32_t height) {
   m_singleSampleFBOContainer->FBO().Bind();
   auto singleSampleTexture = std::make_unique<Texture>(width, height);
   m_singleSampleFBOContainer->AttachColorBuffer(
-      GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, std::move(singleSampleTexture));
+    GL_COLOR_ATTACHMENT0,
+    GL_TEXTURE_2D,
+    std::move(singleSampleTexture));
   auto singleSampleRBO = std::make_unique<RenderBuffer>(GL_DEPTH24_STENCIL8);
   singleSampleRBO->Bind();
   singleSampleRBO->BufferStorage(width, height);
@@ -484,7 +502,9 @@ void Renderer::AllocateFBOContainers(uint32_t width, uint32_t height) {
   m_resolveSampleFBOContainer->FBO().Bind();
   auto resolveSampleTexture = std::make_unique<Texture>(width, height);
   m_resolveSampleFBOContainer->AttachColorBuffer(
-      GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, std::move(resolveSampleTexture));
+    GL_COLOR_ATTACHMENT0,
+    GL_TEXTURE_2D,
+    std::move(resolveSampleTexture));
   auto resolveSampleRBO = std::make_unique<RenderBuffer>(GL_DEPTH24_STENCIL8);
   resolveSampleRBO->Bind();
   resolveSampleRBO->BufferStorage(width, height);

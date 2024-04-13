@@ -31,7 +31,7 @@ Window::~Window() {
 }
 
 void Window::Init_Glfw() {
-  glfwSetErrorCallback([](int error, const char* description) { LOG_ERROR("GLFW Error %i: %s", error, description); });
+  glfwSetErrorCallback([](int error, const char *description) { LOG_ERROR("GLFW Error %i: %s", error, description); });
   if (!glfwInit()) {
     LOG_ERROR("Failed to initialize GLFW");
     std::exit(EXIT_FAILURE);
@@ -44,12 +44,12 @@ void Window::Init_Glfw() {
 
   m_glsl_version = "#version 410";
 
-//  const GLFWvidmode* videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-//  m_windowWidth = videoMode->width / 2;
-//  m_windowHeight = videoMode->height / 2;
+  //  const GLFWvidmode* videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+  //  m_windowWidth = videoMode->width / 2;
+  //  m_windowHeight = videoMode->height / 2;
 
-//  m_window = glfwCreateWindow(800,600, "OpenGL Renderer", nullptr, nullptr);
-  m_window = glfwCreateWindow(1600,900, "OpenGL Renderer", nullptr, nullptr);
+  //  m_window = glfwCreateWindow(800,600, "OpenGL Renderer", nullptr, nullptr);
+  m_window = glfwCreateWindow(1600, 900, "OpenGL Renderer", nullptr, nullptr);
 
   if (!m_window) {
     LOG_ERROR("Failed to create GLFW window");
@@ -57,13 +57,12 @@ void Window::Init_Glfw() {
     std::exit(EXIT_FAILURE);
   }
   glfwMakeContextCurrent(m_window);
-//  glfwSetWindowPos(m_window, 100, 100);
+  //  glfwSetWindowPos(m_window, 100, 100);
 
   if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
     LOG_ERROR("Failed to initialize Glad");
     std::exit(EXIT_FAILURE);
   }
-
 
   // glfw may not have created a window at desired size
   int w, h;
@@ -75,21 +74,22 @@ void Window::Init_Glfw() {
   m_windowWidth = w;
   m_windowHeight = h;
 
-  glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* window, int width, int height) {
-    Application::Instance().OnViewportResize(width, height);
-  });
+  glfwSetFramebufferSizeCallback(m_window,
+                                 [](GLFWwindow *window, int width, int height) {
+                                   Application::Instance().OnViewportResize(width, height);
+                                 });
 }
 
 void Window::Init_ImGui() {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
-  ImGuiIO& io = ImGui::GetIO();
+  ImGuiIO &io = ImGui::GetIO();
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-//  io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+  //  io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
   Style();
-  ImGuiStyle& style = ImGui::GetStyle();
+  ImGuiStyle &style = ImGui::GetStyle();
   if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
     style.WindowRounding = 0.0f;
     style.Colors[ImGuiCol_WindowBg].w = 1.0f;
@@ -129,5 +129,3 @@ glm::ivec2 Window::GetFrameBufferDimensions() const {
 void Window::SetShouldClose(bool shouldClose) {
   glfwSetWindowShouldClose(m_window, shouldClose);
 }
-
-
