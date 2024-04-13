@@ -6,14 +6,11 @@
 #define OPENGL_RENDERER_SRC_RENDERER_MESH_HPP_
 
 #include <glm/glm.hpp>
-#include "src/renderer/gl/VertexArray.hpp"
-#include "src/renderer/gl/VertexBuffer.hpp"
-#include "src/renderer/gl/ElementBuffer.hpp"
-
 #include <vector>
-#include <memory>
 
-#include <vector>
+#include "src/gl/ElementBuffer.hpp"
+#include "src/gl/VertexArray.hpp"
+#include "src/gl/VertexBuffer.hpp"
 
 struct Vertex {
   glm::vec3 position;
@@ -23,11 +20,12 @@ struct Vertex {
 
 class Mesh {
  public:
-  Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices);
+  Mesh(const std::vector<Vertex>& vertices,
+       const std::vector<uint32_t>& indices);
   ~Mesh();
-  [[nodiscard]] inline uint32_t NumVertices() const {return m_verticesLength; }
-  [[nodiscard]] inline uint32_t NumIndices() const {return m_indicesLength; }
-  inline const VertexArray& GetVAO() const {return m_vao; }
+  [[nodiscard]] inline uint32_t NumVertices() const { return m_verticesLength; }
+  [[nodiscard]] inline uint32_t NumIndices() const { return m_indicesLength; }
+  [[nodiscard]] inline const VertexArray& GetVAO() const { return m_vao; }
 
  private:
   uint32_t m_verticesLength{0}, m_indicesLength{0};
@@ -36,5 +34,4 @@ class Mesh {
   ElementBuffer m_ebo;
 };
 
-
-#endif //OPENGL_RENDERER_SRC_RENDERER_MESH_HPP_
+#endif  // OPENGL_RENDERER_SRC_RENDERER_MESH_HPP_

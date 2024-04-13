@@ -21,15 +21,13 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_executable(
   opengl_renderer
   src/main.cpp
-  src/core/Input.cpp
+  src/utils/Input.cpp
   src/renderer/Renderer.cpp
   src/renderer/Renderer.hpp
-  src/renderer/Renderer.hpp
-  src/renderer/Window.cpp
-  src/renderer/Window.hpp
-  src/renderer/Window.hpp
-  src/renderer/Application.cpp
-  src/renderer/Application.hpp
+  src/Window.cpp
+  src/Window.hpp
+  src/Application.cpp
+  src/Application.hpp
   dep/imgui/backends/imgui_impl_opengl3.cpp
   dep/imgui/backends/imgui_impl_glfw.cpp
   dep/imgui/imgui_draw.cpp
@@ -37,63 +35,63 @@ add_executable(
   dep/imgui/imgui.cpp
   dep/imgui/imgui_tables.cpp
   dep/imgui/imgui_widgets.cpp
-  src/renderer/gl/VertexArray.cpp
-  src/renderer/gl/VertexArray.hpp
-  src/renderer/gl/VertexBuffer.cpp
-  src/renderer/gl/VertexBuffer.hpp
-  src/renderer/gl/Shader.cpp
-  src/renderer/gl/Shader.hpp
+  src/gl/VertexArray.cpp
+  src/gl/VertexArray.hpp
+  src/gl/VertexBuffer.cpp
+  src/gl/VertexBuffer.hpp
+  src/gl/Shader.cpp
+  src/gl/Shader.hpp
   dep/KHR/khrplatform.h
   dep/glad/glad.c
-  src/renderer/gl/Types.hpp
-  src/renderer/gl/ElementBuffer.cpp
-  src/renderer/gl/ElementBuffer.hpp
-  src/core/Logger.hpp
-  src/core/Logger.hpp
+  src/gl/Types.hpp
+  src/gl/ElementBuffer.cpp
+  src/gl/ElementBuffer.hpp
+  src/utils/Logger.hpp
+  src/utils/Logger.hpp
   src/renderer/Mesh.cpp
   src/renderer/Mesh.hpp
-  src/renderer/camera/FPSCamera.cpp
-  src/renderer/camera/OrbitCamera.cpp
-  src/renderer/shapes/Cube.hpp
+  src/camera/FPSCamera.cpp
+  src/camera/OrbitCamera.cpp
+  src/shapes/Cube.hpp
   src/imgui/ImguiStyles.h
   src/imgui/ImguiStyles.h
   src/imgui/ImguiStyles.h
-  src/renderer/gl/FrameBuffer.cpp
-  src/renderer/gl/FrameBuffer.hpp
-  src/renderer/gl/Texture.cpp
-  src/renderer/gl/Texture.hpp
-  src/renderer/gl/stb_image/stb_image_impl.hpp
+  src/gl/FrameBuffer.cpp
+  src/gl/FrameBuffer.hpp
+  src/gl/Texture.cpp
+  src/gl/Texture.hpp
+  src/gl/stb_image/stb_image_impl.hpp
   src/renderer/Material.cpp
   src/renderer/Material.hpp
-  src/renderer/group/Object.cpp
-  src/renderer/group/Object.hpp
-  src/core/HashedString.hpp
-  src/renderer/group/Transform.cpp
-  src/renderer/group/Transform.hpp
-  src/renderer/resource/ShaderManager.cpp
-  src/renderer/resource/MaterialManager.cpp
-  src/core/Utils.hpp
-  src/renderer/group/Group.cpp
-  src/renderer/group/Group.hpp
-  src/renderer/group/Scene.cpp
-  src/renderer/group/Scene.hpp
-  src/renderer/resource/MeshManager.cpp
-  src/renderer/resource/MeshManager.hpp
-  src/renderer/resource/TextureManager.cpp
-  src/renderer/resource/TextureManager.hpp
+  src/group/Object.cpp
+  src/group/Object.hpp
+  src/utils/HashedString.hpp
+  src/group/Transform.cpp
+  src/group/Transform.hpp
+  src/resource/ShaderManager.cpp
+  src/resource/MaterialManager.cpp
+  src/utils/Utils.hpp
+  src/group/Group.cpp
+  src/group/Group.hpp
+  src/group/Scene.cpp
+  src/group/Scene.hpp
+  src/resource/MeshManager.cpp
+  src/resource/MeshManager.hpp
+  src/resource/TextureManager.cpp
+  src/resource/TextureManager.hpp
   src/scenes/PlaygroundScene.cpp
   src/scenes/PlaygroundScene.hpp
-  src/renderer/camera/Camera.cpp
-  src/renderer/camera/Camera.hpp
+  src/camera/Camera.cpp
+  src/camera/Camera.hpp
   src/Common.hpp
-  src/renderer/gl/RenderBuffer.cpp
-  src/renderer/gl/RenderBuffer.hpp
+  src/gl/RenderBuffer.cpp
+  src/gl/RenderBuffer.hpp
   src/scenes/SceneManager.cpp
   src/scenes/SceneManager.hpp
   src/imgui/ImGuiMenu.cpp
   src/imgui/ImGuiMenu.hpp
-  src/renderer/camera/CameraController.cpp
-  src/renderer/camera/CameraController.hpp
+  src/camera/CameraController.cpp
+  src/camera/CameraController.hpp
   src/scenes/LightingOneScene.cpp
   src/scenes/LightingOneScene.hpp
   src/renderer/Light.cpp
@@ -104,11 +102,11 @@ add_executable(
   src/renderer/Quad.hpp
   src/renderer/Skybox.cpp
   src/renderer/Skybox.hpp
-  src/renderer/ModelManager.cpp
-  src/renderer/ModelManager.hpp
-  src/renderer/gl/FBOContainer.cpp
-  src/renderer/gl/FBOContainer.hpp
-  src/core/Utils.cpp
+  src/resource/ModelManager.cpp
+  src/resource/ModelManager.hpp
+  src/gl/FBOContainer.cpp
+  src/gl/FBOContainer.hpp
+  src/utils/Utils.cpp
   src/renderer/PostProcessor.cpp
   src/renderer/PostProcessor.hpp
   src/renderer/PostProcessingEffect.hpp)

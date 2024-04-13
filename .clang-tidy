@@ -106,7 +106,10 @@ Checks: >
   -readability-magic-numbers,
   -readability-redundant-declaration,
   -bugprone-implicit-widening-of-multiplication-result,
-  -readability-uppercase-literal-suffix
+  -readability-uppercase-literal-suffix,
+  -bugprone-easily-swappable-parameters,
+  -readability-named-parameter,
+  -bugprone-narrowing-conversions
 
 # Turn all the warnings from the checks above into errors.
 WarningsAsErrors: "*"
@@ -118,9 +121,9 @@ CheckOptions:
   - { key: readability-identifier-naming.ClassCase, value: CamelCase }
   - { key: readability-identifier-naming.StructCase, value: CamelCase }
   - {
-    key: readability-identifier-naming.TemplateParameterCase,
-    value: CamelCase,
-  }
+      key: readability-identifier-naming.TemplateParameterCase,
+      value: CamelCase,
+    }
   - { key: readability-identifier-naming.FunctionCase, value: aNy_CasE }
   - { key: readability-identifier-naming.VariableCase, value: lower_case }
   - { key: readability-identifier-naming.ClassMemberCase, value: lower_case }
@@ -130,9 +133,9 @@ CheckOptions:
   - { key: readability-identifier-naming.EnumConstantCase, value: CamelCase }
   #  - { key: readability-identifier-naming.EnumConstantPrefix, value: k }
   - {
-    key: readability-identifier-naming.ConstexprVariableCase,
-    value: CamelCase,
-  }
+      key: readability-identifier-naming.ConstexprVariableCase,
+      value: CamelCase,
+    }
   #  - { key: readability-identifier-naming.ConstexprVariablePrefix, value: k }
   - { key: readability-identifier-naming.GlobalConstantCase, value: CamelCase }
   #  - { key: readability-identifier-naming.GlobalConstantPrefix, value: k }
@@ -141,11 +144,11 @@ CheckOptions:
   - { key: readability-identifier-naming.StaticConstantCase, value: CamelCase }
   #  - { key: readability-identifier-naming.StaticConstantPrefix, value: k }
   - {
-    key: readability-implicit-bool-conversion.AllowIntegerConditions,
-    value: 1,
-  }
+      key: readability-implicit-bool-conversion.AllowIntegerConditions,
+      value: 1,
+    }
   - {
-    key: readability-implicit-bool-conversion.AllowPointerConditions,
-    value: 1,
-  }
+      key: readability-implicit-bool-conversion.AllowPointerConditions,
+      value: 1,
+    }
   - { key: readability-function-cognitive-complexity.IgnoreMacros, value: 1 }

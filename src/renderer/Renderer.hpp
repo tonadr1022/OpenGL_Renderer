@@ -6,21 +6,18 @@
 #define OPENGL_RENDERER_SRC_RENDERER_GL_RENDERER_HPP_
 
 #include <cstdint>
-#include "src/renderer/group/Scene.hpp"
-#include "src/renderer/Skybox.hpp"
-#include "Window.hpp"
-#include "Quad.hpp"
-#include "src/renderer/gl/FBOContainer.hpp"
+
 #include "PostProcessor.hpp"
+#include "Quad.hpp"
+#include "src/Window.hpp"
+#include "src/gl/FBOContainer.hpp"
+#include "src/group/Scene.hpp"
+#include "src/renderer/Skybox.hpp"
 
 class Renderer {
  public:
-  enum class Mode {
-    None, BlinnPhong
-  };
-  enum class DebugMode {
-    None, Normals, Diffuse, DepthBuffer
-  };
+  enum class Mode { None, BlinnPhong };
+  enum class DebugMode { None, Normals, Diffuse, DepthBuffer };
 
   struct RenderSettings {
     bool wireframe{false};
@@ -45,13 +42,14 @@ class Renderer {
 
   PostProcessingUniforms ppUniforms;
 
-  Renderer(Window& window);
+  explicit Renderer(Window& window);
   void Init();
   void RenderScene(const Scene& scene, Camera* camera);
   void ResizeViewport(uint32_t width, uint32_t height);
   void SetDirectionalLight(const DirectionalLight* directionalLight);
   void SetSpotLights(const std::vector<std::unique_ptr<SpotLight>>* spotLights);
-  void SetPointLights(const std::vector<std::unique_ptr<PointLight>>* pointLights);
+  void SetPointLights(
+      const std::vector<std::unique_ptr<PointLight>>* pointLights);
   void Reset();
   void OnImGui();
   void SetSkyboxTexture(Texture* texture);
@@ -65,7 +63,6 @@ class Renderer {
     uint32_t numShaderBinds{0};
     uint32_t numMaterialSwitches{0};
   };
-
 
   inline RenderSettings& GetSettings() { return m_settings; }
   inline const PerFrameStats& GetStats() { return stats; }
@@ -124,7 +121,6 @@ class Renderer {
   void AllocateFBOContainers(uint32_t width, uint32_t height);
 
   void AssignShaders();
-
 };
 
-#endif //OPENGL_RENDERER_SRC_RENDERER_GL_RENDERER_HPP_
+#endif  // OPENGL_RENDERER_SRC_RENDERER_GL_RENDERER_HPP_

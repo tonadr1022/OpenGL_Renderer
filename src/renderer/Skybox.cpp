@@ -3,7 +3,7 @@
 //
 
 #include "Skybox.hpp"
-#include "src/core/Logger.hpp"
+#include "src/utils/Logger.hpp"
 
 namespace {
 constexpr const float Vertices[] = {

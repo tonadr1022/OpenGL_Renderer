@@ -5,8 +5,8 @@
 #ifndef OPENGL_RENDERER_SRC_RENDERER_SKYBOX_HPP_
 #define OPENGL_RENDERER_SRC_RENDERER_SKYBOX_HPP_
 
-#include "src/renderer/gl/VertexArray.hpp"
-#include "src/renderer/gl/VertexBuffer.hpp"
+#include "src/gl/VertexArray.hpp"
+#include "src/gl/VertexBuffer.hpp"
 
 class Skybox {
  public:
@@ -19,4 +19,4 @@ class Skybox {
   VertexBuffer m_vbo;
 };
 
-#endif //OPENGL_RENDERER_SRC_RENDERER_SKYBOX_HPP_
+#endif  // OPENGL_RENDERER_SRC_RENDERER_SKYBOX_HPP_

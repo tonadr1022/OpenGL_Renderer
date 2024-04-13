@@ -3,7 +3,7 @@
 //
 
 #include "SceneManager.hpp"
-#include "src/core/Logger.hpp"
+#include "src/utils/Logger.hpp"
 #include <imgui/imgui.h>
 
 SceneManager::SceneManager() = default;

@@ -5,9 +5,9 @@
 #ifndef OPENGL_RENDERER_SRC_SCENES_SCENEMANAGER_HPP_
 #define OPENGL_RENDERER_SRC_SCENES_SCENEMANAGER_HPP_
 
-#include "src/renderer/camera/FPSCamera.hpp"
-#include "src/renderer/group/Scene.hpp"
 #include <memory>
+
+#include "src/group/Scene.hpp"
 
 class SceneManager {
  public:
@@ -25,4 +25,4 @@ class SceneManager {
   std::unordered_map<HashedString, std::unique_ptr<Scene>> m_sceneMap;
 };
 
-#endif //OPENGL_RENDERER_SRC_SCENES_SCENEMANAGER_HPP_
+#endif  // OPENGL_RENDERER_SRC_SCENES_SCENEMANAGER_HPP_
