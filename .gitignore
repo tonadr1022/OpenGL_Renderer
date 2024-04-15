@@ -17,3 +17,5 @@ testbuild
 *-src
 *-subbuild
 
+venv
+
