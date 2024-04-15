@@ -13,4 +13,7 @@ dep/assimp*
 
 compile_commands.json 
 testbuild
+*-build
+*-src
+*-subbuild
 

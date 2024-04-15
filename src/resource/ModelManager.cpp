@@ -37,8 +37,6 @@ void ModelManager::LoadModel(HashedString modelName, const std::string& modelPat
     LOG_ERROR("Assimp Error: %s", importer.GetErrorString());
     return;
   }
-  LOG_INFO("Mats: %i, meshes: %i, textures: %i ", scene->mNumMaterials, scene->mNumMeshes,
-           scene->mNumTextures);
   ProcessNodes(scene->mRootNode, scene);
   m_groups.emplace(modelName, std::move(model));
 }
