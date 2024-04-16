@@ -168,8 +168,8 @@ else()
   target_include_directories(opengl_renderer PRIVATE dep/assimp-src/include)
 endif()
 
+set(OpenGL_GL_PREFERENCE "GLVND")
 find_package(OpenGL REQUIRED)
-
 target_link_libraries(opengl_renderer ${OPENGL_LIBRARIES} glfw glm
                       assimp::assimp)
 

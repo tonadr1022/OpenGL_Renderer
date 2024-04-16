@@ -6,9 +6,11 @@
 
 #include <imgui/imgui.h>
 
+#include "src/camera/CameraController.hpp"
 #include "src/utils/Logger.hpp"
 
-SceneManager::SceneManager() = default;
+SceneManager::SceneManager(Renderer& renderer, CameraController& camera_controller)
+    : m_renderer(renderer), m_cameraController(camera_controller) {}
 
 void SceneManager::AddScene(HashedString name, std::unique_ptr<Scene> scene) {
   m_sceneMap.emplace(name, std::move(scene));
@@ -34,9 +36,18 @@ void SceneManager::ImGuiSceneSelect() {
       const bool is_selected = scene.get() == m_activeScene;
       if (ImGui::Selectable(name.data(), is_selected)) {
         m_activeScene = scene.get();
+        OnSceneChange();
         if (is_selected) ImGui::SetItemDefaultFocus();
       }
     }
     ImGui::EndCombo();
   }
+}
+
+void SceneManager::OnSceneChange() {
+  m_cameraController.SetMode(m_activeScene->defaultCameraMode);
+  m_cameraController.GetActiveCamera()->SetPosition(m_activeScene->defaultCameraPosition);
+  m_renderer.SetDirectionalLight(m_activeScene->GetDirectionalLight());
+  m_renderer.SetPointLights(m_activeScene->GetPointLights());
+  m_renderer.SetSpotLights(m_activeScene->GetSpotLights());
 }

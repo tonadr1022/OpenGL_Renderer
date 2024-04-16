@@ -12,23 +12,24 @@
 
 ModelViewerScene::ModelViewerScene() : Scene({10, 10, 10}, CameraController::Mode::Orbit) {
   m_skyboxNames = {"Sky 1", "Sky 2", "Church", "Winter"};
-  m_activeSkyboxName = m_skyboxNames[2];
+  m_activeSkyboxName = m_skyboxNames[0];
   Application::Instance().GetRenderer().SetSkyboxTexture(
       TextureManager::GetTexture(HashedString(m_activeSkyboxName.data())));
-  //  auto backpack = ModelManager::CopyLoadedModel("backpack");
-  //  auto teapot = ModelManager::CopyLoadedModel("teapot");
-  //  auto sponza = ModelManager::CopyLoadedModel("sponza");
+  auto backpack = ModelManager::CopyLoadedModel("backpack");
+  auto teapot = ModelManager::CopyLoadedModel("teapot");
+  auto sponza = ModelManager::CopyLoadedModel("sponza");
+  sponza->transform.SetScale(glm::vec3{0.1, 0.1, 0.1});
   auto spot = ModelManager::CopyLoadedModel("spot");
 
-  //  m_modelSelectMap.emplace("Backpack", backpack.get());
-  //  m_groups.push_back(std::move(backpack));
-  //
-  //  m_modelSelectMap.emplace("Teapot", teapot.get());
-  //  teapot->transform.SetScale(glm::vec3(1.0));
-  //  m_groups.push_back(std::move(teapot));
-  //
-  //  m_modelSelectMap.emplace("Sponza", sponza.get());
-  //  m_groups.push_back(std::move(sponza));
+  m_modelSelectMap.emplace("Backpack", backpack.get());
+  m_groups.push_back(std::move(backpack));
+
+  m_modelSelectMap.emplace("Teapot", teapot.get());
+  teapot->transform.SetScale(glm::vec3(1.0));
+  m_groups.push_back(std::move(teapot));
+
+  m_modelSelectMap.emplace("Sponza", sponza.get());
+  m_groups.push_back(std::move(sponza));
 
   m_modelSelectMap.emplace("Spot", spot.get());
   spot->transform.SetScale(glm::vec3(10));

@@ -38,9 +38,7 @@ def run(build_dir):
         print("Error finding executable, exiting...")
         exit(1)
 
-    execute_process = subprocess.Popen(executable_path)
-    execute_process.wait()
-    exit(1)
+    subprocess.run(executable_path, shell=True)
 
 
 def cmake_build(mode):

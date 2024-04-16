@@ -24,7 +24,10 @@ Application *Application::m_instance_ptr = nullptr;
 
 #define DEFAULT_RENDER_TO_IMGUI_VIEWPORT false
 
-Application::Application() : m_cameraController(m_window), m_renderer(m_window) {
+Application::Application()
+    : m_cameraController(m_window),
+      m_renderer(m_window),
+      m_sceneManager(m_renderer, m_cameraController) {
   m_instance_ptr = this;
   Window::SetVsync(false);
   SetupResources();
@@ -36,16 +39,14 @@ Application::Application() : m_cameraController(m_window), m_renderer(m_window) 
   m_cameraController.SetAspectRatio(m_window.GetAspectRatio());
   m_renderer.Init();
 
-  //  if (!m_renderToImGuiViewport) m_cameraController.Focus();
+  if (!m_renderToImGuiViewport) m_cameraController.Focus();
 }
 
 void Application::SetupResources() {
   LoadShaders();
-  //  ModelManager::LoadModel("backpack",
-  //  "resources/models/backpack/backpack.obj");
-  //  ModelManager::LoadModel("teapot", "resources/models/teapot/teapot.obj");
-  //  ModelManager::LoadModel("sponza",
-  //  "/Users/tony/Desktop/sponza/sponza.obj");
+  ModelManager::LoadModel("backpack", "resources/models/backpack/backpack.obj");
+  ModelManager::LoadModel("teapot", "resources/models/teapot/teapot.obj");
+  ModelManager::LoadModel("sponza", "resources/models/sponza/sponza.obj");
   ModelManager::LoadModel("spot", "resources/models/spot/spot_quadrangulated.obj");
 
   MeshManager::AddMesh("cube", Cube::Vertices, Cube::Indices);
@@ -90,7 +91,7 @@ void Application::SetupResources() {
                              Texture::SamplerType::TwoD);
 
   std::vector<TexturePair> spot_textures = {
-      {MatTextureType::Diffuse, TextureManager::GetTexture("oak")}};
+      {MatTextureType::Diffuse, TextureManager::GetTexture("spot_texture")}};
   MaterialManager::AddMaterial("spotTextured", spot_textures, "blinnPhong");
 
   std::vector<TexturePair> wood_container_textures = {
@@ -101,15 +102,11 @@ void Application::SetupResources() {
 
 void Application::Run() {
   m_renderer.SetSkyboxTexture(TextureManager::GetTexture(HashedString("Sky 2")));
-  //  m_sceneManager.AddScene("Playground",
-  //  std::make_unique<PlaygroundScene>());
+  m_sceneManager.AddScene("Playground", std::make_unique<PlaygroundScene>());
   m_sceneManager.AddScene("Lighting One", std::make_unique<LightingOneScene>());
   m_sceneManager.AddScene("Model Viewer", std::make_unique<ModelViewerScene>());
 
-  m_sceneManager.SetActiveScene("Model Viewer");
-  //  m_sceneManager.SetActiveScene("Lighting One");
-  OnSceneChange();
-
+  m_sceneManager.SetActiveScene("Lighting One");
   double curr_time;
   double last_time = glfwGetTime();
   double delta_time;
@@ -310,16 +307,6 @@ void Application::OnMouseButtonEvent(int button, int action) {
 void Application::OnMouseScrollEvent(double yOffset) {
   if (!m_renderToImGuiViewport && ImGui::GetIO().WantCaptureMouse) return;
   m_cameraController.OnMouseScrollEvent(yOffset);
-}
-
-void Application::OnSceneChange() {
-  Scene *active_scene = m_sceneManager.GetActiveScene();
-  m_cameraController.SetMode(active_scene->defaultCameraMode);
-  m_cameraController.GetActiveCamera()->SetPosition(active_scene->defaultCameraPosition);
-  m_renderer.SetDirectionalLight(active_scene->GetDirectionalLight());
-  m_renderer.SetPointLights(active_scene->GetPointLights());
-  m_renderer.SetSpotLights(active_scene->GetSpotLights());
-  //        m_cameraController.GetActiveCamera().SetTargetPos({0, 0, 0});
 }
 
 void Application::OnKeyEvent(int key, int action, int mods) {

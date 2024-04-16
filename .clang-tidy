@@ -111,6 +111,7 @@ Checks: >
   -readability-named-parameter,
   -bugprone-narrowing-conversions,
   -readability-implicit-bool-conversion
+  -readability-function-cognitive-complexity
 # Turn all the warnings from the checks above into errors.
 WarningsAsErrors: "*"
 

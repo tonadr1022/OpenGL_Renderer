@@ -40,6 +40,10 @@ Or Open the project in an IDE and build from there if these scripts don't work (
 
 ![MSAA Comparison](screenshots/msaa_comparison.png)
 
+### Stencil Testing
+
+![Stencil Test](screenshots/stencil-test.png)
+
 ## TODO (soon to far)
 
 - Framebuffer stack for multiple post-processing effects
