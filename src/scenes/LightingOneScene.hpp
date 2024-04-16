@@ -14,6 +14,7 @@ class LightingOneScene : public Scene {
 
  private:
   std::vector<Object*> m_cubes;
+  std::vector<Group*> m_spots;
 };
 
 #endif  // OPENGL_RENDERER_SRC_SCENES_LIGHTINGONESCENE_HPP_

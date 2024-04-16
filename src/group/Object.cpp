@@ -6,6 +6,8 @@
 
 Object::Object(const Mesh* mesh, Material* material) : m_material(material), m_mesh(mesh) {}
 
+Object::Object(Object& other) : m_material(other.m_material), m_mesh(other.m_mesh) {}
+
 Object::Object(const Mesh* mesh) : m_mesh(mesh) {}
 
 void Object::SetMaterial(Material* material) { m_material = material; }

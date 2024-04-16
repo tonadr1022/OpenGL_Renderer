@@ -76,16 +76,14 @@ void Renderer::UpdateRenderState(const Object &object) {
       SetBlinnPhongUniforms();
     }
 
-    m_skyboxTexture->Bind(GL_TEXTURE4);
+    // m_skyboxTexture->Bind(GL_TEXTURE4);
 
+    glActiveTexture(GL_TEXTURE10);
+    glBindTexture(static_cast<GLenum>(GL_TEXTURE_CUBE_MAP), m_skyboxTexture->Id());
     m_state.boundShader->SetInt("renderMode", static_cast<int>(debugMode));
-
-    m_state.boundShader->SetInt("skybox", 4);
-
+    // m_state.boundShader->SetInt("skybox", 0);
     m_state.boundShader->SetBool("useBlinn", m_settings.useBlinn);
-
     m_state.boundShader->SetVec3("u_ViewPos", m_camera->GetPosition());
-
     m_state.boundShader->SetMat4("u_VP", m_camera->GetVPMatrix());
 
     SetLightingUniforms();

@@ -13,6 +13,7 @@ class Object {
  public:
   Object(const Mesh* mesh, Material* material);
   explicit Object(const Mesh* mesh);
+  Object(Object& other);
 
   Transform transform;
   void SetMaterial(Material* material);

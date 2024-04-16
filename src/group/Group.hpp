@@ -18,7 +18,7 @@ class Group {
   void AddObject(std::unique_ptr<Object> object);
   void RemoveObject(const Object* object);
 
-  Group(const Group& other) {
+  Group(Group& other) {
     this->backFaceCull = other.backFaceCull;
     this->selected = other.selected;
     for (const auto& object : other.m_objects) {

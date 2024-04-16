@@ -17,6 +17,7 @@
 #include "src/scenes/PlaygroundScene.hpp"
 #include "src/shapes/Cube.hpp"
 #include "src/utils/Input.hpp"
+#include "src/utils/Logger.hpp"
 
 using ImGui::GetContentRegionAvail;
 
@@ -108,6 +109,7 @@ void Application::Run() {
   m_sceneManager.AddScene("Model Viewer", std::make_unique<ModelViewerScene>());
 
   m_sceneManager.SetActiveScene("Lighting One");
+
   double curr_time;
   double last_time = glfwGetTime();
   double delta_time;
@@ -115,23 +117,20 @@ void Application::Run() {
     curr_time = glfwGetTime();
     delta_time = curr_time - last_time;
     last_time = curr_time;
-
     // input
     Input::Update();
-
     // update
     m_sceneManager.GetActiveScene()->Update(delta_time);
     m_cameraController.Update(delta_time);
-
     m_sceneManager.GetActiveScene()->PreRender();
 
     // render
     if (m_settings.showImGui) ImGuiMenu::StartFrame(m_renderToImGuiViewport);
     m_renderer.RenderScene(*m_sceneManager.GetActiveScene(), m_cameraController.GetActiveCamera());
     if (m_settings.showImGui) OnImGui();
-
     if (m_settings.showImGui) ImGuiMenu::EndFrame();
     m_window.SwapBuffers();
+    GL_LOG_ERROR();
   }
 }
 

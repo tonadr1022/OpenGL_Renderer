@@ -21,6 +21,7 @@ void SceneManager::SetActiveScene(HashedString name) {
   if (it == m_sceneMap.end()) LOG_ERROR("Scene not found: %s", name.data());
   m_activeScene = it->second.get();
   m_activeSceneName = name;
+  OnSceneChange();
 }
 
 Scene* SceneManager::GetActiveScene() {
@@ -36,6 +37,7 @@ void SceneManager::ImGuiSceneSelect() {
       const bool is_selected = scene.get() == m_activeScene;
       if (ImGui::Selectable(name.data(), is_selected)) {
         m_activeScene = scene.get();
+        m_activeSceneName = name;
         OnSceneChange();
         if (is_selected) ImGui::SetItemDefaultFocus();
       }

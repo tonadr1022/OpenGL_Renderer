@@ -46,6 +46,8 @@ class Scene {
   std::vector<std::unique_ptr<SpotLight>> m_spotLights;
   std::vector<std::unique_ptr<PointLight>> m_pointLights;
   std::unique_ptr<DirectionalLight> m_directionalLight = nullptr;
+  std::string m_skyboxName;
+
   std::vector<std::unique_ptr<Group>> m_groups;
 };
 

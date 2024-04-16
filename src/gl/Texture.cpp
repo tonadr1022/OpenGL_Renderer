@@ -57,7 +57,6 @@ void Texture::GenerateTextureFromBuffer(unsigned char* buffer, bool mipmap, uint
                    static_cast<GLsizei>(height), 0, format, GL_UNSIGNED_BYTE, buffer);
       break;
     case SamplerType::TwoDMultiSample:
-      GL_LOG_ERROR();
       glad_glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, static_cast<GLsizei>(numSamples),
                                    GL_RGB, static_cast<GLsizei>(width),
                                    static_cast<GLsizei>(height), GL_TRUE);

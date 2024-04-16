@@ -17,7 +17,6 @@ class ModelViewerScene : public Scene {
   std::unordered_map<std::string, Group*> m_modelSelectMap;
   Group* m_visibleModel;
   std::string m_activeModelName;
-  std::string m_activeSkyboxName;
   std::vector<std::string> m_skyboxNames;
 
   template <typename T>

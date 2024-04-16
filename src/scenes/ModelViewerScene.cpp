@@ -9,12 +9,13 @@
 #include "src/resource/MaterialManager.hpp"
 #include "src/resource/ModelManager.hpp"
 #include "src/resource/TextureManager.hpp"
+#include "src/utils/HashedString.hpp"
 
 ModelViewerScene::ModelViewerScene() : Scene({10, 10, 10}, CameraController::Mode::Orbit) {
   m_skyboxNames = {"Sky 1", "Sky 2", "Church", "Winter"};
-  m_activeSkyboxName = m_skyboxNames[0];
+  m_skyboxName = m_skyboxNames[0];
   Application::Instance().GetRenderer().SetSkyboxTexture(
-      TextureManager::GetTexture(HashedString(m_activeSkyboxName.data())));
+      TextureManager::GetTexture(HashedString(m_skyboxName.data())));
   auto backpack = ModelManager::CopyLoadedModel("backpack");
   auto teapot = ModelManager::CopyLoadedModel("teapot");
   auto sponza = ModelManager::CopyLoadedModel("sponza");
@@ -59,12 +60,12 @@ void ModelViewerScene::Update(double dt) { Scene::Update(dt); }
 void ModelViewerScene::OnImGui() {
   Scene::OnImGui();
   ImGui::Begin("Model Viewer");
-  if (ImGui::BeginCombo("##Skybox", ("Skybox: " + m_activeSkyboxName).c_str())) {
+  if (ImGui::BeginCombo("##Skybox", ("Skybox: " + m_skyboxName).c_str())) {
     for (auto& name : m_skyboxNames) {
       if (ImGui::Selectable(name.data())) {
         Application::Instance().GetRenderer().SetSkyboxTexture(
             TextureManager::GetTexture(HashedString(name.data())));
-        m_activeSkyboxName = name;
+        m_skyboxName = name;
       }
     }
     ImGui::EndCombo();

@@ -82,6 +82,7 @@ void FPSCamera::OnImGui() {
     m_fov = glm::degrees(fov_rad);
     UpdateMatrices();
   }
+
   ImGui::SliderFloat("Movement Speed", &m_movementSpeed, MinMoveSpeed, MaxMoveSpeed);
   ImGui::SliderFloat("Mouse Sensitivity", &m_mouseSensitivity, MinMouseSensitivity,
                      MaxMouseSensitivity);

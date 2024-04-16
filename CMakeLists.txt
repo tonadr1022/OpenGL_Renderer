@@ -10,6 +10,10 @@ endif()
 
 project("opengl_renderer")
 
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 include_directories("dep")
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -168,14 +172,15 @@ else()
   target_include_directories(opengl_renderer PRIVATE dep/assimp-src/include)
 endif()
 
+# not legacy OpenGL
 set(OpenGL_GL_PREFERENCE "GLVND")
+
 find_package(OpenGL REQUIRED)
+
 target_link_libraries(opengl_renderer ${OPENGL_LIBRARIES} glfw glm
                       assimp::assimp)
 
-if(CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET opengl_renderer PROPERTY CXX_STANDARD 20)
-endif()
+# set_property(TARGET opengl_renderer PROPERTY CXX_STANDARD 20)
 
 add_custom_command(
   TARGET opengl_renderer
