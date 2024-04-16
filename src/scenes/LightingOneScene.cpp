@@ -29,7 +29,6 @@ LightingOneScene::LightingOneScene() : Scene({1, 2, 4}) {
   for (auto& cube : m_cubes) {
     cube->transform.UpdateModelMatrix();
   }
-  cube_group->selected = true;
   AddGroup(std::move(cube_group));
   AddGroup(std::move(plane_group));
 
@@ -56,9 +55,9 @@ LightingOneScene::LightingOneScene() : Scene({1, 2, 4}) {
 }
 
 void LightingOneScene::Update(double dt) {
-  //  for (auto& cube : m_cubes) {
-  //    cube->transform.Rotate((float) dt * 10, {0.5f, 1.0f, 0.0f});
-  //  }
+  // for (auto& cube : m_cubes) {
+  //   cube->transform.Rotate(static_cast<float>(dt) * 10, {0.5f, 1.0f, 0.0f});
+  // }
   //  for (auto& cube : m_cubes) {
   //    cube->transform.UpdateModelMatrix();
   //  }

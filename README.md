@@ -38,9 +38,14 @@ Or Open the project in an IDE and build from there if these scripts don't work (
 
 ### MSAA
 
+By rendering to a multi-sampled framebuffer and blitting (copying, and in this case, taking the average) it to a single sampled frambuffer to render to the screen or perform post-processing.
+
 ![MSAA Comparison](screenshots/msaa_comparison.png)
 
 ### Stencil Testing
+
+Objects can be outlined with a stencil by rendering to a stencil buffer
+with a shader that increases object size and draws a single color, followed by drawing the object normally. I've had issues with scaling, since some models are much larger, so it was difficult to define a single outline strength.
 
 ![Stencil Test](screenshots/stencil-test.png)
 
@@ -53,6 +58,12 @@ Or Open the project in an IDE and build from there if these scripts don't work (
 - Commit to actually learning CMake and cross-platform compatibility (Ugh)
 - Rewrite in OpenGL 4.6 with data oriented approach (batched rendering, direct state access)
 - Learn Vulkan
+
+## What I've Learned
+
+### CMake
+
+In my long journey moving from CLion on MacOS to Neovim on both MacOS and Linux, I realized the importance of learning CMake from the CLI and making it simple to build and run the project on different platforms.
 
 ## Dependencies
 

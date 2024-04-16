@@ -186,13 +186,14 @@ void Renderer::RenderGroup(const Group &group) {
   if (group.selected) {
     // if selected, render twice, once as normal, writing to the stencil buffer,
     // then enlarged, disabling stencil wiring using the border color
-    m_singleColorShader->Bind();
-    m_state.boundShader = m_singleColorShader;
+    m_stencilShader->Bind();
+    m_state.boundShader = m_stencilShader;
     m_state.boundShaderName = "";
 
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilMask(0x00);
-    m_singleColorShader->SetMat4("u_VP", m_camera->GetVPMatrix());
+
+    m_stencilShader->SetMat4("u_VP", m_camera->GetVPMatrix());
     for (auto &&object : group.GetObjects()) {
       if (!object->shouldDraw) continue;
       const auto *mesh = object->GetMesh();
@@ -221,8 +222,7 @@ void Renderer::Init() {
   // action to take when any stencil test passes or fails, replace when pass
   // stencil test and depth test (or only stencil if no depth test)
   glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-  glStencilFunc(GL_NOTEQUAL, 1,
-                0xFF);  // all fragments should pass stencil test
+  glStencilFunc(GL_NOTEQUAL, 1, 0xFF);  // all fragments should pass stencil test
 }
 
 void Renderer::Reset() {}
@@ -356,7 +356,7 @@ void Renderer::AssignShaders() {
   m_contrastShader = ShaderManager::GetShader("contrast");
   m_invertShader = ShaderManager::GetShader("invert");
   m_skyboxShader = ShaderManager::GetShader("skybox");
-  m_singleColorShader = ShaderManager::GetShader("singleColor");
+  m_stencilShader = ShaderManager::GetShader("singleColor");
   m_skyboxShader->Bind();
   m_skyboxShader->SetInt("skybox", 0);
 }

@@ -23,13 +23,14 @@ using ImGui::GetContentRegionAvail;
 Application *Application::m_instance_ptr = nullptr;
 
 #define DEFAULT_RENDER_TO_IMGUI_VIEWPORT false
+#define DEFAULT_VSYNC true
 
 Application::Application()
     : m_cameraController(m_window),
       m_renderer(m_window),
       m_sceneManager(m_renderer, m_cameraController) {
   m_instance_ptr = this;
-  m_window.SetVsync(false);
+  m_window.SetVsync(DEFAULT_VSYNC);
   SetupResources();
 
   m_renderToImGuiViewport = DEFAULT_RENDER_TO_IMGUI_VIEWPORT;
@@ -342,6 +343,6 @@ void Application::LoadShaders() {
   ShaderManager::AddShader("skybox", {{GET_SHADER_PATH("skybox.vert"), ShaderType::Vertex},
                                       {GET_SHADER_PATH("skybox.frag"), ShaderType::Fragment}});
   ShaderManager::AddShader("singleColor",
-                           {{GET_SHADER_PATH("singleColor.vert"), ShaderType::Vertex},
-                            {GET_SHADER_PATH("singleColor.frag"), ShaderType::Fragment}});
+                           {{GET_SHADER_PATH("singleColorStencil.vert"), ShaderType::Vertex},
+                            {GET_SHADER_PATH("singleColorStencil.frag"), ShaderType::Fragment}});
 }
