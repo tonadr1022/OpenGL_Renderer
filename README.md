@@ -5,22 +5,22 @@ techniques while abstracting them into
 an API that allows for scene creation without making OpenGL calls. Along the way, it has improved my C++ skills,
 although I'm learning that C++ (and graphics programming for that matter) is really a lifelong journey.
 
-## Building
+## Building and Running
 
-On MacOS and Linux:
-
-```shell
-sh build_run_debug.sh
-# or 
-sh build_run_release.sh
-```
-
-On Windows (Using Visual Studio 2022 as CMake generator):
+Run tasks.py or open the project in your IDE
 
 ```
-win_build_run_debug.bat
-or
-win_build_run_release.bat
+# Run in Debug mode
+python tasks.py -r
+
+# Specify Mode: [Debug, RelWithDebInfo, Release]
+python tasks.py -r --mode Release
+
+# Build Only
+python tasks.py -b
+
+# Clean
+python tasks.py -c
 ```
 
 Or Open the project in an IDE and build from there if these scripts don't work (Still learning CMake)
@@ -66,5 +66,3 @@ Or Open the project in an IDE and build from there if these scripts don't work (
   class which itself was inspired by [Entt](https://github.com/skypjack/entt).
 - [ThinMatrix](https://www.youtube.com/watch?v=VS8wlS9hF8E&list=PLRIWtICgwaX0u7Rf9zkZhLoLuZVfUksDP):
   A few OpenGL techniquesÎ
-
-
