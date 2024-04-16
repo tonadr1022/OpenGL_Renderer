@@ -29,7 +29,7 @@ Application::Application()
       m_renderer(m_window),
       m_sceneManager(m_renderer, m_cameraController) {
   m_instance_ptr = this;
-  Window::SetVsync(false);
+  m_window.SetVsync(false);
   SetupResources();
 
   m_renderToImGuiViewport = DEFAULT_RENDER_TO_IMGUI_VIEWPORT;
@@ -180,6 +180,10 @@ void Application::OnImGui() {
       ImGui::TreePop();
     }
 
+    bool vsync = m_window.IsVsync();
+    if (ImGui::Checkbox("VSync", &vsync)) {
+      m_window.SetVsync(vsync);
+    }
     ImGui::Checkbox("MSAA", &renderer_settings.useMSAA);
     ImGui::Checkbox("Wireframe", &renderer_settings.wireframe);
     ImGui::Checkbox("Use Blinn", &renderer_settings.useBlinn);

@@ -13,7 +13,8 @@ class Window {
  public:
   Window();
   ~Window();
-  static void SetVsync(bool state);
+  [[nodiscard]] bool IsVsync() const;
+  void SetVsync(bool state);
   void SwapBuffers();
   bool ShouldClose();
   void SetShouldClose(bool shouldClose);
@@ -28,6 +29,7 @@ class Window {
   uint32_t m_windowWidth{}, m_windowHeight{};
   GLFWwindow* m_window = nullptr;
   const char* m_glsl_version = "#version 410";
+  bool m_vsync;
 
   void Init_Glfw();
   void Init_ImGui();

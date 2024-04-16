@@ -98,7 +98,10 @@ void Window::Init_ImGui() {
   ImGui_ImplOpenGL3_Init(m_glsl_version);
 }
 
-void Window::SetVsync(bool state) { glfwSwapInterval(state); }
+void Window::SetVsync(bool state) {
+  m_vsync = state;
+  glfwSwapInterval(state);
+}
 
 bool Window::ShouldClose() { return glfwWindowShouldClose(m_window); }
 
@@ -116,3 +119,5 @@ glm::ivec2 Window::GetFrameBufferDimensions() const {
   return {m_framebufferWidth, m_framebufferHeight};
 }
 void Window::SetShouldClose(bool shouldClose) { glfwSetWindowShouldClose(m_window, shouldClose); }
+
+bool Window::IsVsync() const { return m_vsync; }
