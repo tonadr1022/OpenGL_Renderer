@@ -113,8 +113,8 @@ class Renderer {
   void IncStats(uint32_t numVertices, uint32_t numIndices);
   void StartFrame(const Scene& scene);
   void RenderGroup(const Group& group);
-  void SetLightingUniforms();
-  void SetBlinnPhongShaderUniforms() const;
+  void SetLightingUniforms(const Shader& shader);
+  void SetBlinnPhongShaderUniforms(const Shader& shader) const;
   void RenderSkybox(Camera* camera);
   void AllocateFBOContainers(uint32_t width, uint32_t height);
 

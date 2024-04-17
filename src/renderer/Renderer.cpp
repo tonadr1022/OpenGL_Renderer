@@ -12,6 +12,7 @@
 #include "src/resource/ShaderManager.hpp"
 #include "src/resource/TextureManager.hpp"
 #include "src/utils/HashedString.hpp"
+#include "src/utils/Logger.hpp"
 #include "src/utils/Utils.hpp"
 
 namespace {
@@ -76,7 +77,7 @@ void Renderer::UpdateRenderState(const Object &object) {
     if (mat != m_state.boundMaterial) {
       m_state.boundMaterial = mat;
       m_stats.numMaterialSwitches++;
-      SetBlinnPhongShaderUniforms();
+      SetBlinnPhongShaderUniforms(*m_state.boundShader);
     }
 
     if (m_skyboxTexture) m_skyboxTexture->Bind(GL_TEXTURE4);
@@ -86,53 +87,51 @@ void Renderer::UpdateRenderState(const Object &object) {
     m_state.boundShader->SetVec3("u_ViewPos", m_camera->GetPosition());
     m_state.boundShader->SetMat4("u_VP", m_camera->GetVPMatrix());
 
-    SetLightingUniforms();
+    SetLightingUniforms(*m_state.boundShader);
   }
 
   if (mat != m_state.boundMaterial) {
     m_state.boundMaterial = mat;
     m_stats.numMaterialSwitches++;
-    SetBlinnPhongShaderUniforms();
+    SetBlinnPhongShaderUniforms(*m_state.boundShader);
   }
 }
 
-void Renderer::SetBlinnPhongShaderUniforms() const {
+void Renderer::SetBlinnPhongShaderUniforms(const Shader &shader) const {
   // For now, this assumes only one type per material. will need to refactor if
   // otherwise
   uint32_t num_diffuse_maps = 0;
   uint32_t num_specular_maps = 0;
   uint32_t num_emission_maps = 0;
+
   for (const auto &texture_pair : m_state.boundMaterial->textures) {
     switch (texture_pair.first) {
       case MatTextureType::Diffuse:
         texture_pair.second->Bind(GL_TEXTURE0);
-        m_state.boundShader->SetInt("materialMaps.diffuseMap", 0);
+        shader.SetInt("materialMaps.diffuseMap", 0);
         num_diffuse_maps++;
         break;
       case MatTextureType::Specular:
         texture_pair.second->Bind(GL_TEXTURE1);
-        m_state.boundShader->SetInt("materialMaps.specularMap", 1);
+        shader.SetInt("materialMaps.specularMap", 1);
         num_specular_maps++;
         break;
       case MatTextureType::Emission:
         texture_pair.second->Bind(GL_TEXTURE2);
-        m_state.boundShader->SetInt("materialMaps.emissionMap", 2);
+        shader.SetInt("materialMaps.emissionMap", 2);
         num_emission_maps++;
         break;
       default:
         break;
     }
   }
-  m_state.boundShader->SetBool("hasDiffuseMap",
-                               m_settings.diffuseMapEnabled && num_diffuse_maps > 0);
-  m_state.boundShader->SetBool("hasSpecularMap",
-                               m_settings.specularMapEnabled && num_specular_maps > 0);
-  m_state.boundShader->SetBool("hasEmissionMap",
-                               m_settings.emissionMapEnabled && num_emission_maps > 0);
-  m_state.boundShader->SetVec3("material.ambient", m_state.boundMaterial->ambientColor);
-  m_state.boundShader->SetVec3("material.diffuse", m_state.boundMaterial->diffuseColor);
-  m_state.boundShader->SetVec3("material.specular", m_state.boundMaterial->specularColor);
-  m_state.boundShader->SetFloat("material.shininess", m_state.boundMaterial->shininess);
+  shader.SetBool("hasDiffuseMap", m_settings.diffuseMapEnabled && num_diffuse_maps > 0);
+  shader.SetBool("hasSpecularMap", m_settings.specularMapEnabled && num_specular_maps > 0);
+  shader.SetBool("hasEmissionMap", m_settings.emissionMapEnabled && num_emission_maps > 0);
+  shader.SetVec3("material.ambient", m_state.boundMaterial->ambientColor);
+  shader.SetVec3("material.diffuse", m_state.boundMaterial->diffuseColor);
+  shader.SetVec3("material.specular", m_state.boundMaterial->specularColor);
+  shader.SetFloat("material.shininess", m_state.boundMaterial->shininess);
 }
 
 void Renderer::ResetStats() { m_stats = {}; }
@@ -236,41 +235,62 @@ void Renderer::Init() {
 
 void Renderer::RenderScene(const Scene &scene, Camera *camera) {
   m_camera = camera;
+  GL_LOG_ERROR();
   StartFrame(scene);
+  GL_LOG_ERROR();
   for (const auto &group : scene.GetGroups()) {
     RenderGroup(*group);
   }
+  GL_LOG_ERROR();
 
   // spaghetti for now.
-  int i = 0;
   m_defaultInstancedShader->Bind();
   m_state.boundShader = m_defaultInstancedShader;
 
+  GL_LOG_ERROR();
   // TODO(tony): make not spaghetti here, duplicated
-  if (m_skyboxTexture) m_skyboxTexture->Bind(GL_TEXTURE4);
-  m_state.boundShader->SetInt("renderMode", static_cast<int>(debugMode));
-  m_state.boundShader->SetInt("skybox", 4);
-  m_state.boundShader->SetBool("useBlinn", m_settings.useBlinn);
-  m_state.boundShader->SetVec3("u_ViewPos", m_camera->GetPosition());
-  m_state.boundShader->SetMat4("u_VP", m_camera->GetVPMatrix());
 
+  if (m_skyboxTexture) m_skyboxTexture->Bind(GL_TEXTURE4);
+  GL_LOG_ERROR();
+  m_defaultInstancedShader->SetInt("renderMode", static_cast<int>(debugMode));
+  GL_LOG_ERROR();
+  // m_defaultInstancedShader->SetInt("skybox", 4);
+  GL_LOG_ERROR();
+  m_defaultInstancedShader->SetBool("useBlinn", m_settings.useBlinn);
+  GL_LOG_ERROR();
+  m_defaultInstancedShader->SetVec3("u_ViewPos", m_camera->GetPosition());
+  GL_LOG_ERROR();
+  m_defaultInstancedShader->SetMat4("u_VP", m_camera->GetVPMatrix());
+
+  GL_LOG_ERROR();
   for (const auto &instanced_model : scene.m_instanced_model_renderers) {
+    GL_LOG_ERROR();
     glBindBuffer(GL_ARRAY_BUFFER, instanced_model->m_matrix_buffer_id);
+    GL_LOG_ERROR();
     for (const auto &object : instanced_model->m_model->GetObjects()) {
+      GL_LOG_ERROR();
       m_state.boundMaterial = object->GetMaterial();
-      m_state.boundShader->SetMat4("u_Model", object->transform.GetModelMatrix());
-      SetBlinnPhongShaderUniforms();
-      SetLightingUniforms();
+      GL_LOG_ERROR();
+      // m_defaultInstancedShader->SetMat4("u_Model", object->transform.GetModelMatrix());
+      GL_LOG_ERROR();
+      SetBlinnPhongShaderUniforms(*m_defaultInstancedShader);
+      GL_LOG_ERROR();
+      SetLightingUniforms(*m_defaultInstancedShader);
+      GL_LOG_ERROR();
 
       object->GetMesh()->GetVAO().Bind();
+      GL_LOG_ERROR();
       // object->GetMesh()->Draw();
       glDrawElementsInstanced(GL_TRIANGLES, object->GetMesh()->NumIndices(), GL_UNSIGNED_INT,
                               nullptr, instanced_model->m_num_instances);
+      GL_LOG_ERROR();
     }
   }
+  GL_LOG_ERROR();
 
   if (m_settings.renderSkybox && m_skyboxTexture) RenderSkybox(camera);
 
+  GL_LOG_ERROR();
   // blit from multi-sampled result to the intermediate FBO
 
   glBindFramebuffer(GL_READ_FRAMEBUFFER, m_settings.useMSAA
@@ -283,6 +303,7 @@ void Renderer::RenderScene(const Scene &scene, Camera *camera) {
   // Not having this line gave me a few headaches! Quite mad when writing this!
   glActiveTexture(GL_TEXTURE0);
   m_postProcessor.Render(m_resolveSampleFBOContainer->Textures()[0].get());
+  GL_LOG_ERROR();
 }
 
 void Renderer::RenderSkybox(Camera *camera) {
@@ -326,63 +347,54 @@ void Renderer::SetSpotLights(const std::vector<std::unique_ptr<SpotLight> > *spo
   m_spotLights = spotLights;
 }
 
-void Renderer::SetLightingUniforms() {
+void Renderer::SetLightingUniforms(const Shader &shader) {
   if (m_settings.renderDirectionalLights && m_directionalLight != nullptr) {
-    m_state.boundShader->SetBool("directionalLightEnabled", true);
-    m_state.boundShader->SetVec3(directional_light_strings[0], m_directionalLight->color);
-    m_state.boundShader->SetFloat(directional_light_strings[1],
-                                  m_directionalLight->ambientIntensity);
-    m_state.boundShader->SetFloat(directional_light_strings[2],
-                                  m_directionalLight->diffuseIntensity);
-    m_state.boundShader->SetFloat(directional_light_strings[3],
-                                  m_directionalLight->specularIntensity);
-    m_state.boundShader->SetVec3(directional_light_strings[4], m_directionalLight->direction);
+    shader.SetBool("directionalLightEnabled", true);
+    shader.SetVec3(directional_light_strings[0], m_directionalLight->color);
+    shader.SetFloat(directional_light_strings[1], m_directionalLight->ambientIntensity);
+    shader.SetFloat(directional_light_strings[2], m_directionalLight->diffuseIntensity);
+    shader.SetFloat(directional_light_strings[3], m_directionalLight->specularIntensity);
+    shader.SetVec3(directional_light_strings[4], m_directionalLight->direction);
   } else {
-    m_state.boundShader->SetBool("directionalLightEnabled", false);
+    shader.SetBool("directionalLightEnabled", false);
   }
   if (m_settings.renderPointLights && m_pointLights != nullptr) {
-    m_state.boundShader->SetBool("pointLightEnabled", true);
+    shader.SetBool("pointLightEnabled", true);
     int i = 0;
     for (const auto &light : *m_pointLights) {
-      m_state.boundShader->SetVec3(point_light_strings[NUM_POINT_PARAMS * i], light->color);
-      m_state.boundShader->SetFloat(point_light_strings[NUM_POINT_PARAMS * i + 1],
-                                    light->ambientIntensity);
-      m_state.boundShader->SetFloat(point_light_strings[NUM_POINT_PARAMS * i + 2],
-                                    light->diffuseIntensity);
-      m_state.boundShader->SetFloat(point_light_strings[NUM_POINT_PARAMS * i + 3],
-                                    light->specularIntensity);
-      m_state.boundShader->SetVec3(point_light_strings[NUM_POINT_PARAMS * i + 4], light->position);
-      m_state.boundShader->SetFloat(point_light_strings[NUM_POINT_PARAMS * i + 5], light->radius);
+      shader.SetVec3(point_light_strings[NUM_POINT_PARAMS * i], light->color);
+      shader.SetFloat(point_light_strings[NUM_POINT_PARAMS * i + 1], light->ambientIntensity);
+      shader.SetFloat(point_light_strings[NUM_POINT_PARAMS * i + 2], light->diffuseIntensity);
+      shader.SetFloat(point_light_strings[NUM_POINT_PARAMS * i + 3], light->specularIntensity);
+      shader.SetVec3(point_light_strings[NUM_POINT_PARAMS * i + 4], light->position);
+      shader.SetFloat(point_light_strings[NUM_POINT_PARAMS * i + 5], light->radius);
       i++;
     }
-    m_state.boundShader->SetInt("numPointLights", i);
+    shader.SetInt("numPointLights", i);
   } else {
-    m_state.boundShader->SetBool("pointLightEnabled", false);
+    shader.SetBool("pointLightEnabled", false);
   }
   if (m_settings.renderSpotlights && m_spotLights != nullptr) {
-    m_state.boundShader->SetBool("spotLightEnabled", true);
+    shader.SetBool("spotLightEnabled", true);
     int i = 0;
     for (const auto &light : *m_spotLights) {
-      m_state.boundShader->SetVec3(spot_light_strings[NUM_SPOT_PARAMS * i], light->color);
-      m_state.boundShader->SetFloat(spot_light_strings[NUM_SPOT_PARAMS * i + 1],
-                                    light->ambientIntensity);
-      m_state.boundShader->SetFloat(spot_light_strings[NUM_SPOT_PARAMS * i + 2],
-                                    light->diffuseIntensity);
-      m_state.boundShader->SetFloat(spot_light_strings[NUM_SPOT_PARAMS * i + 3],
-                                    light->specularIntensity);
-      m_state.boundShader->SetVec3(spot_light_strings[NUM_SPOT_PARAMS * i + 4], light->position);
-      m_state.boundShader->SetVec3(spot_light_strings[NUM_SPOT_PARAMS * i + 5], light->direction);
-      m_state.boundShader->SetFloat(spot_light_strings[NUM_SPOT_PARAMS * i + 6], light->radius);
-      m_state.boundShader->SetFloat(spot_light_strings[NUM_SPOT_PARAMS * i + 7],
-                                    glm::cos(glm::radians(light->angle - light->penumbra)));
-      m_state.boundShader->SetFloat(spot_light_strings[NUM_SPOT_PARAMS * i + 8],
-                                    glm::cos(glm::radians(light->angle)));
+      shader.SetVec3(spot_light_strings[NUM_SPOT_PARAMS * i], light->color);
+      shader.SetFloat(spot_light_strings[NUM_SPOT_PARAMS * i + 1], light->ambientIntensity);
+      shader.SetFloat(spot_light_strings[NUM_SPOT_PARAMS * i + 2], light->diffuseIntensity);
+      shader.SetFloat(spot_light_strings[NUM_SPOT_PARAMS * i + 3], light->specularIntensity);
+      shader.SetVec3(spot_light_strings[NUM_SPOT_PARAMS * i + 4], light->position);
+      shader.SetVec3(spot_light_strings[NUM_SPOT_PARAMS * i + 5], light->direction);
+      shader.SetFloat(spot_light_strings[NUM_SPOT_PARAMS * i + 6], light->radius);
+      shader.SetFloat(spot_light_strings[NUM_SPOT_PARAMS * i + 7],
+                      glm::cos(glm::radians(light->angle - light->penumbra)));
+      shader.SetFloat(spot_light_strings[NUM_SPOT_PARAMS * i + 8],
+                      glm::cos(glm::radians(light->angle)));
       i++;
     }
 
-    m_state.boundShader->SetInt("numSpotLights", i);
+    shader.SetInt("numSpotLights", i);
   } else {
-    m_state.boundShader->SetBool("spotLightEnabled", false);
+    shader.SetBool("spotLightEnabled", false);
   }
 }
 

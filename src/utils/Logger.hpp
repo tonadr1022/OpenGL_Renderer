@@ -154,12 +154,11 @@ class Logger {
 #define LOG_CRITICAL(Message, ...) Logger::Critical(__LINE__, FILENAME_ONLY, Message, ##__VA_ARGS__)
 
 #define GL_LOG_ERROR(...)                                                                        \
-// #define GL_LOG_ERROR(...)                                                                        \
-//   do {                                                                                           \
-//     std::string error_##__LINE__##__FILE__ = Logger::GetGLError();                               \
-//     if (strcmp(error_##__LINE__##__FILE__.c_str(), "") != 0)                                     \
-//       Logger::Error(__LINE__, FILENAME_ONLY, error_##__LINE__##__FILE__.c_str(), ##__VA_ARGS__); \
-//   } while (0)
+  do {                                                                                           \
+    std::string error_##__LINE__##__FILE__ = Logger::GetGLError();                               \
+    if (strcmp(error_##__LINE__##__FILE__.c_str(), "") != 0)                                     \
+      Logger::Error(__LINE__, FILENAME_ONLY, error_##__LINE__##__FILE__.c_str(), ##__VA_ARGS__); \
+  } while (0)
 
 #define ASSERT(condition, message, ...)                    \
   if (!(condition)) {                                      \

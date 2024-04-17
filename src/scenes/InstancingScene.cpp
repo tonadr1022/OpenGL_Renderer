@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "src/camera/CameraController.hpp"
+#include "src/resource/MaterialManager.hpp"
 #include "src/resource/ModelManager.hpp"
 
 InstancingScene::InstancingScene() : Scene({50, 50, 50}, "Sky 1", CameraController::Mode::Orbit) {
@@ -41,7 +42,11 @@ InstancingScene::InstancingScene() : Scene({50, 50, 50}, "Sky 1", CameraControll
 
   // enable instance matrix attributes.
 
-  auto new_spot = ModelManager::CopyLoadedModel("backpack");
+  auto new_spot = ModelManager::CopyLoadedModel("spot");
+  auto* spot_mat = MaterialManager::GetMaterial("spotTextured");
+  for (const auto& obj : new_spot->GetObjects()) {
+    obj->SetMaterial(spot_mat);
+  }
   m_instanced_model_renderers.emplace_back(
       std::make_unique<InstancedModelRenderer>(new_spot.get(), model_matrices));
   m_instanced_models.push_back(std::move(new_spot));

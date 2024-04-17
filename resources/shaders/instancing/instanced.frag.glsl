@@ -26,6 +26,7 @@ struct MaterialMaps {
     sampler2D emissionMap;
     sampler2D normalMap;
 };
+
 uniform samplerCube skybox;
 
 struct LightBase {
@@ -175,8 +176,7 @@ float linearizeDepth(float depth) {
 
 void main() {
     if (renderMode == 0) {
-        vec4 totalLight = hasDiffuseMap ? texture(materialMaps.diffuseMap, TexCoord) : vec4(1.0, 0.0, 1.0, 1.0);
-        // vec4 totalLight = calcTotalLight();
+        vec4 totalLight = calcTotalLight();
         // emission
         vec3 emission = vec3(0.0);
         if (hasEmissionMap) {

@@ -91,6 +91,14 @@ due to poor cache coherence. If I were to start fresh, I would avoid having
 scenes extend the base scene class and instead use a component or
 [ECS](https://en.wikipedia.org/wiki/Entity_component_system).
 
+### Graphics Debugging
+
+After I started developing on Linux, I was able to use Renderdoc, a
+life-changing tool compared to only using log macros without the ability to
+trace through OpenGL calls. I hadn't been able to use it previously being on
+MacOS, and being able to see the exact state and order of each call was
+extremely useful in finding where issues were located.
+
 ## Dependencies
 
 - [GLFW](https://github.com/glfw/glfw): window creation and OpenGL context
