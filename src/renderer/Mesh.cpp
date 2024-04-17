@@ -4,8 +4,6 @@
 
 #include "Mesh.hpp"
 
-#include "src/utils/Logger.hpp"
-
 Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices)
     : m_verticesLength(vertices.size()), m_indicesLength(indices.size()) {
   m_vao.Bind();

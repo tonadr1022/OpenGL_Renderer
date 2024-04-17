@@ -19,8 +19,10 @@ class ModelViewerScene : public Scene {
   std::string m_activeModelName;
   std::vector<std::string> m_skyboxNames;
 
+  bool m_stencilSelectedDemo = false;
+
   template <typename T>
-  void ImGuiTransformComponent(T* object, const std::string& iStr);
+  void ImGuiTransformComponent(T* object, const std::string& index_str);
 };
 
 #endif  // OPENGL_RENDERER_SRC_SCENES_MODELVIEWERSCENE_HPP_

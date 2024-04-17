@@ -12,9 +12,11 @@
 #include "src/renderer/Light.hpp"
 
 class Scene {
+  friend class Renderer;
+
  public:
   Scene();
-  explicit Scene(const glm::vec3& defaultCameraPos,
+  explicit Scene(const glm::vec3& defaultCameraPos, std::string skyboxName,
                  CameraController::Mode defaultCamMode = CameraController::Mode::FPS);
   virtual ~Scene() = default;
   virtual void Update(double dt);

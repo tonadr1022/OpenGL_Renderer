@@ -10,13 +10,12 @@
 #include "src/resource/MeshManager.hpp"
 #include "src/resource/ModelManager.hpp"
 
-LightingOneScene::LightingOneScene() : Scene({1, 2, 4}) {
+LightingOneScene::LightingOneScene() : Scene({1, 2, 4}, "") {
   Material* wood_container_mat = MaterialManager::GetMaterial("woodContainer");
   Mesh* cube_mesh = MeshManager::GetMesh("cube");
 
   auto plane = std::make_unique<Object>(MeshManager::GetMesh("cube1024"), wood_container_mat);
   plane->transform.Scale({1000, 1, 1000});
-  plane->transform.UpdateModelMatrix();
   auto plane_group = std::make_unique<Group>();
   plane_group->AddObject(std::move(plane));
 
@@ -25,6 +24,7 @@ LightingOneScene::LightingOneScene() : Scene({1, 2, 4}) {
   for (const auto& obj : spot->GetObjects()) {
     obj->SetMaterial(spot_mat);
   }
+
   AddGroup(std::move(spot));
 
   auto cube_group = std::make_unique<Group>();
@@ -37,17 +37,14 @@ LightingOneScene::LightingOneScene() : Scene({1, 2, 4}) {
   //   }
   // }
 
-  for (int z = -200; z <= 20; z += 5) {
-    for (int x = -20; x <= 20; x += 5) {
-      auto cube = std::make_unique<Object>(cube_mesh, wood_container_mat);
-      cube->transform.Translate({x, 3, z});
-      m_cubes.push_back(cube.get());
-      cube_group->AddObject(std::move(cube));
-    }
-  }
-  for (auto& cube : m_cubes) {
-    cube->transform.UpdateModelMatrix();
-  }
+  // for (int z = -200; z <= 20; z += 5) {
+  //   for (int x = -20; x <= 20; x += 5) {
+  //     auto cube = std::make_unique<Object>(cube_mesh, wood_container_mat);
+  //     cube->transform.Translate({x, 3, z});
+  //     m_cubes.push_back(cube.get());
+  //     cube_group->AddObject(std::move(cube));
+  //   }
+  // }
 
   AddGroup(std::move(cube_group));
   AddGroup(std::move(plane_group));

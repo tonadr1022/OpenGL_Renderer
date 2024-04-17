@@ -6,6 +6,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
 
 #include "imgui/imgui.h"
 #include "src/utils/Input.hpp"
@@ -109,7 +110,14 @@ void OrbitCamera::UpdateMatrices() {
 }
 
 void OrbitCamera::SetPosition(const glm::vec3& newPos) {
-  m_pos = newPos;
+  // straight from wikipedia: https://en.wikipedia.org/wiki/Spherical_coordinate_system
+  auto dist_to_target = glm::distance(newPos, m_target);
+  m_distance = dist_to_target;
+  auto diff = newPos - m_target;
+  m_polarAngle = glm::acos(diff.z / dist_to_target);
+  float sign = diff.y > 0 ? 1 : diff.y < 0 ? -1 : 0;
+  m_azimuthAngle = sign * glm::acos(diff.x / glm::sqrt(diff.x * diff.x + diff.y * diff.y));
+
   UpdatePosition();
   UpdateMatrices();
 }

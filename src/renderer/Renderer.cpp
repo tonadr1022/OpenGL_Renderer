@@ -4,10 +4,14 @@
 
 #include "Renderer.hpp"
 
+#include <iostream>
+
 #include "imgui/imgui.h"
 #include "src/Common.hpp"
 #include "src/gl/FrameBuffer.hpp"
 #include "src/resource/ShaderManager.hpp"
+#include "src/resource/TextureManager.hpp"
+#include "src/utils/HashedString.hpp"
 #include "src/utils/Utils.hpp"
 
 namespace {
@@ -71,38 +75,34 @@ void Renderer::UpdateRenderState(const Object &object) {
 
     if (mat != m_state.boundMaterial) {
       m_state.boundMaterial = mat;
-
       m_stats.numMaterialSwitches++;
-      SetBlinnPhongUniforms();
+      SetBlinnPhongShaderUniforms();
     }
 
-    // m_skyboxTexture->Bind(GL_TEXTURE4);
-
-    glActiveTexture(GL_TEXTURE10);
-    glBindTexture(static_cast<GLenum>(GL_TEXTURE_CUBE_MAP), m_skyboxTexture->Id());
+    if (m_skyboxTexture) m_skyboxTexture->Bind(GL_TEXTURE4);
     m_state.boundShader->SetInt("renderMode", static_cast<int>(debugMode));
-    // m_state.boundShader->SetInt("skybox", 0);
+    m_state.boundShader->SetInt("skybox", 4);
     m_state.boundShader->SetBool("useBlinn", m_settings.useBlinn);
     m_state.boundShader->SetVec3("u_ViewPos", m_camera->GetPosition());
     m_state.boundShader->SetMat4("u_VP", m_camera->GetVPMatrix());
 
     SetLightingUniforms();
   }
+
   if (mat != m_state.boundMaterial) {
     m_state.boundMaterial = mat;
     m_stats.numMaterialSwitches++;
-
-    SetBlinnPhongUniforms();
+    SetBlinnPhongShaderUniforms();
   }
 }
 
-void Renderer::SetBlinnPhongUniforms() const {
+void Renderer::SetBlinnPhongShaderUniforms() const {
   // For now, this assumes only one type per material. will need to refactor if
   // otherwise
   uint32_t num_diffuse_maps = 0;
   uint32_t num_specular_maps = 0;
   uint32_t num_emission_maps = 0;
-  for (auto &&texture_pair : m_state.boundMaterial->textures) {
+  for (const auto &texture_pair : m_state.boundMaterial->textures) {
     switch (texture_pair.first) {
       case MatTextureType::Diffuse:
         texture_pair.second->Bind(GL_TEXTURE0);
@@ -129,7 +129,6 @@ void Renderer::SetBlinnPhongUniforms() const {
                                m_settings.specularMapEnabled && num_specular_maps > 0);
   m_state.boundShader->SetBool("hasEmissionMap",
                                m_settings.emissionMapEnabled && num_emission_maps > 0);
-
   m_state.boundShader->SetVec3("material.ambient", m_state.boundMaterial->ambientColor);
   m_state.boundShader->SetVec3("material.diffuse", m_state.boundMaterial->diffuseColor);
   m_state.boundShader->SetVec3("material.specular", m_state.boundMaterial->specularColor);
@@ -138,13 +137,17 @@ void Renderer::SetBlinnPhongUniforms() const {
 
 void Renderer::ResetStats() { m_stats = {}; }
 
-void Renderer::StartFrame(const Scene & /*scene*/) {
+void Renderer::StartFrame(const Scene &scene) {
   // reset state
   m_state.boundShader = nullptr;
   m_state.boundMaterial = nullptr;
   m_state.boundShaderName = "";
+
   ResetStats();
+
   glPolygonMode(GL_FRONT_AND_BACK, m_settings.wireframe ? GL_LINE : GL_FILL);
+
+  m_skyboxTexture = TextureManager::GetTexture(HashedString(scene.m_skyboxName.data()));
 
   if (m_settings.useMSAA) {
     m_multiSampleFBOContainer->FBO().Bind();
@@ -156,6 +159,10 @@ void Renderer::StartFrame(const Scene & /*scene*/) {
   glEnable(GL_STENCIL_TEST);
   glClearColor(0.0, 0.0, 0.0, 1.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+  // reset stencil buffer state. This gave me issues!
+  glStencilFunc(GL_ALWAYS, 1, 0xFF);
+  glStencilMask(0xFF);
 }
 
 void Renderer::RenderGroup(const Group &group) {
@@ -181,13 +188,15 @@ void Renderer::RenderGroup(const Group &group) {
     IncStats(mesh->NumVertices(), mesh->NumIndices());
   }
 
-  if (group.selected) {
+  // stencil draw calls if the group is selected
+  if (group.stencil) {
     // if selected, render twice, once as normal, writing to the stencil buffer,
     // then enlarged, disabling stencil wiring using the border color
     m_stencilShader->Bind();
     m_state.boundShader = m_stencilShader;
     m_state.boundShaderName = "";
 
+    // only write to the buffer if
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
     glStencilMask(0x00);
 
@@ -223,17 +232,17 @@ void Renderer::Init() {
   glStencilFunc(GL_NOTEQUAL, 1, 0xFF);  // all fragments should pass stencil test
 }
 
-void Renderer::Reset() {}
-
 void Renderer::RenderScene(const Scene &scene, Camera *camera) {
   m_camera = camera;
   StartFrame(scene);
   for (const auto &group : scene.GetGroups()) {
     RenderGroup(*group);
   }
-  if (m_settings.renderSkybox) RenderSkybox(camera);
+
+  if (m_settings.renderSkybox && m_skyboxTexture) RenderSkybox(camera);
 
   // blit from multi-sampled result to the intermediate FBO
+
   glBindFramebuffer(GL_READ_FRAMEBUFFER, m_settings.useMSAA
                                              ? m_multiSampleFBOContainer->FBO().Id()
                                              : m_singleSampleFBOContainer->FBO().Id());
@@ -241,22 +250,24 @@ void Renderer::RenderScene(const Scene &scene, Camera *camera) {
   glBlitFramebuffer(0, 0, static_cast<GLsizei>(m_width), static_cast<GLsizei>(m_height), 0, 0,
                     static_cast<GLsizei>(m_width), static_cast<GLsizei>(m_height), 0x00004000,
                     GL_NEAREST);
+  // Not having this line gave me a few headaches! Quite mad when writing this!
+  glActiveTexture(GL_TEXTURE0);
   m_postProcessor.Render(m_resolveSampleFBOContainer->Textures()[0].get());
 }
 
 void Renderer::RenderSkybox(Camera *camera) {
+  // draw it behind everything
   glDepthFunc(GL_LEQUAL);
 
   m_skyboxTexture->Bind(GL_TEXTURE0);
-
   m_skyboxShader->Bind();
+  m_state.boundShader = m_skyboxShader;
+  m_state.boundShaderName = "";
   glm::mat4 vp = camera->GetProjectionMatrix() * glm::mat4(glm::mat3(camera->GetViewMatrix()));
   m_skyboxShader->SetMat4("VP", vp);
   m_skybox.Draw();
-  //  m_skyboxShader->Unbind();
-  //  t->Unbind();
+  // back to normal depth func
   glDepthFunc(GL_LESS);
-  //  glEnable(GL_STENCIL_TEST);
 }
 
 void Renderer::ResizeViewport(uint32_t width, uint32_t height) {
@@ -355,11 +366,7 @@ void Renderer::AssignShaders() {
   m_invertShader = ShaderManager::GetShader("invert");
   m_skyboxShader = ShaderManager::GetShader("skybox");
   m_stencilShader = ShaderManager::GetShader("singleColor");
-  m_skyboxShader->Bind();
-  m_skyboxShader->SetInt("skybox", 0);
 }
-
-void Renderer::SetSkyboxTexture(Texture *texture) { m_skyboxTexture = texture; }
 
 void Renderer::IncStats(uint32_t numVertices, uint32_t numIndices) {
   m_stats.drawCalls++;

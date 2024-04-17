@@ -107,3 +107,9 @@ scenes extend the base scene class and instead use a component or
 - [GEngine](https://github.com/JuanDiegoMontoya/Gengine/tree/37739ecfcb608f6b282b36ed8a962fac968b1487):
   Inspiration for input handling with GLFW, and the HashedString class which
   itself was inspired by [Entt](https://github.com/skypjack/entt).
+
+## Funny Glitches
+
+(Mainly for me to look back and laught at later on)
+
+![Spot Texture Glitch](screenshots/funny-glitch1.png)

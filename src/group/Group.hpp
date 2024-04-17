@@ -12,6 +12,8 @@
 
 class Group {
   friend class ModelManager;
+  // for instancing demo for now
+  friend class Application;
 
  public:
   explicit Group(bool backFaceCull = true);
@@ -20,7 +22,7 @@ class Group {
 
   Group(Group& other) {
     this->backFaceCull = other.backFaceCull;
-    this->selected = other.selected;
+    this->stencil = other.stencil;
     for (const auto& object : other.m_objects) {
       this->m_objects.push_back(std::make_unique<Object>(*object));
     }
@@ -31,9 +33,10 @@ class Group {
   [[nodiscard]] inline const std::vector<std::unique_ptr<Object>>& GetObjects() const {
     return m_objects;
   }
+
   Transform transform;
   bool backFaceCull = true;
-  bool selected = false;
+  bool stencil = false;
   bool visible = true;
   bool wireframe = false;
 

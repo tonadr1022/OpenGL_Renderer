@@ -156,7 +156,6 @@ std::vector<TexturePair> ModelManager::LoadMaterialTextures(aiMaterial* aiMateri
     // add or get the texture
     //    auto t = std::string(m_name + textureFilename.data);
     auto texture_name = HashedString((std::string(m_path) + texture_filename.data).c_str());
-    //    std::cout << m_name << " " << textureFilename.data << std::endl;
     Texture* texture = TextureManager::GetTexture(texture_name);
     if (texture == nullptr) {
       texture = TextureManager::AddTexture(texture_name,

@@ -5,17 +5,13 @@
 #include "ModelViewerScene.hpp"
 
 #include "imgui/imgui.h"
-#include "src/Application.hpp"
 #include "src/resource/MaterialManager.hpp"
 #include "src/resource/ModelManager.hpp"
-#include "src/resource/TextureManager.hpp"
 #include "src/utils/HashedString.hpp"
 
-ModelViewerScene::ModelViewerScene() : Scene({10, 10, 10}, CameraController::Mode::Orbit) {
+ModelViewerScene::ModelViewerScene() : Scene({50, 50, 50}, "Sky 1", CameraController::Mode::Orbit) {
   m_skyboxNames = {"Sky 1", "Sky 2", "Church", "Winter"};
-  m_skyboxName = m_skyboxNames[0];
-  Application::Instance().GetRenderer().SetSkyboxTexture(
-      TextureManager::GetTexture(HashedString(m_skyboxName.data())));
+
   auto backpack = ModelManager::CopyLoadedModel("backpack");
   auto teapot = ModelManager::CopyLoadedModel("teapot");
   auto sponza = ModelManager::CopyLoadedModel("sponza");
@@ -34,7 +30,6 @@ ModelViewerScene::ModelViewerScene() : Scene({10, 10, 10}, CameraController::Mod
 
   m_modelSelectMap.emplace("Spot", spot.get());
   spot->transform.SetScale(glm::vec3(10));
-  spot->selected = true;
   auto* spot_mat = MaterialManager::GetMaterial("spotTextured");
   for (const auto& obj : spot->GetObjects()) {
     obj->SetMaterial(spot_mat);
@@ -63,8 +58,6 @@ void ModelViewerScene::OnImGui() {
   if (ImGui::BeginCombo("##Skybox", ("Skybox: " + m_skyboxName).c_str())) {
     for (auto& name : m_skyboxNames) {
       if (ImGui::Selectable(name.data())) {
-        Application::Instance().GetRenderer().SetSkyboxTexture(
-            TextureManager::GetTexture(HashedString(name.data())));
         m_skyboxName = name;
       }
     }
@@ -85,6 +78,10 @@ void ModelViewerScene::OnImGui() {
 
   if (ImGui::CollapsingHeader("Model")) {
     ImGuiTransformComponent(m_visibleModel, "");
+  }
+
+  if (ImGui::Checkbox("Stencil Outline", &m_stencilSelectedDemo)) {
+    m_visibleModel->stencil = m_stencilSelectedDemo;
   }
 
   static int selected_object_index = 0;
@@ -174,11 +171,11 @@ void ModelViewerScene::OnImGui() {
 }
 
 template <typename T>
-void ModelViewerScene::ImGuiTransformComponent(T* obj, const std::string& iStr) {
+void ModelViewerScene::ImGuiTransformComponent(T* obj, const std::string& index_str) {
   ImGui::Text("Transform");
 
   auto pos = obj->transform.GetPosition();
-  if (ImGui::DragFloat3(("Position##" + iStr).c_str(), &pos.x, 0.01)) {
+  if (ImGui::DragFloat3(("Position##" + index_str).c_str(), &pos.x, 0.01)) {
     obj->transform.SetLocalPos(pos);
   }
   static bool uniform_scale = false;
@@ -186,7 +183,7 @@ void ModelViewerScene::ImGuiTransformComponent(T* obj, const std::string& iStr) 
   auto scale = obj->transform.GetScale();
   if (uniform_scale) {
     auto old_scale = scale;
-    if (ImGui::DragFloat3(("Scale##" + iStr).c_str(), &scale.x, 0.001)) {
+    if (ImGui::DragFloat3(("Scale##" + index_str).c_str(), &scale.x, 0.001)) {
       float change = 0;
       if (old_scale.x != scale.x) {
         change = scale.x - old_scale.x;
@@ -199,7 +196,7 @@ void ModelViewerScene::ImGuiTransformComponent(T* obj, const std::string& iStr) 
           glm::vec3(old_scale.x + change, old_scale.y + change, old_scale.z + change));
     }
   } else {
-    if (ImGui::DragFloat3(("Scale##" + iStr).c_str(), &scale.x, 0.001)) {
+    if (ImGui::DragFloat3(("Scale##" + index_str).c_str(), &scale.x, 0.001)) {
       obj->transform.SetScale(scale);
     }
   }

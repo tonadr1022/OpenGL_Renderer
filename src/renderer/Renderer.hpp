@@ -49,9 +49,7 @@ class Renderer {
   void SetDirectionalLight(const DirectionalLight* directionalLight);
   void SetSpotLights(const std::vector<std::unique_ptr<SpotLight>>* spotLights);
   void SetPointLights(const std::vector<std::unique_ptr<PointLight>>* pointLights);
-  void Reset();
   void OnImGui();
-  void SetSkyboxTexture(Texture* texture);
 
   void RecompileShaders();
 
@@ -115,7 +113,7 @@ class Renderer {
   void StartFrame(const Scene& scene);
   void RenderGroup(const Group& group);
   void SetLightingUniforms();
-  void SetBlinnPhongUniforms() const;
+  void SetBlinnPhongShaderUniforms() const;
   void RenderSkybox(Camera* camera);
   void AllocateFBOContainers(uint32_t width, uint32_t height);
 

@@ -26,7 +26,6 @@ struct MaterialMaps {
     sampler2D emissionMap;
     sampler2D normalMap;
 };
-
 uniform samplerCube skybox;
 
 struct LightBase {

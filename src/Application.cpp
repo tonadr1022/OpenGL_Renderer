@@ -4,6 +4,8 @@
 
 #include "Application.hpp"
 
+#include <cstdint>
+
 #include "imgui/imgui.h"
 #include "src/Common.hpp"
 #include "src/imgui/ImGuiMenu.hpp"
@@ -103,12 +105,23 @@ void Application::SetupResources() {
 }
 
 void Application::Run() {
-  m_renderer.SetSkyboxTexture(TextureManager::GetTexture(HashedString("Sky 2")));
   m_sceneManager.AddScene("Playground", std::make_unique<PlaygroundScene>());
   m_sceneManager.AddScene("Lighting One", std::make_unique<LightingOneScene>());
   m_sceneManager.AddScene("Model Viewer", std::make_unique<ModelViewerScene>());
 
   m_sceneManager.SetActiveScene("Lighting One");
+
+  uint32_t count = 10000;
+  std::vector<glm::mat4> model_matrices(count);
+  unsigned int buffer;
+  glGenBuffers(1, &buffer);
+  glBindBuffer(GL_ARRAY_BUFFER, buffer);
+  glBufferData(GL_ARRAY_BUFFER, count * sizeof(glm::mat4), model_matrices.data(), GL_STATIC_DRAW);
+
+  // TODO Continue instancing.
+  auto spot = ModelManager::CopyLoadedModel("spot");
+  for (uint32_t i = 0; i < spot->m_objects.size(); i++) {
+  }
 
   double curr_time;
   double last_time = glfwGetTime();

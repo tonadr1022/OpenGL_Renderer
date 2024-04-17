@@ -102,7 +102,7 @@ void CameraController::Focus() {
   if (!m_focused) {
     m_focused = true;
     if (m_mode == Mode::FPS) {
-      // Input::SetCursorVisible(false);
+      Input::SetCursorVisible(false);
       Input::CenterCursor();
     }
   }

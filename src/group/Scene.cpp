@@ -4,6 +4,8 @@
 
 #include "Scene.hpp"
 
+#include <utility>
+
 #include "imgui/imgui.h"
 
 void Scene::AddGroup(std::unique_ptr<Group> group) { m_groups.push_back(std::move(group)); }
@@ -23,8 +25,11 @@ void Scene::Update(double dt) {}
 
 Scene::Scene() : defaultCameraPosition({0, 0, 0}) {}
 
-Scene::Scene(const glm::vec3& defaultCameraPos, CameraController::Mode defaultCamMode)
-    : defaultCameraPosition(defaultCameraPos), defaultCameraMode(defaultCamMode) {}
+Scene::Scene(const glm::vec3& defaultCameraPos, std::string skyboxName,
+             CameraController::Mode defaultCamMode)
+    : defaultCameraPosition(defaultCameraPos),
+      m_skyboxName(std::move(skyboxName)),
+      defaultCameraMode(defaultCamMode) {}
 
 void Scene::ImGuiLights() {
   if (m_directionalLight != nullptr) {
