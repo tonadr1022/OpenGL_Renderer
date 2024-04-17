@@ -19,3 +19,7 @@ Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& ind
 }
 
 Mesh::~Mesh() = default;
+
+void Mesh::Draw() const {
+  glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indicesLength), GL_UNSIGNED_INT, nullptr);
+}

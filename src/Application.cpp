@@ -14,6 +14,7 @@
 #include "src/resource/ModelManager.hpp"
 #include "src/resource/ShaderManager.hpp"
 #include "src/resource/TextureManager.hpp"
+#include "src/scenes/InstancingScene.hpp"
 #include "src/scenes/LightingOneScene.hpp"
 #include "src/scenes/ModelViewerScene.hpp"
 #include "src/scenes/PlaygroundScene.hpp"
@@ -108,20 +109,9 @@ void Application::Run() {
   m_sceneManager.AddScene("Playground", std::make_unique<PlaygroundScene>());
   m_sceneManager.AddScene("Lighting One", std::make_unique<LightingOneScene>());
   m_sceneManager.AddScene("Model Viewer", std::make_unique<ModelViewerScene>());
+  m_sceneManager.AddScene("Instancing 1", std::make_unique<InstancingScene>());
 
-  m_sceneManager.SetActiveScene("Lighting One");
-
-  uint32_t count = 10000;
-  std::vector<glm::mat4> model_matrices(count);
-  unsigned int buffer;
-  glGenBuffers(1, &buffer);
-  glBindBuffer(GL_ARRAY_BUFFER, buffer);
-  glBufferData(GL_ARRAY_BUFFER, count * sizeof(glm::mat4), model_matrices.data(), GL_STATIC_DRAW);
-
-  // TODO Continue instancing.
-  auto spot = ModelManager::CopyLoadedModel("spot");
-  for (uint32_t i = 0; i < spot->m_objects.size(); i++) {
-  }
+  m_sceneManager.SetActiveScene("Instancing 1");
 
   double curr_time;
   double last_time = glfwGetTime();
@@ -357,4 +347,8 @@ void Application::LoadShaders() {
   ShaderManager::AddShader("singleColor",
                            {{GET_SHADER_PATH("singleColorStencil.vert"), ShaderType::Vertex},
                             {GET_SHADER_PATH("singleColorStencil.frag"), ShaderType::Fragment}});
+  ShaderManager::AddShader(
+      "instancedDefault",
+      {{GET_SHADER_PATH("instancing/instanced.vert.glsl"), ShaderType::Vertex},
+       {GET_SHADER_PATH("instancing/instanced.frag.glsl"), ShaderType::Fragment}});
 }

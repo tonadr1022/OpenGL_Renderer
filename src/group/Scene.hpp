@@ -9,6 +9,7 @@
 
 #include "src/camera/CameraController.hpp"
 #include "src/group/Group.hpp"
+#include "src/renderer/InstancedModelRenderer.hpp"
 #include "src/renderer/Light.hpp"
 
 class Scene {
@@ -51,6 +52,7 @@ class Scene {
   std::string m_skyboxName;
 
   std::vector<std::unique_ptr<Group>> m_groups;
+  std::vector<std::unique_ptr<InstancedModelRenderer>> m_instanced_model_renderers;
 };
 
 #endif  // OPENGL_RENDERER_SRC_RENDERER_GROUP_SCENE_HPP_

@@ -183,8 +183,9 @@ void Renderer::RenderGroup(const Group &group) {
     UpdateRenderState(*object);
     mesh->GetVAO().Bind();
     m_state.boundShader->SetMat4("u_Model", object->transform.GetModelMatrix());
-    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mesh->NumIndices()), GL_UNSIGNED_INT,
-                   nullptr);
+    mesh->Draw();
+    // glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mesh->NumIndices()), GL_UNSIGNED_INT,
+    //                nullptr);
     IncStats(mesh->NumVertices(), mesh->NumIndices());
   }
 
@@ -206,8 +207,9 @@ void Renderer::RenderGroup(const Group &group) {
       const auto *mesh = object->GetMesh();
       mesh->GetVAO().Bind();
       m_state.boundShader->SetMat4("u_Model", object->transform.GetModelMatrix());
-      glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mesh->NumIndices()), GL_UNSIGNED_INT,
-                     nullptr);
+      mesh->Draw();
+      // glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mesh->NumIndices()), GL_UNSIGNED_INT,
+      //                nullptr);
       IncStats(mesh->NumVertices(), mesh->NumIndices());
     }
     // reset stencil buffer state
@@ -237,6 +239,32 @@ void Renderer::RenderScene(const Scene &scene, Camera *camera) {
   StartFrame(scene);
   for (const auto &group : scene.GetGroups()) {
     RenderGroup(*group);
+  }
+
+  // spaghetti for now.
+  int i = 0;
+  m_defaultInstancedShader->Bind();
+  m_state.boundShader = m_defaultInstancedShader;
+
+  if (m_skyboxTexture) m_skyboxTexture->Bind(GL_TEXTURE4);
+  m_state.boundShader->SetInt("renderMode", static_cast<int>(debugMode));
+  m_state.boundShader->SetInt("skybox", 4);
+  m_state.boundShader->SetBool("useBlinn", m_settings.useBlinn);
+  m_state.boundShader->SetVec3("u_ViewPos", m_camera->GetPosition());
+  m_state.boundShader->SetMat4("u_VP", m_camera->GetVPMatrix());
+  for (const auto &instanced_model : scene.m_instanced_model_renderers) {
+    for (const auto &object : instanced_model->m_model->GetObjects()) {
+      m_state.boundMaterial = object->GetMaterial();
+      m_state.boundShader->SetMat4("u_Model", object->transform.GetModelMatrix());
+      SetBlinnPhongShaderUniforms();
+      SetLightingUniforms();
+
+      object->GetMesh()->GetVAO().Bind();
+      // object->GetMesh()->Draw();
+      // glBindBuffer(GL_ARRAY_BUFFER, instanced_model->m_matrix_buffer_id);
+      // glDrawElementsInstanced(GL_TRIANGLES, object->GetMesh()->NumIndices(), GL_UNSIGNED_INT,
+      //                         nullptr, instanced_model->m_num_instances);
+    }
   }
 
   if (m_settings.renderSkybox && m_skyboxTexture) RenderSkybox(camera);
@@ -291,6 +319,7 @@ void Renderer::SetPointLights(const std::vector<std::unique_ptr<PointLight> > *p
 void Renderer::SetDirectionalLight(const DirectionalLight *directionalLight) {
   m_directionalLight = directionalLight;
 }
+
 void Renderer::SetSpotLights(const std::vector<std::unique_ptr<SpotLight> > *spotLights) {
   m_spotLights = spotLights;
 }
@@ -306,7 +335,6 @@ void Renderer::SetLightingUniforms() {
     m_state.boundShader->SetFloat(directional_light_strings[3],
                                   m_directionalLight->specularIntensity);
     m_state.boundShader->SetVec3(directional_light_strings[4], m_directionalLight->direction);
-
   } else {
     m_state.boundShader->SetBool("directionalLightEnabled", false);
   }
@@ -366,6 +394,7 @@ void Renderer::AssignShaders() {
   m_invertShader = ShaderManager::GetShader("invert");
   m_skyboxShader = ShaderManager::GetShader("skybox");
   m_stencilShader = ShaderManager::GetShader("singleColor");
+  m_defaultInstancedShader = ShaderManager::GetShader("instancedDefault");
 }
 
 void Renderer::IncStats(uint32_t numVertices, uint32_t numIndices) {

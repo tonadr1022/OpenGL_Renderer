@@ -86,6 +86,7 @@ class Renderer {
   Shader* m_invertShader = nullptr;
   Shader* m_skyboxShader = nullptr;
   Shader* m_stencilShader = nullptr;
+  Shader* m_defaultInstancedShader = nullptr;
 
   Quad m_screenQuad;
   Skybox m_skybox;

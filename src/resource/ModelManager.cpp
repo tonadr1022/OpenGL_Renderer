@@ -20,6 +20,15 @@ std::unique_ptr<Group> ModelManager::CopyLoadedModel(HashedString modelName) {
   return std::make_unique<Group>(*it->second);
 }
 
+Group* ModelManager::GetModel(HashedString modelName) {
+  auto it = m_groups.find(modelName);
+  if (it == m_groups.end()) {
+    LOG_ERROR("Model not found");
+    return nullptr;
+  }
+  return it->second.get();
+}
+
 void ModelManager::LoadModel(HashedString modelName, const std::string& modelPath,
                              bool backfaceCull) {
   auto model = std::make_unique<Group>();

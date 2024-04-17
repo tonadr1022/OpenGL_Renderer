@@ -12,12 +12,15 @@
 #include <string>
 
 #include "src/group/Group.hpp"
+#include "src/utils/HashedString.hpp"
 
 class ModelManager {
  public:
   static void LoadModel(HashedString modelName, const std::string& modelPath,
                         bool backfaceCull = true);
   static std::unique_ptr<Group> CopyLoadedModel(HashedString modelName);
+  static Group* GetModel(HashedString modelName);
+  static Group* CopyModel(HashedString existingModelName, HashedString newModelName);
 
  private:
   static void ProcessNodes(aiNode* rootNode, const aiScene* scene);

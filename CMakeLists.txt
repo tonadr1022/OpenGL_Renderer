@@ -82,6 +82,9 @@ add_executable(
   src/resource/TextureManager.hpp
   src/scenes/PlaygroundScene.cpp
   src/scenes/PlaygroundScene.hpp
+  src/scenes/InstancingScene.hpp
+  src/scenes/InstancingScene.cpp
+  src/renderer/InstancedModelRenderer.cpp
   src/camera/Camera.cpp
   src/camera/Camera.hpp
   src/Common.hpp
