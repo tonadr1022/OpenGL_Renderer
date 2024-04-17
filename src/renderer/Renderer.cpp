@@ -246,13 +246,16 @@ void Renderer::RenderScene(const Scene &scene, Camera *camera) {
   m_defaultInstancedShader->Bind();
   m_state.boundShader = m_defaultInstancedShader;
 
+  // TODO(tony): make not spaghetti here, duplicated
   if (m_skyboxTexture) m_skyboxTexture->Bind(GL_TEXTURE4);
   m_state.boundShader->SetInt("renderMode", static_cast<int>(debugMode));
   m_state.boundShader->SetInt("skybox", 4);
   m_state.boundShader->SetBool("useBlinn", m_settings.useBlinn);
   m_state.boundShader->SetVec3("u_ViewPos", m_camera->GetPosition());
   m_state.boundShader->SetMat4("u_VP", m_camera->GetVPMatrix());
+
   for (const auto &instanced_model : scene.m_instanced_model_renderers) {
+    glBindBuffer(GL_ARRAY_BUFFER, instanced_model->m_matrix_buffer_id);
     for (const auto &object : instanced_model->m_model->GetObjects()) {
       m_state.boundMaterial = object->GetMaterial();
       m_state.boundShader->SetMat4("u_Model", object->transform.GetModelMatrix());
@@ -261,9 +264,8 @@ void Renderer::RenderScene(const Scene &scene, Camera *camera) {
 
       object->GetMesh()->GetVAO().Bind();
       // object->GetMesh()->Draw();
-      // glBindBuffer(GL_ARRAY_BUFFER, instanced_model->m_matrix_buffer_id);
-      // glDrawElementsInstanced(GL_TRIANGLES, object->GetMesh()->NumIndices(), GL_UNSIGNED_INT,
-      //                         nullptr, instanced_model->m_num_instances);
+      glDrawElementsInstanced(GL_TRIANGLES, object->GetMesh()->NumIndices(), GL_UNSIGNED_INT,
+                              nullptr, instanced_model->m_num_instances);
     }
   }
 
