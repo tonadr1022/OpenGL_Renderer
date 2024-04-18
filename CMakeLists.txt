@@ -27,11 +27,8 @@ add_executable(
   src/main.cpp
   src/utils/Input.cpp
   src/renderer/Renderer.cpp
-  src/renderer/Renderer.hpp
   src/Window.cpp
-  src/Window.hpp
   src/Application.cpp
-  src/Application.hpp
   dep/imgui/backends/imgui_impl_opengl3.cpp
   dep/imgui/backends/imgui_impl_glfw.cpp
   dep/imgui/imgui_draw.cpp
@@ -40,80 +37,42 @@ add_executable(
   dep/imgui/imgui_tables.cpp
   dep/imgui/imgui_widgets.cpp
   src/gl/VertexArray.cpp
-  src/gl/VertexArray.hpp
   src/gl/VertexBuffer.cpp
-  src/gl/VertexBuffer.hpp
   src/gl/Shader.cpp
-  src/gl/Shader.hpp
   dep/KHR/khrplatform.h
   dep/glad/glad.c
-  src/gl/Types.hpp
   src/gl/ElementBuffer.cpp
-  src/gl/ElementBuffer.hpp
-  src/utils/Logger.hpp
-  src/utils/Logger.hpp
   src/renderer/Mesh.cpp
-  src/renderer/Mesh.hpp
   src/camera/FPSCamera.cpp
   src/camera/OrbitCamera.cpp
-  src/shapes/Cube.hpp
   src/gl/FrameBuffer.cpp
-  src/gl/FrameBuffer.hpp
   src/gl/Texture.cpp
-  src/gl/Texture.hpp
-  src/gl/stb_image/stb_image_impl.hpp
   src/renderer/Material.cpp
-  src/renderer/Material.hpp
   src/group/Object.cpp
-  src/group/Object.hpp
-  src/utils/HashedString.hpp
   src/group/Transform.cpp
-  src/group/Transform.hpp
   src/resource/ShaderManager.cpp
   src/resource/MaterialManager.cpp
-  src/utils/Utils.hpp
   src/group/Group.cpp
-  src/group/Group.hpp
   src/group/Scene.cpp
-  src/group/Scene.hpp
   src/resource/MeshManager.cpp
-  src/resource/MeshManager.hpp
   src/resource/TextureManager.cpp
-  src/resource/TextureManager.hpp
-  src/scenes/PlaygroundScene.cpp
-  src/scenes/PlaygroundScene.hpp
-  src/scenes/InstancingScene.hpp
   src/scenes/InstancingScene.cpp
   src/renderer/InstancedModelRenderer.cpp
   src/camera/Camera.cpp
-  src/camera/Camera.hpp
-  src/Common.hpp
   src/gl/RenderBuffer.cpp
-  src/gl/RenderBuffer.hpp
   src/scenes/SceneManager.cpp
-  src/scenes/SceneManager.hpp
   src/imgui/ImGuiMenu.cpp
-  src/imgui/ImGuiMenu.hpp
   src/camera/CameraController.cpp
-  src/camera/CameraController.hpp
   src/scenes/LightingOneScene.cpp
-  src/scenes/LightingOneScene.hpp
   src/renderer/Light.cpp
-  src/renderer/Light.hpp
   src/scenes/ModelViewerScene.cpp
-  src/scenes/ModelViewerScene.hpp
   src/renderer/Quad.cpp
-  src/renderer/Quad.hpp
   src/renderer/Skybox.cpp
-  src/renderer/Skybox.hpp
   src/resource/ModelManager.cpp
-  src/resource/ModelManager.hpp
   src/gl/FBOContainer.cpp
-  src/gl/FBOContainer.hpp
   src/utils/Utils.cpp
   src/renderer/PostProcessor.cpp
-  src/renderer/PostProcessor.hpp
-  src/renderer/PostProcessingEffect.hpp)
+  )
 
 # if (CMAKE_BUILD_TYPE MATCHES Debug) add_compile_definitions(DEBUG_MODE)
 # set(CMAKE_CXX_FLAGS "-g") endif ()

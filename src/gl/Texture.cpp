@@ -143,11 +143,16 @@ Texture::Texture(const std::vector<std::string>& texturePaths) : m_samplerType(S
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 }
 
-void Texture::Screenshot(uint32_t width, uint32_t height, std::string_view filename) const {
+void Texture::Screenshot(std::string_view filename) const {
   Bind();
   stbi_flip_vertically_on_write(true);
-  std::vector<GLubyte> pixels(width * height * 3);
+  int w;
+  int h;
+  int miplevel = 0;
+  glGetTexLevelParameteriv(GL_TEXTURE_2D, miplevel, GL_TEXTURE_WIDTH, &w);
+  glGetTexLevelParameteriv(GL_TEXTURE_2D, miplevel, GL_TEXTURE_HEIGHT, &h);
+  std::vector<GLubyte> pixels(w * h * 3);
   glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
   std::string full_path = "screenshots/" + std::string(filename);
-  stbi_write_png(full_path.c_str(), width, height, 3, pixels.data(), width * 3);
+  stbi_write_png(full_path.c_str(), w, h, 3, pixels.data(), w * 3);
 }

@@ -7,7 +7,6 @@
 #include "src/group/Object.hpp"
 #include "src/resource/MaterialManager.hpp"
 #include "src/resource/MeshManager.hpp"
-#include "src/resource/ModelManager.hpp"
 
 InstancingScene::InstancingScene() : Scene({50, 50, 50}, "Sky 1", CameraController::Mode::Orbit) {
   // unsigned int amount = 10000;
@@ -49,16 +48,14 @@ InstancingScene::InstancingScene() : Scene({50, 50, 50}, "Sky 1", CameraControll
   uint32_t amount = dims.x * dims.y * dims.z;
   int i = 0;
   m_model_matrices.reserve(amount);
-  for (int z = -dims.z / 2; z < dims.z / 2; z++) {
-    for (int y = -dims.y / 2; y < dims.y / 2; y++) {
+  for (int y = -dims.y / 2; y < dims.y / 2; y++) {
+    for (int z = -dims.z / 2; z < dims.z / 2; z++) {
       for (int x = -dims.x / 2; x < dims.x / 2; x++, i++) {
         auto model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(x * 10, y * 10, z * 10));
         m_model_matrices.push_back(model);
       }
     }
-  }
-  for (unsigned int i = 0; i < amount; i++) {
   }
 
   // enable instance matrix attributes.

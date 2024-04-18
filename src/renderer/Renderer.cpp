@@ -237,25 +237,20 @@ void Renderer::RenderScene(const Scene &scene, Camera *camera) {
   m_camera = camera;
   GL_LOG_ERROR();
   StartFrame(scene);
+
+  // regular objects
   for (const auto &group : scene.GetGroups()) {
     RenderGroup(*group);
   }
 
+  // instanced objects
   m_defaultInstancedShader->Bind();
   m_state.boundShader = m_defaultInstancedShader;
-  if (m_skyboxTexture) m_skyboxTexture->Bind(GL_TEXTURE4);
-  m_defaultInstancedShader->SetInt("renderMode", static_cast<int>(debugMode));
-  m_defaultInstancedShader->SetInt("skybox", 4);
-  m_defaultInstancedShader->SetBool("useBlinn", m_settings.useBlinn);
-  m_defaultInstancedShader->SetVec3("u_ViewPos", m_camera->GetPosition());
-  m_defaultInstancedShader->SetMat4("u_VP", m_camera->GetVPMatrix());
-
+  m_state.boundShaderName = "";
   for (const auto &instanced_model : scene.m_instanced_model_renderers) {
     glBindBuffer(GL_ARRAY_BUFFER, instanced_model->m_matrix_buffer_id);
     for (const auto &object : instanced_model->m_model->GetObjects()) {
-      m_state.boundMaterial = object->GetMaterial();
-      SetBlinnPhongShaderUniforms(*m_defaultInstancedShader);
-      SetLightingUniforms(*m_defaultInstancedShader);
+      UpdateRenderState(*object);
       object->GetMesh()->GetVAO().Bind();
       glDrawElementsInstanced(GL_TRIANGLES, object->GetMesh()->NumIndices(), GL_UNSIGNED_INT,
                               nullptr, instanced_model->m_num_instances);
@@ -393,7 +388,7 @@ void Renderer::IncStats(uint32_t numVertices, uint32_t numIndices) {
 void Renderer::Screenshot(std::string_view filename) {
   if (std::isalpha(filename[0])) {
     const Texture &final_texture = GetFinalImageTexture();
-    final_texture.Screenshot(m_width, m_height, std::string(filename) + ".png");
+    final_texture.Screenshot(std::string(filename) + ".png");
   } else {
     Screenshot();
   }
@@ -403,7 +398,7 @@ void Renderer::Screenshot() {
   std::string dt_string = Utils::GetDateTimeString();
   std::string screenshot_name = "screenshot_" + dt_string + ".png";
   const Texture &final_texture = GetFinalImageTexture();
-  final_texture.Screenshot(m_width, m_height, screenshot_name);
+  final_texture.Screenshot(screenshot_name);
 }
 
 const Texture &Renderer::GetFinalImageTexture() {

@@ -19,7 +19,6 @@
 #include "src/scenes/InstancingScene.hpp"
 #include "src/scenes/LightingOneScene.hpp"
 #include "src/scenes/ModelViewerScene.hpp"
-#include "src/scenes/PlaygroundScene.hpp"
 #include "src/shapes/Cube.hpp"
 #include "src/utils/Input.hpp"
 #include "src/utils/Logger.hpp"
@@ -110,7 +109,6 @@ void Application::SetupResources() {
 }
 
 void Application::Run() {
-  m_sceneManager.AddScene("Playground", std::make_unique<PlaygroundScene>());
   m_sceneManager.AddScene("Lighting One", std::make_unique<LightingOneScene>());
   m_sceneManager.AddScene("Model Viewer", std::make_unique<ModelViewerScene>());
   m_sceneManager.AddScene("Instancing 1", std::make_unique<InstancingScene>());

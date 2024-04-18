@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "src/utils/HashedString.hpp"
+
 InstancedModelRenderer::InstancedModelRenderer(const Group* model,
                                                const std::vector<glm::mat4>& model_matrices)
     : m_model(model), m_num_instances(model_matrices.size()) {
@@ -14,6 +16,7 @@ InstancedModelRenderer::InstancedModelRenderer(const Group* model,
   constexpr int SizeOfMatrix = sizeof(glm::mat4);
   constexpr int MatrixStartLoc = 3;
   for (const auto& object : m_model->GetObjects()) {
+    object->GetMaterial()->shaderName = HashedString("instancedDefault");
     const auto& vao = object->GetMesh()->GetVAO();
     vao.Bind();
     for (int i = 0; i < 4; i++) {

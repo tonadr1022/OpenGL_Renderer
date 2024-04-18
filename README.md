@@ -54,10 +54,16 @@ larger, so it was difficult to define a single outline strength.
 
 ![Stencil Test](screenshots/stencil-test.png)
 
+### Instancing
+
+Any model can be instanced
+
+![Instancing](screenshots/instancing1.png)
+
 ## TODO (soon to far)
 
+- Turn into a library rather than coupling demos and scenes with the renderer.
 - Uniform buffer objects (uniforms across shaders)
-- GPU instancing
 - PBR
 - Rewrite in OpenGL 4.6 with data oriented approach (batched rendering, direct
   state access)
@@ -115,9 +121,3 @@ extremely useful in finding where issues were located.
 - [GEngine](https://github.com/JuanDiegoMontoya/Gengine/tree/37739ecfcb608f6b282b36ed8a962fac968b1487):
   Inspiration for input handling with GLFW, and the HashedString class which
   itself was inspired by [Entt](https://github.com/skypjack/entt).
-
-## Funny Glitches
-
-(Mainly for me to look back and laught at later on)
-
-![Spot Texture Glitch](screenshots/funny-glitch1.png)

@@ -33,7 +33,7 @@ class Texture {
   void SetWrapMode(GLint s, GLint t);
   void SetFilterMode(GLint minFilter, GLint magFilter);
 
-  void Screenshot(uint32_t width, uint32_t height, std::string_view filename) const;
+  void Screenshot(std::string_view filename) const;
 
  private:
   GLuint m_id{0};
