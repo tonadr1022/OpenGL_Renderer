@@ -5,12 +5,14 @@
 #include "Application.hpp"
 
 #include <cstdint>
+#include <memory>
 
 #include "imgui/imgui.h"
 #include "src/Common.hpp"
 #include "src/gl/ElementBuffer.hpp"
 #include "src/gl/VertexArray.hpp"
 #include "src/gl/VertexBuffer.hpp"
+#include "src/group/Scene.hpp"
 #include "src/imgui/ImGuiMenu.hpp"
 #include "src/resource/MaterialManager.hpp"
 #include "src/resource/MeshManager.hpp"
@@ -117,53 +119,18 @@ void Application::Run() {
   m_sceneManager.AddScene("Instancing 1", std::make_unique<InstancingScene>());
   m_sceneManager.SetActiveScene("Instancing 1");
 
-  auto vertices = Cube::Vertices;
-  // unsigned int buffer;
-  // glGenBuffers(1, &buffer);
-  // glBindBuffer(GL_ARRAY_BUFFER, buffer);
-  // glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), &model_matrices[0], GL_STATIC_DRAW);
-  constexpr int MatrixStartLoc = 3;
-  // vao.Bind();
-  // for (int i = 0; i < 4; i++) {
-  //   glVertexAttribPointer(i + MatrixStartLoc, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4),
-  //                         (void *)(i * sizeof(glm::vec4)));
-  //   glVertexAttribDivisor(i + MatrixStartLoc, 1);
-  // }
-
   auto *shader = ShaderManager::GetShader("instancedDefault");
   auto *camera = m_cameraController.GetActiveCamera();
-
-  auto *obj = MeshManager::GetMesh("cube");
+  // unsigned int amount = 1000;
+  // std::vector<glm::mat4> model_matrices(amount);
+  // for (unsigned int i = 0; i < amount; i++) {
+  //   auto model = glm::mat4(1.0f);
+  //   model = glm::translate(model, glm::vec3(i, i, i));
+  //   model_matrices[i] = model;
+  // }
+  //
   // auto spot = ModelManager::CopyLoadedModel("spot");
-
-  obj->GetVAO().Bind();
-  // Location in GPU to store the vertices data
-  // Number of instances
-  unsigned int amount = 1000;
-  // Generate a buffer to store transformation matrices
-  unsigned int buffer;
-  glGenBuffers(1, &buffer);
-  // Specify the property of the buffer
-  glBindBuffer(GL_ARRAY_BUFFER, buffer);
-  // Matrices data
-
-  std::vector<glm::mat4> model_matrices(amount);
-  for (unsigned int i = 0; i < amount; i++) {
-    auto model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(i, i, i));
-    model_matrices[i] = model;
-  }
-
-  glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), model_matrices.data(), GL_STATIC_DRAW);
-
-  for (unsigned int i = 0; i < 4; i++) {
-    glEnableVertexAttribArray(MatrixStartLoc + i);
-    glVertexAttribPointer(MatrixStartLoc + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4),
-                          (const GLvoid *)(sizeof(glm::vec4) * i));
-    glVertexAttribDivisor(MatrixStartLoc + i, 1);
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////////////////
+  // auto spot_instanced = std::make_unique<InstancedModelRenderer>(spot.get(), model_matrices);
 
   while (!m_window.ShouldClose()) {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -172,14 +139,13 @@ void Application::Run() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     shader->Bind();
     shader->SetMat4("u_VP", camera->GetVPMatrix());
-    glDrawElementsInstanced(GL_TRIANGLES, obj->NumIndices(), GL_UNSIGNED_INT, nullptr, amount);
-    // shader->SetMat4("u_VP", camera->GetVPMatrix());
-    // // shader->SetMat4("u_Model", glm::scale(glm::mat4(1.0), glm::vec3(10.0)));
-    // glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    // vao.Bind();
-    // // glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
-    // glDrawElementsInstanced(GL_TRIANGLES, new_spot->NumIndices(), GL_UNSIGNED_INT, nullptr,
-    // amount);
+    for (auto &spot_instanced : m_sceneManager.GetActiveScene()->m_instanced_model_renderers) {
+      glBindBuffer(GL_ARRAY_BUFFER, spot_instanced->m_matrix_buffer_id);
+      for (const auto &obj : spot_instanced->m_model->GetObjects()) {
+        glDrawElementsInstanced(GL_TRIANGLES, obj->GetMesh()->NumIndices(), GL_UNSIGNED_INT,
+                                nullptr, spot_instanced->m_num_instances);
+      }
+    }
     Input::Update();
     m_window.SwapBuffers();
     GL_LOG_ERROR();

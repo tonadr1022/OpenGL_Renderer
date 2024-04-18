@@ -40,6 +40,7 @@ class Scene {
 
   glm::vec3 defaultCameraPosition;
   CameraController::Mode defaultCameraMode;
+  std::vector<std::unique_ptr<InstancedModelRenderer>> m_instanced_model_renderers;
 
  protected:
   void AddGroup(std::unique_ptr<Group> group);
@@ -52,7 +53,6 @@ class Scene {
   std::string m_skyboxName;
 
   std::vector<std::unique_ptr<Group>> m_groups;
-  std::vector<std::unique_ptr<InstancedModelRenderer>> m_instanced_model_renderers;
 };
 
 #endif  // OPENGL_RENDERER_SRC_RENDERER_GROUP_SCENE_HPP_

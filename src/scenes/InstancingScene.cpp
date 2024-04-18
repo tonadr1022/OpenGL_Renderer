@@ -42,18 +42,26 @@ InstancingScene::InstancingScene() : Scene({50, 50, 50}, "Sky 1", CameraControll
   //   // 4. now add to list of matrices
   //   model_matrices[i] = model;
   // }
-  //
-  // // enable instance matrix attributes.
-  //
-  // auto new_spot = ModelManager::CopyLoadedModel("spot");
-  // auto* spot_mat = MaterialManager::GetMaterial("spotTextured");
-  // for (const auto& obj : new_spot->GetObjects()) {
-  //   obj->SetMaterial(spot_mat);
-  // }
-  // m_instanced_model_renderers.emplace_back(
-  //     std::make_unique<InstancedModelRenderer>(new_spot.get(), model_matrices));
-  // m_instanced_models.push_back(std::move(new_spot));
-  //
-  // glm::vec3 directional_dir = {0.4f, -0.7f, -0.7f};
-  // m_directionalLight = std::make_unique<DirectionalLight>(directional_dir);
+
+  unsigned int amount = 1000;
+  std::vector<glm::mat4> model_matrices(amount);
+  for (unsigned int i = 0; i < amount; i++) {
+    auto model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(i, i, i));
+    model_matrices[i] = model;
+  }
+
+  // enable instance matrix attributes.
+
+  auto new_spot = ModelManager::CopyLoadedModel("spot");
+  auto* spot_mat = MaterialManager::GetMaterial("spotTextured");
+  for (const auto& obj : new_spot->GetObjects()) {
+    obj->SetMaterial(spot_mat);
+  }
+  m_instanced_models.push_back(std::move(new_spot));
+  m_instanced_model_renderers.emplace_back(
+      std::make_unique<InstancedModelRenderer>(m_instanced_models[0].get(), model_matrices));
+
+  glm::vec3 directional_dir = {0.4f, -0.7f, -0.7f};
+  m_directionalLight = std::make_unique<DirectionalLight>(directional_dir);
 }
