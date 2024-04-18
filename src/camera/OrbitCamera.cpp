@@ -6,7 +6,6 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <iostream>
 
 #include "imgui/imgui.h"
 #include "src/utils/Input.hpp"
@@ -26,7 +25,6 @@ OrbitCamera::OrbitCamera(float aspectRatio)
 void OrbitCamera::ProcessMouseMovement(double xOffset, double yOffset) {
   float speed = 0.05;
   if (Input::IsKeyDown(GLFW_KEY_RIGHT_SHIFT)) {
-    //      glm::vec3 moveOffset = m
     // Move target based on camera orientation and mouse offset
     glm::vec3 move_offset = m_right * static_cast<float>(-xOffset) * m_sensitivity +
                             m_up * static_cast<float>(yOffset) * m_sensitivity;
@@ -52,6 +50,10 @@ void OrbitCamera::OnImGui() {
   float fov_rad = glm::radians(m_fov);
   if (ImGui::SliderAngle("FOV", &fov_rad, MinFov, MaxFov)) {
     m_fov = glm::degrees(fov_rad);
+    UpdateMatrices();
+  }
+  if (ImGui::SliderFloat("Distance", &m_distance, 1.0, 1000)) {
+    UpdatePosition();
     UpdateMatrices();
   }
 }

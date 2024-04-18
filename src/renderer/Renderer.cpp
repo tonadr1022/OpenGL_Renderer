@@ -180,6 +180,7 @@ void Renderer::RenderGroup(const Group &group) {
     if (!object->shouldDraw) continue;
     const auto *mesh = object->GetMesh();
     UpdateRenderState(*object);
+    m_state.boundShader->SetBool("reflective", group.reflective);
     mesh->GetVAO().Bind();
     m_state.boundShader->SetMat4("u_Model", object->transform.GetModelMatrix());
     mesh->Draw();

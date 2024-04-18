@@ -35,6 +35,7 @@ class Group {
   }
 
   Transform transform;
+  bool reflective = false;
   bool backFaceCull = true;
   bool stencil = false;
   bool visible = true;

@@ -55,8 +55,8 @@ struct DirectionalLight {
 struct PointLight {
     LightBase base;
     vec3 position;
-    //    float linear;
-    //    float quadratic;
+//    float linear;
+//    float quadratic;
     float radius;
 };
 
@@ -65,8 +65,8 @@ struct SpotLight {
     vec3 position;
     vec3 direction;
     float radius;
-    //    float linear;
-    //    float quadratic;
+//    float linear;
+//    float quadratic;
     float innerCutoff;
     float outerCutoff;
 };
@@ -91,8 +91,10 @@ uniform bool hasEmissionMap;
 
 uniform vec3 u_ViewPos;
 
-uniform int renderMode; // 0 normal, 1 normals
+uniform int renderMode;// 0 normal, 1 normals
 uniform bool useBlinn;
+
+uniform bool reflective;
 
 vec4 calcLightColor(LightBase light, vec3 lightDir, vec3 norm) {
     vec4 diffuseColor = hasDiffuseMap ? texture(materialMaps.diffuseMap, TexCoord) : vec4(material.diffuse, 1.0);
@@ -180,7 +182,7 @@ vec4 calcTotalLight() {
 }
 
 float linearizeDepth(float depth) {
-    float z = depth * 2.0 - 1.0; // 0,1 to NDC
+    float z = depth * 2.0 - 1.0;// 0,1 to NDC
     // inverse projection transformation
     return (2.0 * near * far) / (far + near - z * (far - near));
 }
@@ -200,13 +202,16 @@ void main() {
             discard;
         }
 
-        vec3 viewToFrag = normalize(FragPos - u_ViewPos);
-        vec4 environmentRefraction = texture(skybox, ViewRefractDir);
-        vec4 environmentReflection = vec4(texture(skybox, ViewReflectDir).rgb, 1.0);
-        vec4 mixedEnviron = mix(environmentReflection, environmentRefraction, 0.5);
+        if (reflective) {
+            vec3 viewToFrag = normalize(FragPos - u_ViewPos);
+            vec4 environmentRefraction = texture(skybox, ViewRefractDir);
+            vec4 environmentReflection = vec4(texture(skybox, ViewReflectDir).rgb, 1.0);
+            vec4 mixedEnviron = mix(environmentReflection, environmentRefraction, 0);
+            FragColor = mix(color, mixedEnviron, 1);
+        } else {
+            FragColor = color;
+        }
 
-        //        FragColor = mix(color, mixedEnviron, 0.6);
-        FragColor = color;
     } else if (renderMode == 1) {
         FragColor = vec4(normalize(Normal) * 0.5 + 0.5, 1.0);
     } else if (renderMode == 2) {

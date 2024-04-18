@@ -82,6 +82,7 @@ uniform vec3 u_ViewPos;
 
 uniform int renderMode;// 0 normal, 1 normals
 uniform bool useBlinn;
+uniform bool reflective;
 
 
 
@@ -190,14 +191,15 @@ void main() {
             discard;
         }
 
-        vec3 viewToFrag = normalize(FragPos - u_ViewPos);
-        vec4 environmentRefraction = texture(skybox, ViewRefractDir);
-        vec4 environmentReflection = vec4(texture(skybox, ViewReflectDir).rgb, 1.0);
-        vec4 mixedEnviron = mix(environmentReflection, environmentRefraction, 0.5);
-
-//        FragColor = mix(color, mixedEnviron, 0.6);
-        FragColor = color;
-
+        if (reflective) {
+            vec3 viewToFrag = normalize(FragPos - u_ViewPos);
+            vec4 environmentRefraction = texture(skybox, ViewRefractDir);
+            vec4 environmentReflection = vec4(texture(skybox, ViewReflectDir).rgb, 1.0);
+            vec4 mixedEnviron = mix(environmentReflection, environmentRefraction, 0);
+            FragColor = mix(color, mixedEnviron, 1);
+        } else {
+            FragColor = color;
+        }
 
 
 

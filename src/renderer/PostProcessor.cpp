@@ -99,20 +99,21 @@ std::unique_ptr<FBOContainer> PostProcessor::makeFBOContainer(uint32_t width, ui
 
 void PostProcessor::LoadShaders() {
   ShaderManager::AddShader(
-      "contrast", {{GET_SHADER_PATH("quad.vert"), ShaderType::Vertex},
-                   {GET_SHADER_PATH("postprocessing/contrast.frag"), ShaderType::Fragment}});
-  ShaderManager::AddShader("invert",
-                           {{GET_SHADER_PATH("quad.vert"), ShaderType::Vertex},
-                            {GET_SHADER_PATH("postprocessing/invert.frag"), ShaderType::Fragment}});
-  ShaderManager::AddShader("colorChannel", {{GET_SHADER_PATH("quad.vert"), ShaderType::Vertex},
-                                            {GET_SHADER_PATH("postprocessing/colorChannel.frag"),
-                                             ShaderType::Fragment}});
+      "contrast", {{GET_SHADER_PATH("quad.vert.glsl"), ShaderType::Vertex},
+                   {GET_SHADER_PATH("postprocessing/contrast.frag.glsl"), ShaderType::Fragment}});
   ShaderManager::AddShader(
-      "grayscale", {{GET_SHADER_PATH("quad.vert"), ShaderType::Vertex},
-                    {GET_SHADER_PATH("postprocessing/grayscale.frag"), ShaderType::Fragment}});
+      "invert", {{GET_SHADER_PATH("quad.vert.glsl"), ShaderType::Vertex},
+                 {GET_SHADER_PATH("postprocessing/invert.frag.glsl"), ShaderType::Fragment}});
+  ShaderManager::AddShader(
+      "colorChannel",
+      {{GET_SHADER_PATH("quad.vert.glsl"), ShaderType::Vertex},
+       {GET_SHADER_PATH("postprocessing/colorChannel.frag.glsl"), ShaderType::Fragment}});
+  ShaderManager::AddShader(
+      "grayscale", {{GET_SHADER_PATH("quad.vert.glsl"), ShaderType::Vertex},
+                    {GET_SHADER_PATH("postprocessing/grayscale.frag.glsl"), ShaderType::Fragment}});
 
-  ShaderManager::AddShader("quad", {{GET_SHADER_PATH("quad.vert"), ShaderType::Vertex},
-                                    {GET_SHADER_PATH("quad.frag"), ShaderType::Fragment}});
+  ShaderManager::AddShader("quad", {{GET_SHADER_PATH("quad.vert.glsl"), ShaderType::Vertex},
+                                    {GET_SHADER_PATH("quad.frag.glsl"), ShaderType::Fragment}});
 }
 
 void PostProcessor::OnImGui() {

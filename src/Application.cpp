@@ -11,6 +11,7 @@
 #include "src/Common.hpp"
 #include "src/group/Scene.hpp"
 #include "src/imgui/ImGuiMenu.hpp"
+#include "src/renderer/Material.hpp"
 #include "src/resource/MaterialManager.hpp"
 #include "src/resource/MeshManager.hpp"
 #include "src/resource/ModelManager.hpp"
@@ -54,7 +55,6 @@ void Application::SetupResources() {
   ModelManager::LoadModel("teapot", "resources/models/teapot/teapot.obj");
   ModelManager::LoadModel("sponza", "resources/models/sponza/sponza.obj");
   ModelManager::LoadModel("spot", "resources/models/spot/spot_quadrangulated.obj");
-
   ModelManager::LoadModel("spot2", "resources/models/spot/spot_quadrangulated.obj");
 
   MeshManager::AddMesh("cube", Cube::Vertices, Cube::Indices);
@@ -102,6 +102,10 @@ void Application::SetupResources() {
       {MatTextureType::Diffuse, TextureManager::GetTexture("spot_texture")}};
   MaterialManager::AddMaterial("spotTextured", spot_textures, "blinnPhong");
 
+  std::vector<TexturePair> oak_texture = {
+      {MatTextureType::Diffuse, TextureManager::GetTexture("oak")}};
+  MaterialManager::AddMaterial("oak", oak_texture, "blinnPhong");
+
   std::vector<TexturePair> wood_container_textures = {
       {MatTextureType::Diffuse, TextureManager::GetTexture("woodContainerDiffuse")},
       {MatTextureType::Specular, TextureManager::GetTexture("woodContainerDiffuse")}};
@@ -113,6 +117,7 @@ void Application::Run() {
   m_sceneManager.AddScene("Model Viewer", std::make_unique<ModelViewerScene>());
   m_sceneManager.AddScene("Instancing 1", std::make_unique<InstancingScene>());
   m_sceneManager.SetActiveScene("Instancing 1");
+  m_sceneManager.SetActiveScene("Lighting One");
 
   double curr_time;
   double last_time = glfwGetTime();
@@ -336,16 +341,17 @@ void Application::OnKeyEvent(int key, int action, int mods) {
 }
 
 void Application::LoadShaders() {
-  ShaderManager::AddShader("default", {{GET_SHADER_PATH("default.vert"), ShaderType::Vertex},
-                                       {GET_SHADER_PATH("default.frag"), ShaderType::Fragment}});
+  ShaderManager::AddShader("default",
+                           {{GET_SHADER_PATH("default.vert.glsl"), ShaderType::Vertex},
+                            {GET_SHADER_PATH("default.frag.glsl"), ShaderType::Fragment}});
   ShaderManager::AddShader("blinnPhong",
-                           {{GET_SHADER_PATH("blinnPhong.vert"), ShaderType::Vertex},
-                            {GET_SHADER_PATH("blinnPhong.frag"), ShaderType::Fragment}});
-  ShaderManager::AddShader("skybox", {{GET_SHADER_PATH("skybox.vert"), ShaderType::Vertex},
-                                      {GET_SHADER_PATH("skybox.frag"), ShaderType::Fragment}});
-  ShaderManager::AddShader("singleColor",
-                           {{GET_SHADER_PATH("singleColorStencil.vert"), ShaderType::Vertex},
-                            {GET_SHADER_PATH("singleColorStencil.frag"), ShaderType::Fragment}});
+                           {{GET_SHADER_PATH("blinnPhong.vert.glsl"), ShaderType::Vertex},
+                            {GET_SHADER_PATH("blinnPhong.frag.glsl"), ShaderType::Fragment}});
+  ShaderManager::AddShader("skybox", {{GET_SHADER_PATH("skybox.vert.glsl"), ShaderType::Vertex},
+                                      {GET_SHADER_PATH("skybox.frag.glsl"), ShaderType::Fragment}});
+  ShaderManager::AddShader(
+      "singleColor", {{GET_SHADER_PATH("singleColorStencil.vert.glsl"), ShaderType::Vertex},
+                      {GET_SHADER_PATH("singleColorStencil.frag.glsl"), ShaderType::Fragment}});
   ShaderManager::AddShader(
       "instancedDefault",
       {{GET_SHADER_PATH("instancing/instancedDefault.vert.glsl"), ShaderType::Vertex},

@@ -16,13 +16,17 @@ ModelViewerScene::ModelViewerScene() : Scene({50, 50, 50}, "Sky 1", CameraContro
   auto teapot = ModelManager::CopyLoadedModel("teapot");
   auto sponza = ModelManager::CopyLoadedModel("sponza");
   sponza->transform.SetScale(glm::vec3{0.1, 0.1, 0.1});
-  auto spot = ModelManager::CopyLoadedModel("spot");
+  auto spot = ModelManager::CopyLoadedModel("spot2");
 
   m_modelSelectMap.emplace("Backpack", backpack.get());
   m_groups.push_back(std::move(backpack));
 
   m_modelSelectMap.emplace("Teapot", teapot.get());
+  auto* oak_mat = MaterialManager::GetMaterial("oak");
   teapot->transform.SetScale(glm::vec3(1.0));
+  for (const auto& obj : teapot->GetObjects()) {
+    obj->SetMaterial(oak_mat);
+  }
   m_groups.push_back(std::move(teapot));
 
   m_modelSelectMap.emplace("Sponza", sponza.get());
@@ -30,10 +34,12 @@ ModelViewerScene::ModelViewerScene() : Scene({50, 50, 50}, "Sky 1", CameraContro
 
   m_modelSelectMap.emplace("Spot", spot.get());
   spot->transform.SetScale(glm::vec3(10));
+
   auto* spot_mat = MaterialManager::GetMaterial("spotTextured");
   for (const auto& obj : spot->GetObjects()) {
     obj->SetMaterial(spot_mat);
   }
+
   m_groups.push_back(std::move(spot));
 
   // Lights
@@ -83,6 +89,8 @@ void ModelViewerScene::OnImGui() {
   if (ImGui::Checkbox("Stencil Outline", &m_stencilSelectedDemo)) {
     m_visibleModel->stencil = m_stencilSelectedDemo;
   }
+
+  ImGui::Checkbox("Reflective", &m_visibleModel->reflective);
 
   static int selected_object_index = 0;
 

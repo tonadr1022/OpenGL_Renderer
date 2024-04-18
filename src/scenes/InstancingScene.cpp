@@ -63,15 +63,14 @@ InstancingScene::InstancingScene() : Scene({50, 50, 50}, "Sky 1", CameraControll
   Material* wood_container_mat = MaterialManager::GetMaterial("woodContainer");
   Mesh* cube_mesh = MeshManager::GetMesh("cube");
   auto cube = std::make_unique<Object>(cube_mesh, wood_container_mat);
-
   // auto new_spot = ModelManager::CopyLoadedModel("cube");
   auto new_spot = std::make_unique<Group>();
   new_spot->AddObject(std::move(cube));
 
-  auto* spot_mat = MaterialManager::GetMaterial("spotTextured");
-  for (const auto& obj : new_spot->GetObjects()) {
-    obj->SetMaterial(spot_mat);
-  }
+  // auto* spot_mat = MaterialManager::GetMaterial("spotTextured");
+  // for (const auto& obj : new_spot->GetObjects()) {
+  //   obj->SetMaterial(spot_mat);
+  // }
   m_instanced_models.push_back(std::move(new_spot));
   m_instanced_model_renderers.emplace_back(
       std::make_unique<InstancedModelRenderer>(m_instanced_models[0].get(), m_model_matrices));

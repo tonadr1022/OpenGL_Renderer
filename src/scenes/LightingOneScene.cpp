@@ -8,7 +8,6 @@
 
 #include "src/resource/MaterialManager.hpp"
 #include "src/resource/MeshManager.hpp"
-#include "src/resource/ModelManager.hpp"
 
 LightingOneScene::LightingOneScene() : Scene({1, 2, 4}, "") {
   Material* wood_container_mat = MaterialManager::GetMaterial("woodContainer");
@@ -19,23 +18,15 @@ LightingOneScene::LightingOneScene() : Scene({1, 2, 4}, "") {
   auto plane_group = std::make_unique<Group>();
   plane_group->AddObject(std::move(plane));
 
-  auto spot = ModelManager::CopyLoadedModel("spot");
-  auto* spot_mat = MaterialManager::GetMaterial("spotTextured");
-  for (const auto& obj : spot->GetObjects()) {
-    obj->SetMaterial(spot_mat);
-  }
-
-  AddGroup(std::move(spot));
-
   auto cube_group = std::make_unique<Group>();
-  // for (int z = -200; z <= 20; z += 5) {
-  //   for (int x = -20; x <= 20; x += 5) {
-  //     auto cube = std::make_unique<Object>(cube_mesh, wood_container_mat);
-  //     cube->transform.Translate({x, 3, z});
-  //     m_cubes.push_back(cube.get());
-  //     cube_group->AddObject(std::move(cube));
-  //   }
-  // }
+  for (int z = -200; z <= 20; z += 5) {
+    for (int x = -20; x <= 20; x += 5) {
+      auto cube = std::make_unique<Object>(cube_mesh, wood_container_mat);
+      cube->transform.Translate({x, 3, z});
+      m_cubes.push_back(cube.get());
+      cube_group->AddObject(std::move(cube));
+    }
+  }
 
   // for (int z = -200; z <= 20; z += 5) {
   //   for (int x = -20; x <= 20; x += 5) {
