@@ -18,7 +18,7 @@ class Application {
   void Run();
 
   void OnViewportResize(uint32_t width, uint32_t height);
-  void OnMousePosMove(double xoffset, double yoffset);
+  void OnMousePosMove(double xpos, double ypos);
   void OnMouseButtonEvent(int button, int action);
   void OnMouseScrollEvent(double yOffset);
   void OnKeyEvent(int key, int action, int mods);

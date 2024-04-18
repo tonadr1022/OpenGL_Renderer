@@ -1,3 +1,14 @@
+// #version 410 core
+//
+// #define far 1000
+// #define near 0.01
+//
+// out vec4 FragColor;
+//
+// void main() {
+//   FragColor = vec4(0.0,1.0,0.0,1.0);
+// }
+//
 #version 410 core
 
 #define MAX_POINT_LIGHTS 20
@@ -176,12 +187,14 @@ float linearizeDepth(float depth) {
 
 void main() {
     if (renderMode == 0) {
+        // vec4 totalLight = texture(materialMaps.diffuseMap, TexCoord);
         vec4 totalLight = calcTotalLight();
         // emission
         vec3 emission = vec3(0.0);
         if (hasEmissionMap) {
             emission = texture(materialMaps.emissionMap, TexCoord).rgb;
         }
+
         vec4 color = totalLight + vec4(emission, 1.0);
         if (color.a < 0.1) {
             discard;

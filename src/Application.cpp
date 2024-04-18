@@ -9,9 +9,6 @@
 
 #include "imgui/imgui.h"
 #include "src/Common.hpp"
-#include "src/gl/ElementBuffer.hpp"
-#include "src/gl/VertexArray.hpp"
-#include "src/gl/VertexBuffer.hpp"
 #include "src/group/Scene.hpp"
 #include "src/imgui/ImGuiMenu.hpp"
 #include "src/resource/MaterialManager.hpp"
@@ -119,34 +116,23 @@ void Application::Run() {
   m_sceneManager.AddScene("Instancing 1", std::make_unique<InstancingScene>());
   m_sceneManager.SetActiveScene("Instancing 1");
 
-  auto *shader = ShaderManager::GetShader("instancedDefault");
-  auto *camera = m_cameraController.GetActiveCamera();
-  // unsigned int amount = 1000;
-  // std::vector<glm::mat4> model_matrices(amount);
-  // for (unsigned int i = 0; i < amount; i++) {
-  //   auto model = glm::mat4(1.0f);
-  //   model = glm::translate(model, glm::vec3(i, i, i));
-  //   model_matrices[i] = model;
-  // }
-  //
-  // auto spot = ModelManager::CopyLoadedModel("spot");
-  // auto spot_instanced = std::make_unique<InstancedModelRenderer>(spot.get(), model_matrices);
-
+  double curr_time;
+  double last_time = glfwGetTime();
+  double delta_time;
   while (!m_window.ShouldClose()) {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glEnable(GL_DEPTH_TEST);
-    glClearColor(0.0, 0.0, 0.0, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    shader->Bind();
-    shader->SetMat4("u_VP", camera->GetVPMatrix());
-    for (auto &spot_instanced : m_sceneManager.GetActiveScene()->m_instanced_model_renderers) {
-      glBindBuffer(GL_ARRAY_BUFFER, spot_instanced->m_matrix_buffer_id);
-      for (const auto &obj : spot_instanced->m_model->GetObjects()) {
-        glDrawElementsInstanced(GL_TRIANGLES, obj->GetMesh()->NumIndices(), GL_UNSIGNED_INT,
-                                nullptr, spot_instanced->m_num_instances);
-      }
-    }
+    curr_time = glfwGetTime();
+    delta_time = curr_time - last_time;
+    last_time = curr_time;
+
     Input::Update();
+    m_sceneManager.GetActiveScene()->Update(delta_time);
+    m_cameraController.Update(delta_time);
+    m_sceneManager.GetActiveScene()->PreRender();
+
+    if (m_settings.showImGui) ImGuiMenu::StartFrame(m_renderToImGuiViewport);
+    m_renderer.RenderScene(*m_sceneManager.GetActiveScene(), m_cameraController.GetActiveCamera());
+    if (m_settings.showImGui) OnImGui();
+    if (m_settings.showImGui) ImGuiMenu::EndFrame();
     m_window.SwapBuffers();
     GL_LOG_ERROR();
   }
@@ -364,6 +350,6 @@ void Application::LoadShaders() {
                             {GET_SHADER_PATH("singleColorStencil.frag"), ShaderType::Fragment}});
   ShaderManager::AddShader(
       "instancedDefault",
-      {{GET_SHADER_PATH("instancing/instancedTest.vert.glsl"), ShaderType::Vertex},
-       {GET_SHADER_PATH("instancing/instancedTest.frag.glsl"), ShaderType::Fragment}});
+      {{GET_SHADER_PATH("instancing/instancedDefault.vert.glsl"), ShaderType::Vertex},
+       {GET_SHADER_PATH("instancing/instancedDefault.frag.glsl"), ShaderType::Fragment}});
 }

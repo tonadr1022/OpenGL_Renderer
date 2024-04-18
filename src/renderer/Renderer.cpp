@@ -237,53 +237,34 @@ void Renderer::RenderScene(const Scene &scene, Camera *camera) {
   m_camera = camera;
   GL_LOG_ERROR();
   StartFrame(scene);
-  GL_LOG_ERROR();
   for (const auto &group : scene.GetGroups()) {
     RenderGroup(*group);
   }
-  GL_LOG_ERROR();
 
-  // spaghetti for now.
   m_defaultInstancedShader->Bind();
   m_state.boundShader = m_defaultInstancedShader;
-
-  GL_LOG_ERROR();
-  // TODO(tony): make not spaghetti here, duplicated
-
-  // if (m_skyboxTexture) m_skyboxTexture->Bind(GL_TEXTURE4);
-  GL_LOG_ERROR();
+  if (m_skyboxTexture) m_skyboxTexture->Bind(GL_TEXTURE4);
   m_defaultInstancedShader->SetInt("renderMode", static_cast<int>(debugMode));
-  GL_LOG_ERROR();
-  // m_defaultInstancedShader->SetInt("skybox", 4);
-  GL_LOG_ERROR();
+  m_defaultInstancedShader->SetInt("skybox", 4);
   m_defaultInstancedShader->SetBool("useBlinn", m_settings.useBlinn);
-  GL_LOG_ERROR();
   m_defaultInstancedShader->SetVec3("u_ViewPos", m_camera->GetPosition());
-  GL_LOG_ERROR();
   m_defaultInstancedShader->SetMat4("u_VP", m_camera->GetVPMatrix());
 
-  GL_LOG_ERROR();
   for (const auto &instanced_model : scene.m_instanced_model_renderers) {
-    GL_LOG_ERROR();
     glBindBuffer(GL_ARRAY_BUFFER, instanced_model->m_matrix_buffer_id);
-    GL_LOG_ERROR();
     for (const auto &object : instanced_model->m_model->GetObjects()) {
-      GL_LOG_ERROR();
+      m_state.boundMaterial = object->GetMaterial();
+      SetBlinnPhongShaderUniforms(*m_defaultInstancedShader);
+      SetLightingUniforms(*m_defaultInstancedShader);
       object->GetMesh()->GetVAO().Bind();
-      GL_LOG_ERROR();
-      // object->GetMesh()->Draw();
       glDrawElementsInstanced(GL_TRIANGLES, object->GetMesh()->NumIndices(), GL_UNSIGNED_INT,
                               nullptr, instanced_model->m_num_instances);
-      GL_LOG_ERROR();
     }
   }
-  GL_LOG_ERROR();
 
   if (m_settings.renderSkybox && m_skyboxTexture) RenderSkybox(camera);
 
-  GL_LOG_ERROR();
   // blit from multi-sampled result to the intermediate FBO
-
   glBindFramebuffer(GL_READ_FRAMEBUFFER, m_settings.useMSAA
                                              ? m_multiSampleFBOContainer->FBO().Id()
                                              : m_singleSampleFBOContainer->FBO().Id());
@@ -291,6 +272,7 @@ void Renderer::RenderScene(const Scene &scene, Camera *camera) {
   glBlitFramebuffer(0, 0, static_cast<GLsizei>(m_width), static_cast<GLsizei>(m_height), 0, 0,
                     static_cast<GLsizei>(m_width), static_cast<GLsizei>(m_height), 0x00004000,
                     GL_NEAREST);
+
   // Not having this line gave me a few headaches! Quite mad when writing this!
   glActiveTexture(GL_TEXTURE0);
   m_postProcessor.Render(m_resolveSampleFBOContainer->Textures()[0].get());
