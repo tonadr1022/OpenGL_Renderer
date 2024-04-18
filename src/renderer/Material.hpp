@@ -10,6 +10,7 @@
 
 #include "src/gl/Shader.hpp"
 #include "src/gl/Texture.hpp"
+#include "src/utils/HashedString.hpp"
 
 // using namespace GL;
 // class Material {
@@ -35,47 +36,50 @@ enum class MatTextureType { None, Diffuse, Specular, Emission, Normal };
 using TexturePair = std::pair<MatTextureType, Texture*>;
 
 struct Material {
-  enum class Type { Default, BlinnPhong };
+  HashedString name;
+  enum class Type { Default, BlinnPhong, Instanced, Custom };
   std::vector<TexturePair> textures;
   std::vector<PerMaterialUniformData> materialUniforms;
-  HashedString shaderName;
   glm::vec3 specularColor = {1.0, 1.0, 1.0};
   glm::vec3 diffuseColor = {1.0, 1.0, 1.0};
   glm::vec3 ambientColor = {1.0, 1.0, 1.0};
   Type type;
+  HashedString shaderName;
   float shininess = 32;
   float strength = 1;
+  [[nodiscard]] Shader* GetShader() const;
 
-  Material(const std::vector<TexturePair>& textures,
-           const std::vector<PerMaterialUniformData>& materialUniforms, HashedString shaderName,
-           Type type)
-      : textures(textures),
+  Material(Material& other) = delete;
+
+  Material(HashedString name, Material& other)
+      : name(name),
+        textures(other.textures),
+        materialUniforms(other.materialUniforms),
+        specularColor(other.specularColor),
+        diffuseColor(other.diffuseColor),
+        ambientColor(other.ambientColor),
+        type(other.type),
+        shaderName(other.shaderName),
+        shininess(other.shininess),
+        strength(other.strength) {}
+
+  Material(HashedString name, const std::vector<TexturePair>& textures,
+           const std::vector<PerMaterialUniformData>& materialUniforms, Type type,
+           HashedString shaderName = "")
+      : name(name),
+        textures(textures),
         materialUniforms(materialUniforms),
-        shaderName(shaderName),
-        type(type) {}
+        type(type),
+        shaderName(shaderName) {}
 
-  Material(const std::vector<TexturePair>& textures, HashedString shaderName, Type type)
-      : textures(textures), shaderName(shaderName), type(type) {}
+  Material(HashedString name, const std::vector<TexturePair>& textures, Type type)
+      : name(name), textures(textures), type(type), shaderName("") {}
 
-  Material(const glm::vec3& color, HashedString shaderName, Type type)
-      : shaderName(shaderName), type(type) {}
+  Material(HashedString name, const glm::vec3& color, Type type)
+      : name(name), type(type), shaderName("") {}
 
-  Material(HashedString shaderName, Type type) : shaderName(shaderName), type(type) {}
-
-  Material(const std::vector<TexturePair>& textures,
-           const std::vector<PerMaterialUniformData>& materialUniforms, HashedString shaderName)
-      : textures(textures),
-        materialUniforms(materialUniforms),
-        shaderName(shaderName),
-        type(Type::BlinnPhong) {}
-
-  Material(const std::vector<TexturePair>& textures, HashedString shaderName)
-      : textures(textures), shaderName(shaderName), type(Type::BlinnPhong) {}
-
-  Material(const glm::vec3& color, HashedString shaderName)
-      : shaderName(shaderName), type(Type::BlinnPhong) {}
-
-  explicit Material(HashedString shaderName) : shaderName(shaderName), type(Type::BlinnPhong) {}
+  Material(HashedString name, HashedString shaderName, Type type)
+      : name(name), type(type), shaderName(shaderName) {}
 };
 
 #endif  // OPENGL_RENDERER_SRC_RENDERER_MATERIAL_HPP_

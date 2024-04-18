@@ -1,5 +1,6 @@
 #include "src/renderer/InstancedGroup.hpp"
 
+#include "src/resource/MaterialManager.hpp"
 #include "src/utils/HashedString.hpp"
 
 InstancedGroup::InstancedGroup(const Group* group, const std::vector<glm::mat4>& model_matrices)
@@ -12,7 +13,14 @@ InstancedGroup::InstancedGroup(const Group* group, const std::vector<glm::mat4>&
   constexpr int SizeOfMatrix = sizeof(glm::mat4);
   constexpr int MatrixStartLoc = 3;
   for (const auto& object : m_model->GetObjects()) {
-    object->GetMaterial()->shaderName = HashedString("instancedDefault");
+    // need to copy materials instead of setting just shader name
+    auto new_mat_name =
+        HashedString((std::string(object->GetMaterial()->name) + "_instanced").c_str());
+    MaterialManager::AddMaterial(new_mat_name, *object->GetMaterial());
+    object->SetMaterial(MaterialManager::GetMaterial(new_mat_name));
+    object->GetMaterial()->type = Material::Type::Instanced;
+
+    // enable matrix vertex attributes
     const auto& vao = object->GetMesh()->GetVAO();
     vao.Bind();
     for (int i = 0; i < 4; i++) {

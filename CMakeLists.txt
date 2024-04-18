@@ -71,7 +71,7 @@ add_executable(
   src/gl/FBOContainer.cpp
   src/utils/Utils.cpp
   src/renderer/PostProcessor.cpp
-  )
+  src/renderer/Material.cpp)
 
 # if (CMAKE_BUILD_TYPE MATCHES Debug) add_compile_definitions(DEBUG_MODE)
 # set(CMAKE_CXX_FLAGS "-g") endif ()

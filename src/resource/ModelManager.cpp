@@ -132,8 +132,7 @@ Material* ModelManager::LoadMaterial(aiMaterial* aiMat, HashedString matName) {
   auto specular_maps =
       LoadMaterialTextures(aiMat, aiTextureType_SPECULAR, MatTextureType::Specular);
   textures.insert(textures.end(), specular_maps.begin(), specular_maps.end());
-
-  MaterialManager::AddMaterial(matName, textures, "blinnPhong", Material::Type::BlinnPhong);
+  MaterialManager::AddMaterial(matName, textures, Material::Type::BlinnPhong);
   Material* mat = MaterialManager::GetMaterial(matName);
 
   aiColor4D color;

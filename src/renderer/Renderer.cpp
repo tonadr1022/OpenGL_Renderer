@@ -4,8 +4,6 @@
 
 #include "Renderer.hpp"
 
-#include <iostream>
-
 #include "imgui/imgui.h"
 #include "src/Common.hpp"
 #include "src/gl/FrameBuffer.hpp"
@@ -67,9 +65,8 @@ std::vector<HashedString> spot_light_strings = GenerateSpotLightStrings(50);
 void Renderer::UpdateRenderState(const Object &object) {
   Material *mat = object.GetMaterial();
 
-  if (m_state.boundShaderName != mat->shaderName) {
-    m_state.boundShader = ShaderManager::GetShader(mat->shaderName);
-    m_state.boundShaderName = mat->shaderName;
+  if (!m_state.boundShader || m_state.boundMaterial != mat) {
+    m_state.boundShader = mat->GetShader();
 
     m_state.boundShader->Bind();
     m_stats.numShaderBinds++;
@@ -140,7 +137,6 @@ void Renderer::StartFrame(const Scene &scene) {
   // reset state
   m_state.boundShader = nullptr;
   m_state.boundMaterial = nullptr;
-  m_state.boundShaderName = "";
 
   ResetStats();
 
@@ -179,11 +175,16 @@ void Renderer::RenderGroup(const Group &group) {
   for (auto &&object : group.GetObjects()) {
     if (!object->shouldDraw) continue;
     const auto *mesh = object->GetMesh();
+    GL_LOG_ERROR();
     UpdateRenderState(*object);
+    GL_LOG_ERROR();
     m_state.boundShader->SetBool("reflective", group.reflective);
     mesh->GetVAO().Bind();
+    GL_LOG_ERROR();
     m_state.boundShader->SetMat4("u_Model", object->transform.GetModelMatrix());
+    GL_LOG_ERROR();
     mesh->Draw();
+    GL_LOG_ERROR();
     // glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mesh->NumIndices()), GL_UNSIGNED_INT,
     //                nullptr);
     IncStats(mesh->NumVertices(), mesh->NumIndices());
@@ -195,7 +196,6 @@ void Renderer::RenderGroup(const Group &group) {
     // then enlarged, disabling stencil wiring using the border color
     m_stencilShader->Bind();
     m_state.boundShader = m_stencilShader;
-    m_state.boundShaderName = "";
 
     // only write to the buffer if
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
@@ -239,15 +239,16 @@ void Renderer::RenderScene(const Scene &scene, Camera *camera) {
   GL_LOG_ERROR();
   StartFrame(scene);
 
+  GL_LOG_ERROR();
   // regular objects
   for (const auto &group : scene.GetGroups()) {
     RenderGroup(*group);
   }
 
+  GL_LOG_ERROR();
   // instanced objects
   m_defaultInstancedShader->Bind();
   m_state.boundShader = m_defaultInstancedShader;
-  m_state.boundShaderName = "";
   for (const auto &instanced_model : scene.m_instanced_model_renderers) {
     glBindBuffer(GL_ARRAY_BUFFER, instanced_model->m_matrix_buffer_id);
     for (const auto &object : instanced_model->m_model->GetObjects()) {
@@ -255,9 +256,11 @@ void Renderer::RenderScene(const Scene &scene, Camera *camera) {
       object->GetMesh()->GetVAO().Bind();
       glDrawElementsInstanced(GL_TRIANGLES, object->GetMesh()->NumIndices(), GL_UNSIGNED_INT,
                               nullptr, instanced_model->m_num_instances);
+      IncStats(object->GetMesh()->NumVertices(), object->GetMesh()->NumIndices());
     }
   }
 
+  GL_LOG_ERROR();
   if (m_settings.renderSkybox && m_skyboxTexture) RenderSkybox(camera);
 
   // blit from multi-sampled result to the intermediate FBO
@@ -282,7 +285,6 @@ void Renderer::RenderSkybox(Camera *camera) {
   m_skyboxTexture->Bind(GL_TEXTURE0);
   m_skyboxShader->Bind();
   m_state.boundShader = m_skyboxShader;
-  m_state.boundShaderName = "";
   glm::mat4 vp = camera->GetProjectionMatrix() * glm::mat4(glm::mat3(camera->GetViewMatrix()));
   m_skyboxShader->SetMat4("VP", vp);
   m_skybox.Draw();

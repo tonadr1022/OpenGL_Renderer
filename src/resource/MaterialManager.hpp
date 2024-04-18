@@ -13,7 +13,9 @@ class MaterialManager {
  public:
   template <typename... Args>
   static MaterialID AddMaterial(HashedString name, Args&&... args) {
-    m_materials.emplace(name, std::make_unique<Material>(std::forward<Args>(args)...));
+    if (!GetMaterial(name)) {
+      m_materials.emplace(name, std::make_unique<Material>(name, std::forward<Args>(args)...));
+    }
     return name;
   }
   static Material* GetMaterial(HashedString name);

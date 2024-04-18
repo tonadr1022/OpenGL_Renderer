@@ -75,7 +75,6 @@ class Renderer {
   struct RenderState {
     const Material* boundMaterial = nullptr;
     Shader* boundShader = nullptr;
-    HashedString boundShaderName;
   };
 
   const DirectionalLight* m_directionalLight = nullptr;

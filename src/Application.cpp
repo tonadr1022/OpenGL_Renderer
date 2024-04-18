@@ -100,16 +100,17 @@ void Application::SetupResources() {
 
   std::vector<TexturePair> spot_textures = {
       {MatTextureType::Diffuse, TextureManager::GetTexture("spot_texture")}};
-  MaterialManager::AddMaterial("spotTextured", spot_textures, "blinnPhong");
+  MaterialManager::AddMaterial("spotTextured", spot_textures, Material::Type::BlinnPhong);
 
   std::vector<TexturePair> oak_texture = {
       {MatTextureType::Diffuse, TextureManager::GetTexture("oak")}};
-  MaterialManager::AddMaterial("oak", oak_texture, "blinnPhong");
+  MaterialManager::AddMaterial("oak", oak_texture, Material::Type::BlinnPhong);
 
   std::vector<TexturePair> wood_container_textures = {
       {MatTextureType::Diffuse, TextureManager::GetTexture("woodContainerDiffuse")},
       {MatTextureType::Specular, TextureManager::GetTexture("woodContainerDiffuse")}};
-  MaterialManager::AddMaterial("woodContainer", wood_container_textures, "blinnPhong");
+  MaterialManager::AddMaterial("woodContainer", wood_container_textures,
+                               Material::Type::BlinnPhong);
 }
 
 void Application::Run() {
