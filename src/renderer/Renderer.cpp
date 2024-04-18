@@ -250,7 +250,7 @@ void Renderer::RenderScene(const Scene &scene, Camera *camera) {
   GL_LOG_ERROR();
   // TODO(tony): make not spaghetti here, duplicated
 
-  if (m_skyboxTexture) m_skyboxTexture->Bind(GL_TEXTURE4);
+  // if (m_skyboxTexture) m_skyboxTexture->Bind(GL_TEXTURE4);
   GL_LOG_ERROR();
   m_defaultInstancedShader->SetInt("renderMode", static_cast<int>(debugMode));
   GL_LOG_ERROR();
@@ -269,15 +269,6 @@ void Renderer::RenderScene(const Scene &scene, Camera *camera) {
     GL_LOG_ERROR();
     for (const auto &object : instanced_model->m_model->GetObjects()) {
       GL_LOG_ERROR();
-      m_state.boundMaterial = object->GetMaterial();
-      GL_LOG_ERROR();
-      // m_defaultInstancedShader->SetMat4("u_Model", object->transform.GetModelMatrix());
-      GL_LOG_ERROR();
-      SetBlinnPhongShaderUniforms(*m_defaultInstancedShader);
-      GL_LOG_ERROR();
-      SetLightingUniforms(*m_defaultInstancedShader);
-      GL_LOG_ERROR();
-
       object->GetMesh()->GetVAO().Bind();
       GL_LOG_ERROR();
       // object->GetMesh()->Draw();

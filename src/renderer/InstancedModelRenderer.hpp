@@ -12,7 +12,6 @@ class InstancedModelRenderer {
   InstancedModelRenderer(const Group* model, const std::vector<glm::mat4>& model_matrices);
   ~InstancedModelRenderer();
 
- private:
   uint32_t m_matrix_buffer_id;
   uint32_t m_num_instances;
   const Group* m_model;

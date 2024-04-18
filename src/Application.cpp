@@ -8,6 +8,9 @@
 
 #include "imgui/imgui.h"
 #include "src/Common.hpp"
+#include "src/gl/ElementBuffer.hpp"
+#include "src/gl/VertexArray.hpp"
+#include "src/gl/VertexBuffer.hpp"
 #include "src/imgui/ImGuiMenu.hpp"
 #include "src/resource/MaterialManager.hpp"
 #include "src/resource/MeshManager.hpp"
@@ -53,6 +56,8 @@ void Application::SetupResources() {
   ModelManager::LoadModel("teapot", "resources/models/teapot/teapot.obj");
   ModelManager::LoadModel("sponza", "resources/models/sponza/sponza.obj");
   ModelManager::LoadModel("spot", "resources/models/spot/spot_quadrangulated.obj");
+
+  ModelManager::LoadModel("spot2", "resources/models/spot/spot_quadrangulated.obj");
 
   MeshManager::AddMesh("cube", Cube::Vertices, Cube::Indices);
   MeshManager::AddMesh("cube1024", Cube::Create(1024, 1024));
@@ -110,28 +115,72 @@ void Application::Run() {
   m_sceneManager.AddScene("Lighting One", std::make_unique<LightingOneScene>());
   m_sceneManager.AddScene("Model Viewer", std::make_unique<ModelViewerScene>());
   m_sceneManager.AddScene("Instancing 1", std::make_unique<InstancingScene>());
-
   m_sceneManager.SetActiveScene("Instancing 1");
 
-  double curr_time;
-  double last_time = glfwGetTime();
-  double delta_time;
-  while (!m_window.ShouldClose()) {
-    curr_time = glfwGetTime();
-    delta_time = curr_time - last_time;
-    last_time = curr_time;
-    // input
-    Input::Update();
-    // update
-    m_sceneManager.GetActiveScene()->Update(delta_time);
-    m_cameraController.Update(delta_time);
-    m_sceneManager.GetActiveScene()->PreRender();
+  auto vertices = Cube::Vertices;
+  // unsigned int buffer;
+  // glGenBuffers(1, &buffer);
+  // glBindBuffer(GL_ARRAY_BUFFER, buffer);
+  // glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), &model_matrices[0], GL_STATIC_DRAW);
+  constexpr int MatrixStartLoc = 3;
+  // vao.Bind();
+  // for (int i = 0; i < 4; i++) {
+  //   glVertexAttribPointer(i + MatrixStartLoc, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4),
+  //                         (void *)(i * sizeof(glm::vec4)));
+  //   glVertexAttribDivisor(i + MatrixStartLoc, 1);
+  // }
 
-    // render
-    if (m_settings.showImGui) ImGuiMenu::StartFrame(m_renderToImGuiViewport);
-    m_renderer.RenderScene(*m_sceneManager.GetActiveScene(), m_cameraController.GetActiveCamera());
-    if (m_settings.showImGui) OnImGui();
-    if (m_settings.showImGui) ImGuiMenu::EndFrame();
+  auto *shader = ShaderManager::GetShader("instancedDefault");
+  auto *camera = m_cameraController.GetActiveCamera();
+
+  auto *obj = MeshManager::GetMesh("cube");
+  // auto spot = ModelManager::CopyLoadedModel("spot");
+
+  obj->GetVAO().Bind();
+  // Location in GPU to store the vertices data
+  // Number of instances
+  unsigned int amount = 1000;
+  // Generate a buffer to store transformation matrices
+  unsigned int buffer;
+  glGenBuffers(1, &buffer);
+  // Specify the property of the buffer
+  glBindBuffer(GL_ARRAY_BUFFER, buffer);
+  // Matrices data
+
+  std::vector<glm::mat4> model_matrices(amount);
+  for (unsigned int i = 0; i < amount; i++) {
+    auto model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(i, i, i));
+    model_matrices[i] = model;
+  }
+
+  glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), model_matrices.data(), GL_STATIC_DRAW);
+
+  for (unsigned int i = 0; i < 4; i++) {
+    glEnableVertexAttribArray(MatrixStartLoc + i);
+    glVertexAttribPointer(MatrixStartLoc + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4),
+                          (const GLvoid *)(sizeof(glm::vec4) * i));
+    glVertexAttribDivisor(MatrixStartLoc + i, 1);
+  }
+
+  ///////////////////////////////////////////////////////////////////////////////////////////
+
+  while (!m_window.ShouldClose()) {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glEnable(GL_DEPTH_TEST);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    shader->Bind();
+    shader->SetMat4("u_VP", camera->GetVPMatrix());
+    glDrawElementsInstanced(GL_TRIANGLES, obj->NumIndices(), GL_UNSIGNED_INT, nullptr, amount);
+    // shader->SetMat4("u_VP", camera->GetVPMatrix());
+    // // shader->SetMat4("u_Model", glm::scale(glm::mat4(1.0), glm::vec3(10.0)));
+    // glBindBuffer(GL_ARRAY_BUFFER, buffer);
+    // vao.Bind();
+    // // glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr);
+    // glDrawElementsInstanced(GL_TRIANGLES, new_spot->NumIndices(), GL_UNSIGNED_INT, nullptr,
+    // amount);
+    Input::Update();
     m_window.SwapBuffers();
     GL_LOG_ERROR();
   }
@@ -349,6 +398,6 @@ void Application::LoadShaders() {
                             {GET_SHADER_PATH("singleColorStencil.frag"), ShaderType::Fragment}});
   ShaderManager::AddShader(
       "instancedDefault",
-      {{GET_SHADER_PATH("instancing/instanced.vert.glsl"), ShaderType::Vertex},
-       {GET_SHADER_PATH("instancing/instanced.frag.glsl"), ShaderType::Fragment}});
+      {{GET_SHADER_PATH("instancing/instancedTest.vert.glsl"), ShaderType::Vertex},
+       {GET_SHADER_PATH("instancing/instancedTest.frag.glsl"), ShaderType::Fragment}});
 }
