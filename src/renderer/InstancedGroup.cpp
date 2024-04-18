@@ -1,13 +1,9 @@
-#include "src/renderer/InstancedModelRenderer.hpp"
-
-#include <iostream>
+#include "src/renderer/InstancedGroup.hpp"
 
 #include "src/utils/HashedString.hpp"
 
-InstancedModelRenderer::InstancedModelRenderer(const Group* model,
-                                               const std::vector<glm::mat4>& model_matrices)
-    : m_model(model), m_num_instances(model_matrices.size()) {
-  std::cout << model->GetObjects()[0]->GetMesh() << "\n";
+InstancedGroup::InstancedGroup(const Group* group, const std::vector<glm::mat4>& model_matrices)
+    : m_model(group), m_num_instances(model_matrices.size()) {
   glGenBuffers(1, &m_matrix_buffer_id);
   glBindBuffer(GL_ARRAY_BUFFER, m_matrix_buffer_id);
   glBufferData(GL_ARRAY_BUFFER, model_matrices.size() * sizeof(glm::mat4), model_matrices.data(),
@@ -27,4 +23,4 @@ InstancedModelRenderer::InstancedModelRenderer(const Group* model,
   }
 }
 
-InstancedModelRenderer::~InstancedModelRenderer() { glDeleteBuffers(1, &m_matrix_buffer_id); }
+InstancedGroup::~InstancedGroup() { glDeleteBuffers(1, &m_matrix_buffer_id); }

@@ -9,7 +9,7 @@
 
 #include "src/camera/CameraController.hpp"
 #include "src/group/Group.hpp"
-#include "src/renderer/InstancedModelRenderer.hpp"
+#include "src/renderer/InstancedGroup.hpp"
 #include "src/renderer/Light.hpp"
 
 class Scene {
@@ -40,7 +40,7 @@ class Scene {
 
   glm::vec3 defaultCameraPosition;
   CameraController::Mode defaultCameraMode;
-  std::vector<std::unique_ptr<InstancedModelRenderer>> m_instanced_model_renderers;
+  std::vector<std::unique_ptr<InstancedGroup>> m_instanced_model_renderers;
 
  protected:
   void AddGroup(std::unique_ptr<Group> group);

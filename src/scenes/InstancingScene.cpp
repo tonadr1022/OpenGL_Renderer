@@ -73,7 +73,7 @@ InstancingScene::InstancingScene() : Scene({50, 50, 50}, "Sky 1", CameraControll
   // }
   m_instanced_models.push_back(std::move(new_spot));
   m_instanced_model_renderers.emplace_back(
-      std::make_unique<InstancedModelRenderer>(m_instanced_models[0].get(), m_model_matrices));
+      std::make_unique<InstancedGroup>(m_instanced_models[0].get(), m_model_matrices));
 
   glm::vec3 directional_dir = {0.4f, -0.7f, -0.7f};
   m_directionalLight = std::make_unique<DirectionalLight>(directional_dir);

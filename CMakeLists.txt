@@ -47,7 +47,6 @@ add_executable(
   src/camera/OrbitCamera.cpp
   src/gl/FrameBuffer.cpp
   src/gl/Texture.cpp
-  src/renderer/Material.cpp
   src/group/Object.cpp
   src/group/Transform.cpp
   src/resource/ShaderManager.cpp
@@ -57,7 +56,7 @@ add_executable(
   src/resource/MeshManager.cpp
   src/resource/TextureManager.cpp
   src/scenes/InstancingScene.cpp
-  src/renderer/InstancedModelRenderer.cpp
+  src/renderer/InstancedGroup.cpp
   src/camera/Camera.cpp
   src/gl/RenderBuffer.cpp
   src/scenes/SceneManager.cpp
