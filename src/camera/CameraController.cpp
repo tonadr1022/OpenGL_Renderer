@@ -17,7 +17,7 @@ void CameraController::SetAspectRatio(float aspectRatio) {
 }
 
 CameraController::CameraController(const Window &window)
-  : m_focused(false), m_mode(DefaultMode), m_activeCamera(nullptr), m_window(window) {
+    : m_focused(false), m_mode(DefaultMode), m_activeCamera(nullptr), m_window(window) {
   m_orbitCamera = std::make_unique<OrbitCamera>(window.GetAspectRatio());
   m_fpsCamera = std::make_unique<FPSCamera>(window.GetAspectRatio());
   SetMode(DefaultMode);
@@ -37,7 +37,7 @@ void CameraController::SetMode(CameraController::Mode mode) {
 
 void CameraController::Update(double dt) {
   if (Input::IsKeyPressed(GLFW_KEY_TAB) || Input::IsKeyPressed(GLFW_KEY_BACKSLASH) ||
-    Input::IsKeyPressed(GLFW_KEY_ESCAPE)) {
+      Input::IsKeyPressed(GLFW_KEY_ESCAPE)) {
     if (m_focused) {
       Unfocus();
     } else {
@@ -102,7 +102,7 @@ void CameraController::Focus() {
   if (!m_focused) {
     m_focused = true;
     if (m_mode == Mode::FPS) {
-      // Input::SetCursorVisible(false);
+      Input::SetCursorVisible(false);
       Input::CenterCursor();
     }
   }

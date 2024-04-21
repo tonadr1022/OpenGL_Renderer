@@ -56,6 +56,8 @@ void Application::SetupResources() {
   ModelManager::LoadModel("sponza", "resources/models/sponza/sponza.obj");
   ModelManager::LoadModel("spot", "resources/models/spot/spot_quadrangulated.obj");
   ModelManager::LoadModel("spot2", "resources/models/spot/spot_quadrangulated.obj");
+  ModelManager::LoadModel("dragon", "resources/models/dragon/dragon.obj");
+  ModelManager::LoadModel("learn_opengl_rock", "resources/models/rock/rock.obj");
 
   MeshManager::AddMesh("cube", Cube::Vertices, Cube::Indices);
   MeshManager::AddMesh("cube1024", Cube::Create(1024, 1024));
@@ -108,7 +110,8 @@ void Application::SetupResources() {
 
   std::vector<TexturePair> wood_container_textures = {
       {MatTextureType::Diffuse, TextureManager::GetTexture("woodContainerDiffuse")},
-      {MatTextureType::Specular, TextureManager::GetTexture("woodContainerDiffuse")}};
+      {MatTextureType::Specular, TextureManager::GetTexture("woodContainerSpecular")},
+      {MatTextureType::Emission, TextureManager::GetTexture("woodContainerEmission")}};
   MaterialManager::AddMaterial("woodContainer", wood_container_textures,
                                Material::Type::BlinnPhong);
 }

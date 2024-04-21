@@ -55,8 +55,8 @@ struct DirectionalLight {
 struct PointLight {
     LightBase base;
     vec3 position;
-//    float linear;
-//    float quadratic;
+    //    float linear;
+    //    float quadratic;
     float radius;
 };
 
@@ -65,8 +65,8 @@ struct SpotLight {
     vec3 position;
     vec3 direction;
     float radius;
-//    float linear;
-//    float quadratic;
+    //    float linear;
+    //    float quadratic;
     float innerCutoff;
     float outerCutoff;
 };
@@ -91,7 +91,7 @@ uniform bool hasEmissionMap;
 
 uniform vec3 u_ViewPos;
 
-uniform int renderMode;// 0 normal, 1 normals
+uniform int renderMode; // 0 normal, 1 normals
 uniform bool useBlinn;
 
 uniform bool reflective;
@@ -182,7 +182,7 @@ vec4 calcTotalLight() {
 }
 
 float linearizeDepth(float depth) {
-    float z = depth * 2.0 - 1.0;// 0,1 to NDC
+    float z = depth * 2.0 - 1.0; // 0,1 to NDC
     // inverse projection transformation
     return (2.0 * near * far) / (far + near - z * (far - near));
 }
@@ -211,7 +211,6 @@ void main() {
         } else {
             FragColor = color;
         }
-
     } else if (renderMode == 1) {
         FragColor = vec4(normalize(Normal) * 0.5 + 0.5, 1.0);
     } else if (renderMode == 2) {

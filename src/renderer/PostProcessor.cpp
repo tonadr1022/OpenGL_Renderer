@@ -28,6 +28,9 @@ void PostProcessor::Init(uint32_t width, uint32_t height) {
     shader->SetVec4("u_ColorChannels", uniforms.colorChannels);
   };
 
+  m_effects.emplace_back(PostProcessingEffectType::Cel, makeFBOContainer(width, height),
+                         []() { ShaderManager::GetShader("cel")->Bind(); });
+
   m_effects.emplace_back(PostProcessingEffectType::Contrast, makeFBOContainer(width, height),
                          contrast_func);
   m_effects.emplace_back(PostProcessingEffectType::Invert, makeFBOContainer(width, height),
@@ -111,6 +114,10 @@ void PostProcessor::LoadShaders() {
   ShaderManager::AddShader(
       "grayscale", {{GET_SHADER_PATH("quad.vert.glsl"), ShaderType::Vertex},
                     {GET_SHADER_PATH("postprocessing/grayscale.frag.glsl"), ShaderType::Fragment}});
+
+  ShaderManager::AddShader(
+      "cel", {{GET_SHADER_PATH("quad.vert.glsl"), ShaderType::Vertex},
+              {GET_SHADER_PATH("postprocessing/celShade.frag.glsl"), ShaderType::Fragment}});
 
   ShaderManager::AddShader("quad", {{GET_SHADER_PATH("quad.vert.glsl"), ShaderType::Vertex},
                                     {GET_SHADER_PATH("quad.frag.glsl"), ShaderType::Fragment}});

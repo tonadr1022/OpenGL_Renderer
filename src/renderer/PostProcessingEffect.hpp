@@ -14,6 +14,7 @@ enum class PostProcessingEffectType {
   Grayscale,
   ColorChannel,
   GaussianBlur,
+  Cel,
   Count
 };
 
@@ -29,6 +30,8 @@ static constexpr const char* PostProcessingEffectTypeToString(PostProcessingEffe
       return "Gaussian Blue";
     case PostProcessingEffectType::ColorChannel:
       return "Color Channel";
+    case PostProcessingEffectType::Cel:
+      return "Cel";
     default:
       return "None";
   }

@@ -11,36 +11,25 @@
 
 ModelViewerScene::ModelViewerScene() : Scene({50, 50, 50}, "Sky 1", CameraController::Mode::Orbit) {
   m_skyboxNames = {"Sky 1", "Sky 2", "Church", "Winter"};
+  std::vector<std::pair<HashedString, float>> names_scales = {
+      {"teapot", 0.1}, {"sponza", 0.1}, {"spot", 10},
+      {"dragon", 1},   {"backpack", 1}, {"learn_opengl_rock", 1}};
+  for (const auto& pair : names_scales) {
+    auto obj = ModelManager::CopyLoadedModel(pair.first);
+    obj->transform.SetScale(glm::vec3(pair.second));
+    m_modelSelectMap.emplace(pair.first, obj.get());
+    m_groups.push_back(std::move(obj));
+  }
 
-  auto backpack = ModelManager::CopyLoadedModel("backpack");
-  auto teapot = ModelManager::CopyLoadedModel("teapot");
-  auto sponza = ModelManager::CopyLoadedModel("sponza");
-  sponza->transform.SetScale(glm::vec3{0.1, 0.1, 0.1});
-  auto spot = ModelManager::CopyLoadedModel("spot2");
-
-  m_modelSelectMap.emplace("Backpack", backpack.get());
-  m_groups.push_back(std::move(backpack));
-
-  m_modelSelectMap.emplace("Teapot", teapot.get());
   auto* oak_mat = MaterialManager::GetMaterial("oak");
-  teapot->transform.SetScale(glm::vec3(1.0));
-  for (const auto& obj : teapot->GetObjects()) {
+  for (const auto& obj : m_modelSelectMap.at("teapot")->GetObjects()) {
     obj->SetMaterial(oak_mat);
   }
-  m_groups.push_back(std::move(teapot));
-
-  m_modelSelectMap.emplace("Sponza", sponza.get());
-  m_groups.push_back(std::move(sponza));
-
-  m_modelSelectMap.emplace("Spot", spot.get());
-  spot->transform.SetScale(glm::vec3(10));
 
   auto* spot_mat = MaterialManager::GetMaterial("spotTextured");
-  for (const auto& obj : spot->GetObjects()) {
+  for (const auto& obj : m_modelSelectMap.at("spot")->GetObjects()) {
     obj->SetMaterial(spot_mat);
   }
-
-  m_groups.push_back(std::move(spot));
 
   // Lights
   glm::vec3 directional_dir = {0.4f, -0.7f, -0.7f};
@@ -51,9 +40,9 @@ ModelViewerScene::ModelViewerScene() : Scene({50, 50, 50}, "Sky 1", CameraContro
   for (auto& group : m_groups) {
     group->visible = false;
   }
-  m_visibleModel = m_modelSelectMap.find("Spot")->second;
+  m_visibleModel = m_modelSelectMap.find("spot")->second;
   m_visibleModel->visible = true;
-  m_activeModelName = "Spot";
+  m_activeModelName = "spot";
 }
 
 void ModelViewerScene::Update(double dt) { Scene::Update(dt); }

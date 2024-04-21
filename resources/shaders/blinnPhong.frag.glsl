@@ -43,8 +43,8 @@ struct DirectionalLight {
 struct PointLight {
     LightBase base;
     vec3 position;
-//    float linear;
-//    float quadratic;
+    //    float linear;
+    //    float quadratic;
     float radius;
 };
 
@@ -53,8 +53,8 @@ struct SpotLight {
     vec3 position;
     vec3 direction;
     float radius;
-//    float linear;
-//    float quadratic;
+    //    float linear;
+    //    float quadratic;
     float innerCutoff;
     float outerCutoff;
 };
@@ -77,14 +77,11 @@ uniform bool hasDiffuseMap;
 uniform bool hasSpecularMap;
 uniform bool hasEmissionMap;
 
-
 uniform vec3 u_ViewPos;
 
-uniform int renderMode;// 0 normal, 1 normals
+uniform int renderMode; // 0 normal, 1 normals
 uniform bool useBlinn;
 uniform bool reflective;
-
-
 
 vec4 calcLightColor(LightBase light, vec3 lightDir, vec3 norm) {
     vec4 diffuseColor = hasDiffuseMap ? texture(materialMaps.diffuseMap, TexCoord) : vec4(material.diffuse, 1.0);
@@ -92,6 +89,7 @@ vec4 calcLightColor(LightBase light, vec3 lightDir, vec3 norm) {
         discard;
     }
     vec4 specularColor = hasSpecularMap ? texture(materialMaps.specularMap, TexCoord) : vec4(material.specular, 1.0);
+    // vec4 specularColor = hasSpecularMap ? vec4(1.0, 0.0, 0.0, 1.0) : vec4(material.specular, 1.0);
 
     // ambient
     vec4 ambientColor = hasDiffuseMap ? diffuseColor : vec4(material.ambient, 1.0);
@@ -111,7 +109,7 @@ vec4 calcLightColor(LightBase light, vec3 lightDir, vec3 norm) {
         vec3 reflectDir = reflect(-lightDir, norm);
         spec = pow(max(dot(viewDir, reflectDir), 0), material.shininess);
     }
-    vec4 specular =  vec4(light.color, 1.0) * light.specularIntensity * spec * specularColor;
+    vec4 specular = vec4(light.color, 1.0) * light.specularIntensity * spec * specularColor;
 
     return ambient + diffuse + specular;
 }
@@ -120,9 +118,8 @@ float attenuate(vec3 lightPos, float lightRadius) {
     //    float distToLight = length(lightPos - FragPos);
     vec3 toLight = lightPos - FragPos;
     float distToLightSq = dot(toLight, toLight);
-    return clamp(1.0 - distToLightSq/(lightRadius*lightRadius), 0.0, 1.0);
+    return clamp(1.0 - distToLightSq / (lightRadius * lightRadius), 0.0, 1.0);
     //        return 1.0 / (1 + 0.09 * distToLight + 0.032 * distToLight * distToLight);
-
 }
 
 vec4 calcDirectionalLight(DirectionalLight light, vec3 norm) {
@@ -173,7 +170,7 @@ vec4 calcTotalLight() {
 }
 
 float linearizeDepth(float depth) {
-    float z = depth * 2.0 - 1.0;// 0,1 to NDC
+    float z = depth * 2.0 - 1.0; // 0,1 to NDC
     // inverse projection transformation
     return (2.0 * near * far) / (far + near - z * (far - near));
 }
@@ -181,11 +178,13 @@ float linearizeDepth(float depth) {
 void main() {
     if (renderMode == 0) {
         vec4 totalLight = calcTotalLight();
+        // vec4 totalLight = vec4(1.0);
         // emission
         vec3 emission = vec3(0.0);
         if (hasEmissionMap) {
             emission = texture(materialMaps.emissionMap, TexCoord).rgb;
         }
+
         vec4 color = totalLight + vec4(emission, 1.0);
         if (color.a < 0.1) {
             discard;
@@ -200,11 +199,8 @@ void main() {
         } else {
             FragColor = color;
         }
-
-
-
     } else if (renderMode == 1) {
-        FragColor = vec4(normalize(Normal)*0.5 + 0.5, 1.0);
+        FragColor = vec4(normalize(Normal) * 0.5 + 0.5, 1.0);
     } else if (renderMode == 2) {
         vec4 color = hasDiffuseMap ? texture(materialMaps.diffuseMap, TexCoord) : vec4(material.diffuse, 1.0);
         if (color.a < 1.0) {
@@ -217,5 +213,4 @@ void main() {
     } else {
         FragColor = vec4(1.0);
     }
-
 }
