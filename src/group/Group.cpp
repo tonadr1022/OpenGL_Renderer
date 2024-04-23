@@ -18,23 +18,13 @@ void Group::RemoveObject(const Object* object) {
     i++;
   }
 }
+void Group::SetMaterial(Material* material) {
+  for (const auto& obj : m_objects) {
+    obj->SetMaterial(material);
+  }
+}
 
 void Group::UpdateTransforms() {
-  //  if (transform.IsDirty()) {
-  //    transform.UpdateModelMatrix();
-  //    auto& modelMatrix = transform.GetModelMatrix();
-  //    for (auto& obj : m_objects) {
-  //      obj->transform.UpdateModelMatrix(modelMatrix, true);
-  //    }
-  //  } else {
-  //    auto& modelMatrix = transform.GetModelMatrix();
-  //    for (auto& obj : m_objects) {
-  //      if (obj->transform.IsDirty()) {
-  //        obj->transform.UpdateModelMatrix(modelMatrix, false);
-  //      }
-  //    }
-  //  }
-
   bool parent_dirtyy = transform.IsDirty();
   transform.UpdateModelMatrix();
   const auto& model_matrix = transform.GetModelMatrix();

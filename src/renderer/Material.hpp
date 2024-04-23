@@ -76,7 +76,12 @@ struct Material {
       : name(name), textures(textures), type(type), shaderName("") {}
 
   Material(HashedString name, const glm::vec3& color, Type type)
-      : name(name), type(type), shaderName("") {}
+      : name(name),
+        type(type),
+        shaderName(""),
+        specularColor(color),
+        diffuseColor(color),
+        ambientColor(color) {}
 
   Material(HashedString name, HashedString shaderName, Type type)
       : name(name), type(type), shaderName(shaderName) {}

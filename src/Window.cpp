@@ -47,7 +47,7 @@ void Window::Init_Glfw() {
   //  m_windowWidth = videoMode->width / 2;
   //  m_windowHeight = videoMode->height / 2;
 
-  m_window = glfwCreateWindow(1600, 900, "OpenGL Renderer", nullptr, nullptr);
+  m_window = glfwCreateWindow(800, 600, "OpenGL Renderer", nullptr, nullptr);
   // m_window = glfwCreateWindow(800, 600, "OpenGL Renderer", nullptr, nullptr);
 
   if (!m_window) {

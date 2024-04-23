@@ -10,10 +10,9 @@ class LightingOneScene : public Scene {
  public:
   LightingOneScene();
   void Update(double dt) override;
-  void OnImGui() override;
 
  private:
-  std::vector<Object*> m_cubes;
+  std::vector<Group*> m_rotate_objs;
   std::vector<Group*> m_spots;
 };
 

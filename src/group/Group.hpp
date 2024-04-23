@@ -19,6 +19,7 @@ class Group {
   explicit Group(bool backFaceCull = true);
   void AddObject(std::unique_ptr<Object> object);
   void RemoveObject(const Object* object);
+  void SetMaterial(Material* material);
 
   Group(Group& other) {
     this->backFaceCull = other.backFaceCull;

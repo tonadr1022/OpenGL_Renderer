@@ -45,8 +45,6 @@ Application::Application()
 
   m_cameraController.SetAspectRatio(m_window.GetAspectRatio());
   m_renderer.Init();
-
-  if (!m_renderToImGuiViewport) m_cameraController.Focus();
 }
 
 void Application::SetupResources() {
@@ -112,6 +110,9 @@ void Application::SetupResources() {
       {MatTextureType::Diffuse, TextureManager::GetTexture("woodContainerDiffuse")},
       {MatTextureType::Specular, TextureManager::GetTexture("woodContainerSpecular")},
       {MatTextureType::Emission, TextureManager::GetTexture("woodContainerEmission")}};
+  MaterialManager::AddMaterial("woodContainerEmission", wood_container_textures,
+                               Material::Type::BlinnPhong);
+  wood_container_textures.pop_back();
   MaterialManager::AddMaterial("woodContainer", wood_container_textures,
                                Material::Type::BlinnPhong);
 }

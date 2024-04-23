@@ -178,7 +178,7 @@ float linearizeDepth(float depth) {
 void main() {
     if (renderMode == 0) {
         vec4 totalLight = calcTotalLight();
-        // vec4 totalLight = vec4(1.0);
+
         // emission
         vec3 emission = vec3(0.0);
         if (hasEmissionMap) {

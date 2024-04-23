@@ -172,21 +172,14 @@ void Renderer::RenderGroup(const Group &group) {
     glDisable(GL_CULL_FACE);
   }
 
-  for (auto &&object : group.GetObjects()) {
+  for (const auto &object : group.GetObjects()) {
     if (!object->shouldDraw) continue;
     const auto *mesh = object->GetMesh();
-    GL_LOG_ERROR();
     UpdateRenderState(*object);
-    GL_LOG_ERROR();
     m_state.boundShader->SetBool("reflective", group.reflective);
     mesh->GetVAO().Bind();
-    GL_LOG_ERROR();
     m_state.boundShader->SetMat4("u_Model", object->transform.GetModelMatrix());
-    GL_LOG_ERROR();
     mesh->Draw();
-    GL_LOG_ERROR();
-    // glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mesh->NumIndices()), GL_UNSIGNED_INT,
-    //                nullptr);
     IncStats(mesh->NumVertices(), mesh->NumIndices());
   }
 
@@ -208,8 +201,6 @@ void Renderer::RenderGroup(const Group &group) {
       mesh->GetVAO().Bind();
       m_state.boundShader->SetMat4("u_Model", object->transform.GetModelMatrix());
       mesh->Draw();
-      // glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mesh->NumIndices()), GL_UNSIGNED_INT,
-      //                nullptr);
       IncStats(mesh->NumVertices(), mesh->NumIndices());
     }
     // reset stencil buffer state
@@ -241,6 +232,7 @@ void Renderer::RenderScene(const Scene &scene, Camera *camera) {
 
   GL_LOG_ERROR();
   // regular objects
+
   for (const auto &group : scene.GetGroups()) {
     RenderGroup(*group);
   }
